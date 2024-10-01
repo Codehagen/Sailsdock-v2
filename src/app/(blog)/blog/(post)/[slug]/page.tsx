@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { title, seoTitle, summary, seoDescription, image } = post;
 
   return constructMetadata({
-    title: `${seoTitle || title} – Propwrite`,
+    title: `${seoTitle || title} – Sailsdock`,
     description: seoDescription || summary,
     image,
   });

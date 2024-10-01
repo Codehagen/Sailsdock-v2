@@ -13,7 +13,7 @@ const ease = [0.16, 1, 0.3, 1];
 function HeroPill() {
   return (
     <motion.a
-      href="/blog/introducing-propwrite"
+      href="/blog/introducing-Sailsdock"
       className="flex w-auto items-center space-x-2 rounded-full bg-primary/20 px-2 py-1 ring-1 ring-accent whitespace-pre"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -69,7 +69,7 @@ function HeroTitles() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease }}
         >
-          with Propwrite
+          with Sailsdock
         </motion.span>
       </motion.h1>
       <motion.p
@@ -143,7 +143,7 @@ function HeroImage() {
         animationStyle="from-center"
         videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
         thumbnailSrc="/dashboard.png"
-        thumbnailAlt="Propwrite Knowledge Center Dashboard"
+        thumbnailAlt="Sailsdock Knowledge Center Dashboard"
         className="border rounded-lg shadow-lg max-w-screen-lg mt-16"
       />
     </motion.div>

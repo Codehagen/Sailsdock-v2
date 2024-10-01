@@ -32,7 +32,7 @@ const data = [
 export default function Component() {
   return (
     <Section
-      title="How Propwrite Works"
+      title="How Sailsdock Works"
       subtitle="Create your help center and blog in 3 simple steps"
     >
       <Features data={data} />

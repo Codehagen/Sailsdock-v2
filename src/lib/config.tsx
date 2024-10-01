@@ -6,7 +6,7 @@ import { RiInstagramFill } from "react-icons/ri";
 export const BLUR_FADE_DELAY = 0.15;
 
 export const siteConfig = {
-  name: "Propwrite",
+  name: "Sailsdock",
   description: "Modern help center and blog platform",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   keywords: [
@@ -17,11 +17,11 @@ export const siteConfig = {
     "Customer Support",
   ],
   links: {
-    email: "support@propwrite.com",
-    twitter: "https://twitter.com/propwrite",
-    discord: "https://discord.gg/propwrite",
-    github: "https://github.com/propwrite",
-    instagram: "https://instagram.com/propwrite/",
+    email: "support@Sailsdock.com",
+    twitter: "https://twitter.com/Sailsdock",
+    discord: "https://discord.gg/Sailsdock",
+    github: "https://github.com/Sailsdock",
+    instagram: "https://instagram.com/Sailsdock/",
   },
   header: [
     {
@@ -77,7 +77,7 @@ export const siteConfig = {
           {
             title: "For Developers",
             href: "#",
-            description: "Integrate Propwrite's platform into your tech stack.",
+            description: "Integrate Sailsdock's platform into your tech stack.",
           },
         ],
       },
@@ -146,20 +146,20 @@ export const siteConfig = {
   ],
   faqs: [
     {
-      question: "What is Propwrite?",
+      question: "What is Sailsdock?",
       answer: (
         <span>
-          Propwrite is a modern platform for creating and managing help centers
+          Sailsdock is a modern platform for creating and managing help centers
           and blogs. It provides intuitive tools and services to streamline your
           knowledge base and content management.
         </span>
       ),
     },
     {
-      question: "How can I get started with Propwrite?",
+      question: "How can I get started with Sailsdock?",
       answer: (
         <span>
-          You can get started with Propwrite by signing up for an account on our
+          You can get started with Sailsdock by signing up for an account on our
           website, choosing a template, and following our quick-start guide. We
           offer tutorials and documentation to help you along the way.
         </span>
@@ -169,17 +169,17 @@ export const siteConfig = {
       question: "Can I customize the look of my help center?",
       answer: (
         <span>
-          Yes, Propwrite offers extensive customization options. You can adjust
+          Yes, Sailsdock offers extensive customization options. You can adjust
           colors, fonts, and layouts to match your brand identity. Our Pro and
           Enterprise plans offer even more advanced customization features.
         </span>
       ),
     },
     {
-      question: "Is Propwrite suitable for non-technical users?",
+      question: "Is Sailsdock suitable for non-technical users?",
       answer: (
         <span>
-          Absolutely! Propwrite is designed to be user-friendly for both
+          Absolutely! Sailsdock is designed to be user-friendly for both
           technical and non-technical users. Our intuitive interface and
           pre-built templates make it easy for anyone to create and manage a
           professional help center or blog.
@@ -187,10 +187,10 @@ export const siteConfig = {
       ),
     },
     {
-      question: "What kind of support does Propwrite provide?",
+      question: "What kind of support does Sailsdock provide?",
       answer: (
         <span>
-          Propwrite provides comprehensive support including documentation,
+          Sailsdock provides comprehensive support including documentation,
           video tutorials, a community forum, and dedicated customer support. We
           also offer premium support plans for enterprises with more complex
           needs.

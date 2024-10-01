@@ -25,7 +25,7 @@ export const BLOG_CATEGORIES: {
   {
     title: "Company News",
     slug: "company",
-    description: "Updates and announcements from Propwrite.",
+    description: "Updates and announcements from Sailsdock.",
   },
   // {
   //   title: "Education",
@@ -56,45 +56,45 @@ export const HELP_CATEGORIES: {
   icon: JSX.Element;
 }[] = [
   {
-    title: "Propwrite Overview",
+    title: "Sailsdock Overview",
     slug: "overview",
-    description: "Learn about Propwrite and how it can help you.",
+    description: "Learn about Sailsdock and how it can help you.",
     icon: <Settings className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "Getting Started",
     slug: "getting-started",
-    description: "Learn how to get started with Propwrite.",
+    description: "Learn how to get started with Sailsdock.",
     icon: <Settings className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "Link Management",
     slug: "link-management",
-    description: "Learn how to manage your links on Propwrite.",
+    description: "Learn how to manage your links on Sailsdock.",
     icon: <Link2 className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "Custom Domains",
     slug: "custom-domains",
-    description: "Learn how to use custom domains with Propwrite.",
+    description: "Learn how to use custom domains with Sailsdock.",
     icon: <Globe className="h-6 w-6 text-gray-500" />,
   },
   {
-    title: "Migrating to Propwrite",
+    title: "Migrating to Sailsdock",
     slug: "migrating",
-    description: "Easily migrate to Propwrite from other services.",
+    description: "Easily migrate to Sailsdock from other services.",
     icon: <Import className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "SAML SSO",
     slug: "saml-sso",
-    description: "Secure your Propwrite project with SAML SSO.",
+    description: "Secure your Sailsdock project with SAML SSO.",
     icon: <Lock className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "API",
     slug: "api",
-    description: "Learn how to use the Propwrite API.",
+    description: "Learn how to use the Sailsdock API.",
     icon: <Webhook className="h-6 w-6 text-gray-500" />,
   },
 ];
