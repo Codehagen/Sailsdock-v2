@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -22,27 +23,29 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://rsms.me/" />
-        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-      </head>
-      <body
-        className={cn(
-          "min-h-screen bg-background antialiased w-full mx-auto scroll-smooth"
-        )}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <link rel="preconnect" href="https://rsms.me/" />
+          <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        </head>
+        <body
+          className={cn(
+            "min-h-screen bg-background antialiased w-full mx-auto scroll-smooth"
+          )}
         >
-          {children}
-          <ThemeToggle />
-          <Toaster />
-          <TailwindIndicator />
-        </ThemeProvider>
-      </body>
-    </html>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+          >
+            {children}
+            <ThemeToggle />
+            <Toaster />
+            <TailwindIndicator />
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

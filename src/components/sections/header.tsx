@@ -7,10 +7,15 @@ import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { UserButton } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Header() {
   const [addBorder, setAddBorder] = useState(false);
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,6 +32,18 @@ export default function Header() {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+  const handleSignIn = () => {
+    router.push("/sign-in");
+  };
+
+  const handleSignUp = () => {
+    router.push("/sign-up");
+  };
+
+  const handleDashboard = () => {
+    router.push("/dashboard");
+  };
 
   return (
     <header
@@ -51,22 +68,36 @@ export default function Header() {
             </nav>
 
             <div className="gap-2 flex">
-              <Link
-                href="/login"
-                className={buttonVariants({ variant: "outline" })}
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "w-full sm:w-auto text-background flex gap-2"
-                )}
-              >
-                <Icons.logo className="h-6 w-6" />
-                Prøv gratis
-              </Link>
+              {isSignedIn ? (
+                <>
+                  <button
+                    onClick={handleDashboard}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Dashboard
+                  </button>
+                  <UserButton afterSignOutUrl="/" />
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleSignIn}
+                    className={buttonVariants({ variant: "outline" })}
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={handleSignUp}
+                    className={cn(
+                      buttonVariants({ variant: "default" }),
+                      "w-full sm:w-auto text-background flex gap-2"
+                    )}
+                  >
+                    <Icons.logo className="h-6 w-6" />
+                    Prøv gratis
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
