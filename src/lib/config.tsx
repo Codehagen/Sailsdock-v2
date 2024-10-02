@@ -7,21 +7,21 @@ export const BLUR_FADE_DELAY = 0.15;
 
 export const siteConfig = {
   name: "Sailsdock",
-  description: "Modern help center and blog platform",
+  description: "Moderne CRM og kundeoppfølgingsplattform",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   keywords: [
-    "Help Center",
-    "Knowledge Base",
-    "Blog Platform",
-    "Documentation",
-    "Customer Support",
+    "CRM",
+    "Kundeoppfølging",
+    "Lead-generering",
+    "Bedriftsdatabase",
+    "Kundestøtte",
   ],
   links: {
-    email: "support@Sailsdock.com",
-    twitter: "https://twitter.com/Sailsdock",
-    discord: "https://discord.gg/Sailsdock",
-    github: "https://github.com/Sailsdock",
-    instagram: "https://instagram.com/Sailsdock/",
+    email: "support@sailsdock.no",
+    twitter: "https://twitter.com/sailsdock",
+    discord: "https://discord.gg/sailsdock",
+    github: "https://github.com/sailsdock",
+    instagram: "https://instagram.com/sailsdock/",
   },
   header: [
     {
@@ -29,206 +29,208 @@ export const siteConfig = {
       content: {
         main: {
           icon: <Icons.logo className="h-6 w-6" />,
-          title: "Comprehensive Help Center Solutions",
+          title: "Omfattende CRM-løsninger",
           description:
-            "Create, manage, and optimize your help center and blog with ease.",
+            "Finn, følg opp og analyser kunder med vår innovative plattform.",
           href: "#",
         },
         items: [
           {
             href: "#",
-            title: "Quick Setup",
+            title: "Rask Oppstart",
             description:
-              "Launch your help center in minutes with intuitive templates.",
+              "Kom i gang med kundeoppfølging på minutter med våre intuitive maler.",
           },
           {
             href: "#",
-            title: "Content Management",
-            description: "Easily organize and update your knowledge base.",
+            title: "Kundehåndtering",
+            description: "Organiser og oppdater kundeinformasjon enkelt.",
           },
           {
             href: "#",
-            title: "Advanced Search",
+            title: "Avansert Søk",
             description:
-              "Powerful search capabilities for user-friendly navigation.",
+              "Kraftige søkemuligheter for brukervennlig navigasjon i kundedata.",
           },
         ],
       },
     },
     {
-      trigger: "Solutions",
+      trigger: "Løsninger",
       content: {
         items: [
           {
             title: "For Startups",
             href: "#",
-            description: "Establish a professional help center from day one.",
+            description: "Etabler profesjonell kundeoppfølging fra dag én.",
           },
           {
-            title: "For Growing Businesses",
+            title: "For Voksende Bedrifter",
             href: "#",
-            description: "Scale your support as your business expands.",
+            description:
+              "Skaler din kundeoppfølging etter hvert som bedriften vokser.",
           },
           {
-            title: "For Enterprises",
+            title: "For Større Selskaper",
             href: "#",
-            description: "Manage complex knowledge bases with ease.",
+            description: "Håndter komplekse kundeforhold med letthet.",
           },
           {
-            title: "For Developers",
+            title: "For Utviklere",
             href: "#",
-            description: "Integrate Sailsdock's platform into your tech stack.",
+            description: "Integrer Sailsdocks plattform i din teknologistack.",
           },
         ],
       },
     },
     {
       href: "/blog",
-      label: "Blog",
+      label: "Blogg",
     },
     {
       href: "/help",
-      label: "Help",
+      label: "Hjelp",
     },
   ],
   pricing: [
     {
       name: "BASIC",
       href: "#",
-      price: "$19",
-      period: "month",
-      yearlyPrice: "$16",
+      price: "199 kr",
+      period: "måned",
+      yearlyPrice: "169 kr",
       features: [
-        "1 Help Center",
-        "5GB Storage",
-        "Basic Support",
-        "Limited Customization",
-        "Standard Analytics",
+        "1 CRM-bruker",
+        "5GB Lagring",
+        "Grunnleggende Støtte",
+        "Begrenset Tilpasning",
+        "Standard Analyser",
       ],
-      description: "Perfect for small teams and startups",
-      buttonText: "Get Started",
+      description: "Perfekt for små team og startups",
+      buttonText: "Kom i gang",
       isPopular: false,
     },
     {
       name: "PRO",
       href: "#",
-      price: "$49",
-      period: "month",
-      yearlyPrice: "$40",
+      price: "499 kr",
+      period: "måned",
+      yearlyPrice: "399 kr",
       features: [
-        "3 Help Centers",
-        "50GB Storage",
-        "Priority Support",
-        "Advanced Customization",
-        "Advanced Analytics",
+        "3 CRM-brukere",
+        "50GB Lagring",
+        "Prioritert Støtte",
+        "Avansert Tilpasning",
+        "Avanserte Analyser",
       ],
-      description: "Ideal for growing businesses and teams",
-      buttonText: "Get Started",
+      description: "Ideell for voksende bedrifter og team",
+      buttonText: "Kom i gang",
       isPopular: true,
     },
     {
       name: "ENTERPRISE",
       href: "#",
-      price: "Custom",
-      period: "month",
-      yearlyPrice: "Custom",
+      price: "Tilpasset",
+      period: "måned",
+      yearlyPrice: "Tilpasset",
       features: [
-        "Unlimited Help Centers",
-        "Unlimited Storage",
-        "24/7 Premium Support",
-        "Full Customization",
-        "AI-Powered Insights",
+        "Ubegrenset antall brukere",
+        "Ubegrenset Lagring",
+        "24/7 Premium Støtte",
+        "Full Tilpasning",
+        "AI-drevne Innsikter",
       ],
-      description: "For large-scale operations and high-volume support",
-      buttonText: "Contact Sales",
+      description: "For storskala operasjoner og høyvolum kundeoppfølging",
+      buttonText: "Kontakt Salg",
       isPopular: false,
     },
   ],
   faqs: [
     {
-      question: "What is Sailsdock?",
+      question: "Hva er Sailsdock?",
       answer: (
         <span>
-          Sailsdock is a modern platform for creating and managing help centers
-          and blogs. It provides intuitive tools and services to streamline your
-          knowledge base and content management.
+          Sailsdock er en moderne plattform for kundeoppfølging og CRM. Den
+          tilbyr intuitive verktøy og tjenester for å effektivisere din
+          kundehåndtering og lead-generering.
         </span>
       ),
     },
     {
-      question: "How can I get started with Sailsdock?",
+      question: "Hvordan kommer jeg i gang med Sailsdock?",
       answer: (
         <span>
-          You can get started with Sailsdock by signing up for an account on our
-          website, choosing a template, and following our quick-start guide. We
-          offer tutorials and documentation to help you along the way.
+          Du kan komme i gang med Sailsdock ved å registrere en konto på vår
+          nettside, velge en mal, og følge vår hurtigstartsguide. Vi tilbyr
+          veiledninger og dokumentasjon for å hjelpe deg underveis.
         </span>
       ),
     },
     {
-      question: "Can I customize the look of my help center?",
+      question: "Kan jeg tilpasse utseendet på min CRM?",
       answer: (
         <span>
-          Yes, Sailsdock offers extensive customization options. You can adjust
-          colors, fonts, and layouts to match your brand identity. Our Pro and
-          Enterprise plans offer even more advanced customization features.
+          Ja, Sailsdock tilbyr omfattende tilpasningsmuligheter. Du kan justere
+          farger, fonter og oppsett for å matche din merkevareidentitet. Våre
+          Pro- og Enterprise-planer tilbyr enda mer avanserte
+          tilpasningsmuligheter.
         </span>
       ),
     },
     {
-      question: "Is Sailsdock suitable for non-technical users?",
+      question: "Er Sailsdock egnet for ikke-tekniske brukere?",
       answer: (
         <span>
-          Absolutely! Sailsdock is designed to be user-friendly for both
-          technical and non-technical users. Our intuitive interface and
-          pre-built templates make it easy for anyone to create and manage a
-          professional help center or blog.
+          Absolutt! Sailsdock er designet for å være brukervennlig for både
+          tekniske og ikke-tekniske brukere. Vårt intuitive grensesnitt og
+          forhåndsbyggede maler gjør det enkelt for alle å opprette og
+          administrere en profesjonell CRM-løsning.
         </span>
       ),
     },
     {
-      question: "What kind of support does Sailsdock provide?",
+      question: "Hvilken type support tilbyr Sailsdock?",
       answer: (
         <span>
-          Sailsdock provides comprehensive support including documentation,
-          video tutorials, a community forum, and dedicated customer support. We
-          also offer premium support plans for enterprises with more complex
-          needs.
+          Sailsdock tilbyr omfattende support inkludert dokumentasjon,
+          videoveiledninger, et community-forum og dedikert kundestøtte. Vi
+          tilbyr også premium supportplaner for bedrifter med mer komplekse
+          behov.
         </span>
       ),
     },
   ],
   footer: [
     {
-      title: "Product",
+      title: "Produkt",
       links: [
-        { href: "#", text: "Features", icon: null },
-        { href: "#", text: "Pricing", icon: null },
-        { href: "#", text: "Documentation", icon: null },
+        { href: "#", text: "Funksjoner", icon: null },
+        { href: "#", text: "Priser", icon: null },
+        { href: "#", text: "Dokumentasjon", icon: null },
         { href: "#", text: "API", icon: null },
       ],
     },
     {
-      title: "Company",
+      title: "Selskap",
       links: [
-        { href: "#", text: "About Us", icon: null },
-        { href: "#", text: "Careers", icon: null },
-        { href: "#", text: "Blog", icon: null },
-        { href: "#", text: "Press", icon: null },
-        { href: "#", text: "Partners", icon: null },
+        { href: "#", text: "Om Oss", icon: null },
+        { href: "#", text: "Karriere", icon: null },
+        { href: "#", text: "Blogg", icon: null },
+        { href: "#", text: "Presse", icon: null },
+        { href: "#", text: "Partnere", icon: null },
       ],
     },
     {
-      title: "Resources",
+      title: "Ressurser",
       links: [
         { href: "#", text: "Community", icon: null },
-        { href: "#", text: "Contact", icon: null },
+        { href: "#", text: "Kontakt", icon: null },
         { href: "#", text: "Support", icon: null },
         { href: "#", text: "Status", icon: null },
       ],
     },
     {
-      title: "Social",
+      title: "Sosiale Medier",
       links: [
         {
           href: "#",

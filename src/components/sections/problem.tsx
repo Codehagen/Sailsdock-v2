@@ -5,21 +5,21 @@ import { Clock, FileText, Search } from "lucide-react";
 
 const problems = [
   {
-    title: "Time-Consuming Setup",
+    title: "Tidkrevende datainnsamling",
     description:
-      "Businesses waste weeks setting up help centers and blogs from scratch, delaying crucial support and content delivery.",
+      "Bedrifter kaster bort uker på å samle inn og organisere kundedata manuelt, noe som forsinker viktig oppfølging og vekst.",
     icon: Clock,
   },
   {
-    title: "Content Management Challenges",
+    title: "Utfordringer med kundeoppfølging",
     description:
-      "Managing and updating help center content and blog posts across multiple platforms is complex and time-consuming.",
+      "Å holde oversikt over og oppdatere kundeinformasjon på tvers av flere plattformer er komplekst og tidkrevende.",
     icon: FileText,
   },
   {
-    title: "Poor User Experience",
+    title: "Ineffektiv kundeanalyse",
     description:
-      "Inadequate search capabilities and disorganized content make it difficult for users to find the information they need quickly.",
+      "Mangel på avanserte analyseverktøy gjør det vanskelig for bedrifter å få meningsfulle innsikter og ta datadrevne beslutninger.",
     icon: Search,
   },
 ];
@@ -27,8 +27,8 @@ const problems = [
 export default function Component() {
   return (
     <Section
-      title="Challenges in Help Center and Blog Management"
-      subtitle="Why traditional methods fall short"
+      title="Utfordringer i tradisjonell CRM"
+      subtitle="Hvorfor vanlige metoder kommer til kort"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
         {problems.map((problem, index) => (

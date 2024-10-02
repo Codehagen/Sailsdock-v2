@@ -20,10 +20,10 @@ function HeroPill() {
       transition={{ duration: 0.8, ease }}
     >
       <div className="w-fit rounded-full bg-accent px-2 py-0.5 text-center text-xs font-medium text-primary sm:text-sm">
-        🚀 New
+        🚀 Nyhet
       </div>
       <p className="text-xs font-medium text-primary sm:text-sm">
-        Modern Knowledge Center Solution
+        Moderne kundeoppfølging
       </p>
       <svg
         width="12"
@@ -61,7 +61,7 @@ function HeroTitles() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease }}
         >
-          Empower Your Support
+          Styrk din kundeoppfølging
         </motion.span>
         <motion.span
           className="block text-primary"
@@ -69,7 +69,7 @@ function HeroTitles() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease }}
         >
-          with Sailsdock
+          med Sailsdock
         </motion.span>
       </motion.h1>
       <motion.p
@@ -82,9 +82,9 @@ function HeroTitles() {
           ease,
         }}
       >
-        Create a modern help center and dynamic blog in minutes. Intuitive
-        templates, rich media integration, and powerful search capabilities at
-        your fingertips.
+        Vi hjelper deg med å få nye kunder og følge opp eksisterende kunder på
+        en ny, innovativ måte! Opplev kraften i vår komplette bedriftsdatabase
+        og automatiserte lead-generering.
       </motion.p>
     </div>
   );
@@ -107,7 +107,7 @@ function HeroCTA() {
           )}
         >
           <WandSparkles className="h-6 w-6" />
-          Get Started
+          Prøv gratis nå
         </Link>
         <Link
           href="/docs"
@@ -116,7 +116,7 @@ function HeroCTA() {
             "w-full sm:w-auto"
           )}
         >
-          Documentation
+          Les mer om Sailsdock
         </Link>
       </motion.div>
       <motion.p
@@ -125,7 +125,7 @@ function HeroCTA() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0, duration: 0.8 }}
       >
-        Experience the future of help centers. No credit card required.
+        Ingen kort nødvendig.
       </motion.p>
     </>
   );
