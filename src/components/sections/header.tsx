@@ -65,7 +65,7 @@ export default function Header() {
                 )}
               >
                 <Icons.logo className="h-6 w-6" />
-                Get Started
+                Prøv gratis
               </Link>
             </div>
           </div>

@@ -9,36 +9,36 @@ import { motion } from "framer-motion";
 
 const features = [
   {
-    title: "Quick Setup Wizard",
+    title: "Komplett Bedriftsdatabase",
     description:
-      "Launch your help center and blog in minutes with our intuitive setup process and pre-designed templates.",
+      "Vi har alle bedriftene oppført, slik at du kan fokusere på å vokse din virksomhet.",
     className: "hover:bg-blue-500/10 transition-all duration-500 ease-out",
     content: (
       <Safari
         src={`/dashboard.png`}
-        url="https://propwrite.com/setup-wizard"
+        url="https://sailsdock.no/bedriftsdatabase"
         className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
       />
     ),
   },
   {
-    title: "Unified Content Management",
+    title: "Automatisert Lead-generering",
     description:
-      "Manage your help center and blog content from a single, user-friendly dashboard.",
+      "Alle bedrifter i Norge, sortert og servert akkurat slik du trenger dem.",
     className:
       "order-3 xl:order-none hover:bg-green-500/10 transition-all duration-500 ease-out",
     content: (
       <Safari
         src={`/dashboard.png`}
-        url="https://propwrite.com/content-management"
+        url="https://sailsdock.no/lead-generering"
         className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
       />
     ),
   },
   {
-    title: "Advanced Search and Organization",
+    title: "Avansert Analyse",
     description:
-      "Implement powerful search capabilities and intuitive navigation to help users find information quickly.",
+      "Få meningsfulle innsikter skreddersydd for effektiv kundeoppfølging.",
     className:
       "md:row-span-2 hover:bg-purple-500/10 transition-all duration-500 ease-out",
     content: (
@@ -55,16 +55,16 @@ const features = [
         />
         <Safari
           src={`/dashboard.png`}
-          url="https://propwrite.com/search-organization"
+          url="https://sailsdock.no/analyse"
           className="-mb-48 ml-12 mt-16 h-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-x-[-10px] transition-all duration-300"
         />
       </>
     ),
   },
   {
-    title: "Customization and Branding",
+    title: "Sanntidsoppdateringer",
     description:
-      "Easily customize the look and feel of your help center and blog to match your brand identity.",
+      "Hold deg foran med daglige oppdateringer, og sørg for at leadlisten din alltid er oppdatert.",
     className:
       "flex-row order-4 md:col-span-2 md:flex-row xl:order-none hover:bg-orange-500/10 transition-all duration-500 ease-out",
     content: (
@@ -72,7 +72,7 @@ const features = [
         <Ripple className="absolute -bottom-full" />
         <Safari
           src={`/dashboard.png`}
-          url="https://propwrite.com/customization"
+          url="https://sailsdock.no/sanntidsoppdateringer"
           className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
         />
       </>
@@ -83,9 +83,9 @@ const features = [
 export default function Component() {
   return (
     <Section
-      title="Propwrite Solutions"
-      subtitle="Streamline Your Help Center and Blog Management"
-      description="Propwrite's self-service platform simplifies the creation and management of comprehensive help centers and engaging blogs."
+      title="Sailsdock Løsninger"
+      subtitle="Effektiviser din kundeoppfølging og vekst"
+      description="Sailsdocks plattform forenkler prosessen med å finne, følge opp og analysere potensielle og eksisterende kunder."
       className="bg-neutral-100 dark:bg-neutral-900"
     >
       <div className="mx-auto mt-16 grid max-w-sm grid-cols-1 gap-6 text-gray-500 md:max-w-3xl md:grid-cols-2 xl:grid-rows-2 md:grid-rows-3 xl:max-w-6xl xl:auto-rows-fr xl:grid-cols-3">

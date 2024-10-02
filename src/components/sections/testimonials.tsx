@@ -41,18 +41,16 @@ export const TestimonialCard = ({
   img,
   role,
   className,
-  ...props // Capture the rest of the props
+  ...props
 }: TestimonialCardProps) => (
   <div
     className={cn(
       "mb-4 flex w-full cursor-pointer break-inside-avoid flex-col items-center justify-between gap-6 rounded-xl p-4",
-      // light styles
-      " border border-neutral-200 bg-white",
-      // dark styles
+      "border border-neutral-200 bg-white",
       "dark:bg-black dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
       className
     )}
-    {...props} // Spread the rest of the props here
+    {...props}
   >
     <div className="select-none text-sm font-normal text-neutral-700 dark:text-neutral-400">
       {description}
@@ -84,184 +82,184 @@ export const TestimonialCard = ({
 
 const testimonials = [
   {
-    name: "Alex Rivera",
-    role: "CTO at InnovateTech",
+    name: "Alexander Olsen",
+    role: "CTO hos InnovaTech AS",
     img: "https://randomuser.me/api/portraits/men/91.jpg",
     description: (
       <p>
-        The AI-driven analytics from #QuantumInsights have revolutionized our
-        product development cycle.
+        De AI-drevne analysene fra #Sailsdock har revolusjonert vår
+        produktutviklingssyklus.
         <Highlight>
-          Insights are now more accurate and faster than ever.
+          Innsiktene er nå mer nøyaktige og raskere enn noensinne.
         </Highlight>{" "}
-        A game-changer for tech companies.
+        En game-changer for teknologiselskaper.
       </p>
     ),
   },
   {
-    name: "Samantha Lee",
-    role: "Marketing Director at NextGen Solutions",
+    name: "Sofie Larsen",
+    role: "Markedsdirektør hos NextGen Løsninger",
     img: "https://randomuser.me/api/portraits/women/12.jpg",
     description: (
       <p>
-        Implementing #AIStream&apos;s customer prediction model has drastically
-        improved our targeting strategy.
-        <Highlight>Seeing a 50% increase in conversion rates!</Highlight> Highly
-        recommend their solutions.
+        Implementeringen av Sailsdocks kundeprediksjon har drastisk forbedret
+        vår målrettingsstrategi.
+        <Highlight>Vi ser en 50% økning i konverteringsrater!</Highlight>{" "}
+        Anbefaler sterkt deres løsninger.
       </p>
     ),
   },
   {
-    name: "Raj Patel",
-    role: "Founder & CEO at StartUp Grid",
+    name: "Ravi Patel",
+    role: "Grunnlegger & CEO hos StartUp Grid",
     img: "https://randomuser.me/api/portraits/men/45.jpg",
     description: (
       <p>
-        As a startup, we need to move fast and stay ahead. #CodeAI&apos;s
-        automated coding assistant helps us do just that.
-        <Highlight>Our development speed has doubled.</Highlight> Essential tool
-        for any startup.
+        Som en startup trenger vi å bevege oss raskt og ligge foran. Sailsdocks
+        automatiserte kundeoppfølging hjelper oss med nettopp det.
+        <Highlight>Vår utviklingshastighet har doblet seg.</Highlight> Et
+        essensielt verktøy for enhver startup.
       </p>
     ),
   },
   {
-    name: "Emily Chen",
-    role: "Product Manager at Digital Wave",
+    name: "Emma Chen",
+    role: "Produktsjef hos Digital Bølge",
     img: "https://randomuser.me/api/portraits/women/83.jpg",
     description: (
       <p>
-        #VoiceGen&apos;s AI-driven voice synthesis has made creating global
-        products a breeze.
-        <Highlight>Localization is now seamless and efficient.</Highlight> A
-        must-have for global product teams.
+        Sailsdocks AI-drevne kundeanalyse har gjort det å skape globale
+        produkter til en lek.
+        <Highlight>Lokalisering er nå sømløs og effektiv.</Highlight> Et must
+        for globale produktteam.
       </p>
     ),
   },
   {
-    name: "Michael Brown",
-    role: "Data Scientist at FinTech Innovations",
+    name: "Mikkel Brun",
+    role: "Data Scientist hos FinTech Innovasjoner",
     img: "https://randomuser.me/api/portraits/men/1.jpg",
     description: (
       <p>
-        Leveraging #DataCrunch&apos;s AI for our financial models has given us
-        an edge in predictive accuracy.
+        Å utnytte Sailsdocks AI for våre finansielle modeller har gitt oss et
+        forsprang i prediktiv nøyaktighet.
         <Highlight>
-          Our investment strategies are now powered by real-time data analytics.
+          Våre investeringsstrategier er nå drevet av sanntids dataanalyse.
         </Highlight>{" "}
-        Transformative for the finance industry.
+        Transformativt for finansbransjen.
       </p>
     ),
   },
   {
     name: "Linda Wu",
-    role: "VP of Operations at LogiChain Solutions",
+    role: "Operasjonsdirektør hos LogiChain Løsninger",
     img: "https://randomuser.me/api/portraits/women/5.jpg",
     description: (
       <p>
-        #LogiTech&apos;s supply chain optimization tools have drastically
-        reduced our operational costs.
+        Sailsdocks verktøy for optimalisering av forsyningskjeden har drastisk
+        redusert våre driftskostnader.
         <Highlight>
-          Efficiency and accuracy in logistics have never been better.
+          Effektivitet og nøyaktighet i logistikk har aldri vært bedre.
         </Highlight>{" "}
       </p>
     ),
   },
   {
-    name: "Carlos Gomez",
-    role: "Head of R&D at EcoInnovate",
+    name: "Karl Gundersen",
+    role: "FoU-leder hos EcoInnovate",
     img: "https://randomuser.me/api/portraits/men/14.jpg",
     description: (
       <p>
-        By integrating #GreenTech&apos;s sustainable energy solutions,
-        we&apos;ve seen a significant reduction in carbon footprint.
+        Ved å integrere Sailsdocks bærekraftige energiløsninger har vi sett en
+        betydelig reduksjon i karbonavtrykk.
         <Highlight>
-          Leading the way in eco-friendly business practices.
+          Vi leder an i miljøvennlig forretningspraksis.
         </Highlight>{" "}
-        Pioneering change in the industry.
+        Banebrytende endring i bransjen.
       </p>
     ),
   },
   {
     name: "Aisha Khan",
-    role: "Chief Marketing Officer at Fashion Forward",
+    role: "Markedssjef hos Fashion Forward",
     img: "https://randomuser.me/api/portraits/women/56.jpg",
     description: (
       <p>
-        #TrendSetter&apos;s market analysis AI has transformed how we approach
-        fashion trends.
+        Sailsdocks markedsanalyse-AI har transformert hvordan vi tilnærmer oss
+        motetrender.
         <Highlight>
-          Our campaigns are now data-driven with higher customer engagement.
+          Våre kampanjer er nå datadrevne med høyere kundeengasjement.
         </Highlight>{" "}
-        Revolutionizing fashion marketing.
+        Revolusjonerer motemarketing.
       </p>
     ),
   },
   {
-    name: "Tom Chen",
-    role: "Director of IT at HealthTech Solutions",
+    name: "Thomas Chen",
+    role: "IT-direktør hos HealthTech Solutions",
     img: "https://randomuser.me/api/portraits/men/18.jpg",
     description: (
       <p>
-        Implementing #MediCareAI in our patient care systems has improved
-        patient outcomes significantly.
+        Implementering av Sailsdock i våre pasientbehandlingssystemer har
+        forbedret pasientutfall betydelig.
         <Highlight>
-          Technology and healthcare working hand in hand for better health.
+          Teknologi og helsevesen jobber hånd i hånd for bedre helse.
         </Highlight>{" "}
-        A milestone in medical technology.
+        En milepæl innen medisinsk teknologi.
       </p>
     ),
   },
   {
-    name: "Sofia Patel",
-    role: "CEO at EduTech Innovations",
+    name: "Sofia Pettersen",
+    role: "CEO hos EduTech Innovasjoner",
     img: "https://randomuser.me/api/portraits/women/73.jpg",
     description: (
       <p>
-        #LearnSmart&apos;s AI-driven personalized learning plans have doubled
-        student performance metrics.
+        Sailsdocks AI-drevne personlige læringsplaner har doblet studentenes
+        ytelsesmetrikk.
         <Highlight>
-          Education tailored to every learner&apos;s needs.
+          Utdanning skreddersydd for hver enkelt elevs behov.
         </Highlight>{" "}
-        Transforming the educational landscape.
+        Transformerer utdanningslandskapet.
       </p>
     ),
   },
   {
-    name: "Jake Morrison",
-    role: "CTO at SecureNet Tech",
+    name: "Jakob Mortensen",
+    role: "CTO hos SecureNet Tech",
     img: "https://randomuser.me/api/portraits/men/25.jpg",
     description: (
       <p>
-        With #CyberShield&apos;s AI-powered security systems, our data
-        protection levels are unmatched.
-        <Highlight>Ensuring safety and trust in digital spaces.</Highlight>{" "}
-        Redefining cybersecurity standards.
+        Med Sailsdocks AI-drevne sikkerhetssystemer er våre
+        databeskyttelsesnivåer uovertrufne.
+        <Highlight>Sikrer trygghet og tillit i digitale rom.</Highlight>{" "}
+        Redefinerer standarder for cybersikkerhet.
       </p>
     ),
   },
   {
     name: "Nadia Ali",
-    role: "Product Manager at Creative Solutions",
+    role: "Produktsjef hos Creative Solutions",
     img: "https://randomuser.me/api/portraits/women/78.jpg",
     description: (
       <p>
-        #DesignPro&apos;s AI has streamlined our creative process, enhancing
-        productivity and innovation.
-        <Highlight>Bringing creativity and technology together.</Highlight> A
-        game-changer for creative industries.
+        Sailsdocks AI har strømlinjeformet vår kreative prosess, forbedret
+        produktivitet og innovasjon.
+        <Highlight>Bringer kreativitet og teknologi sammen.</Highlight> En
+        game-changer for kreative bransjer.
       </p>
     ),
   },
   {
     name: "Omar Farooq",
-    role: "Founder at Startup Hub",
+    role: "Grunnlegger av Startup Hub",
     img: "https://randomuser.me/api/portraits/men/54.jpg",
     description: (
       <p>
-        #VentureAI&apos;s insights into startup ecosystems have been invaluable
-        for our growth and funding strategies.
-        <Highlight>Empowering startups with data-driven decisions.</Highlight> A
-        catalyst for startup success.
+        Sailsdocks innsikt i startup-økosystemer har vært uvurderlig for våre
+        vekst- og finansieringsstrategier.
+        <Highlight>Styrker startups med datadrevne beslutninger.</Highlight> En
+        katalysator for startup-suksess.
       </p>
     ),
   },
@@ -270,8 +268,8 @@ const testimonials = [
 export default function Testimonials() {
   return (
     <Section
-      title="Testimonials"
-      subtitle="What our customers are saying"
+      title="Kundeomtaler"
+      subtitle="Hva våre kunder sier"
       className="max-w-8xl"
     >
       <div className="relative mt-6 max-h-screen overflow-hidden">

@@ -17,7 +17,8 @@ export default function Logos() {
     <section id="logos">
       <div className="container mx-auto px-4 md:px-8 py-12">
         <h3 className="text-center text-sm font-semibold text-gray-500">
-          TRUSTED BY LEADING TEAMS
+          Gir superkrefter til alle bedrifter, fra ivrige startups til etablerte
+          selskaper.
         </h3>
         <div className="relative mt-6">
           <Marquee className="max-w-full [--duration:40s]">
