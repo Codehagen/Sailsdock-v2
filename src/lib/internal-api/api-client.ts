@@ -1,37 +1,9 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import { auth } from "@clerk/nextjs/server";
-
-export interface ApiResponse<T> {
-  success: boolean;
-  status: number;
-  data: T[];
-  pagination?: {
-    next: string | null;
-    prev: string | null;
-  };
-}
+import { ApiResponse, UserData, CompanyData, DealData } from "./types";
 
 class ApiClient {
   private axiosInstance: AxiosInstance;
-  public get: {
-    userdata: (userId: string) => Promise<ApiResponse<any>>;
-    // Add other GET endpoints here
-  };
-  public post: {
-    user: (userData: Record<string, unknown>) => Promise<ApiResponse<any>>;
-    // Add other POST endpoints here
-  };
-  public patch: {
-    user: (
-      userId: string,
-      userData: Record<string, unknown>
-    ) => Promise<ApiResponse<any>>;
-    // Add other PATCH endpoints here
-  };
-  public delete: {
-    user: (userId: string) => Promise<ApiResponse<any>>;
-    // Add other DELETE endpoints here
-  };
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -41,6 +13,7 @@ class ApiClient {
         "X-CITADEL-LOCK": process.env.FRONTEND_LOCK || "",
         "X-CITADEL-KEY": process.env.FRONTEND_KEY || "",
         "X-CITADEL-ID": process.env.FRONTEND_ID || "",
+        "Cache-Control": "no-cache",
       },
     });
 
@@ -59,22 +32,6 @@ class ApiClient {
         return Promise.reject(error);
       }
     );
-
-    // Initialize endpoint methods
-    this.get = {
-      userdata: (userId: string) => this.request("get", `users/${userId}`),
-    };
-    this.post = {
-      user: (userData: Record<string, unknown>) =>
-        this.request("post", "users", userData),
-    };
-    this.patch = {
-      user: (userId: string, userData: Record<string, unknown>) =>
-        this.request("patch", `users/${userId}`, userData),
-    };
-    this.delete = {
-      user: (userId: string) => this.request("delete", `users/${userId}`),
-    };
   }
 
   private async request<T>(
@@ -125,6 +82,37 @@ class ApiClient {
       }
     }
   }
+
+  users = {
+    get: (userId: string) => this.request<UserData>("get", `users/${userId}`),
+    create: (userData: Partial<UserData>) =>
+      this.request<UserData>("post", "users", userData),
+    update: (userId: string, userData: Partial<UserData>) =>
+      this.request<UserData>("patch", `users/${userId}`, userData),
+    delete: (userId: string) =>
+      this.request<UserData>("delete", `users/${userId}`),
+  };
+
+  companies = {
+    get: (companyId: string) =>
+      this.request<CompanyData>("get", `companies/${companyId}`),
+    create: (companyData: Partial<CompanyData>) =>
+      this.request<CompanyData>("post", "companies", companyData),
+    update: (companyId: string, companyData: Partial<CompanyData>) =>
+      this.request<CompanyData>("patch", `companies/${companyId}`, companyData),
+    delete: (companyId: string) =>
+      this.request<CompanyData>("delete", `companies/${companyId}`),
+  };
+
+  deals = {
+    get: (dealId: string) => this.request<DealData>("get", `deals/${dealId}`),
+    create: (dealData: Partial<DealData>) =>
+      this.request<DealData>("post", "deals", dealData),
+    update: (dealId: string, dealData: Partial<DealData>) =>
+      this.request<DealData>("patch", `deals/${dealId}`, dealData),
+    delete: (dealId: string) =>
+      this.request<DealData>("delete", `deals/${dealId}`),
+  };
 }
 
 export const apiClient = new ApiClient();
