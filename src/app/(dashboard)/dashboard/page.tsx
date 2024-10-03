@@ -1,30 +1,32 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { getCurrentUser } from "@/actions/user/get-user-data";
+import { EmptyPlaceholder } from "@/components/empty-placeholder";
+import { DashboardShell } from "@/components/shell/shell";
+import { DashboardHeader } from "@/components/shell/header";
 import { Button } from "@/components/ui/button";
-import { getClerkUser } from "@/actions/get-clerk-user";
-
-async function fetchDashboardData() {
-  // Implement your server action here
-  // ...
-}
 
 export default async function DashboardPage() {
-  const user = await getClerkUser();
-  // This is mainly for TypeScript type safety
+  const user = await getCurrentUser();
+
   if (!user) {
-    return null; // or some error component
+    console.error("No user data found");
+    return null;
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Welcome, {user.name}!</h1>
-
-      {/* Rest of your component remains the same */}
-    </div>
+    <DashboardShell>
+      <DashboardHeader
+        heading={`Velkommen, ${user.first_name}!`}
+        text="Dine leietakere"
+      ></DashboardHeader>
+      <EmptyPlaceholder>
+        <EmptyPlaceholder.Icon name="user" />
+        <EmptyPlaceholder.Title>Finn ditt workspace</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Description>
+          Du har ikke lagt til et workspace ennå. Legg til et workspace for å
+          komme i gang.
+        </EmptyPlaceholder.Description>
+        <Button className="mt-4">Create New Project</Button>
+      </EmptyPlaceholder>
+    </DashboardShell>
   );
 }

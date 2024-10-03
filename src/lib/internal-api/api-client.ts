@@ -83,35 +83,26 @@ class ApiClient {
     }
   }
 
+  // prettier-ignore
   users = {
     get: (userId: string) => this.request<UserData>("get", `users/${userId}`),
-    create: (userData: Partial<UserData>) =>
-      this.request<UserData>("post", "users", userData),
-    update: (userId: string, userData: Partial<UserData>) =>
-      this.request<UserData>("patch", `users/${userId}`, userData),
-    delete: (userId: string) =>
-      this.request<UserData>("delete", `users/${userId}`),
+    create: (userData: Partial<UserData>) => this.request<UserData>("post", "users/", userData),
+    update: (userId: string, userData: Partial<UserData>) => this.request<UserData>("patch", `users/${userId}`, userData),
+    delete: (userId: string) => this.request<UserData>("delete", `users/${userId}`),
   };
-
+  // prettier-ignore
   companies = {
-    get: (companyId: string) =>
-      this.request<CompanyData>("get", `companies/${companyId}`),
-    create: (companyData: Partial<CompanyData>) =>
-      this.request<CompanyData>("post", "companies", companyData),
-    update: (companyId: string, companyData: Partial<CompanyData>) =>
-      this.request<CompanyData>("patch", `companies/${companyId}`, companyData),
-    delete: (companyId: string) =>
-      this.request<CompanyData>("delete", `companies/${companyId}`),
+    get: (companyId: string) => this.request<CompanyData>("get", `companies/${companyId}`),
+    create: (companyData: Partial<CompanyData>) => this.request<CompanyData>("post", "companies/", companyData),
+    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `companies/${companyId}`, companyData),
+    delete: (companyId: string) => this.request<CompanyData>("delete", `companies/${companyId}`),
   };
-
+  // prettier-ignore
   deals = {
     get: (dealId: string) => this.request<DealData>("get", `deals/${dealId}`),
-    create: (dealData: Partial<DealData>) =>
-      this.request<DealData>("post", "deals", dealData),
-    update: (dealId: string, dealData: Partial<DealData>) =>
-      this.request<DealData>("patch", `deals/${dealId}`, dealData),
-    delete: (dealId: string) =>
-      this.request<DealData>("delete", `deals/${dealId}`),
+    create: (dealData: Partial<DealData>) => this.request<DealData>("post", "deals/", dealData),
+    update: (dealId: string, dealData: Partial<DealData>) => this.request<DealData>("patch", `deals/${dealId}`, dealData),
+    delete: (dealId: string) => this.request<DealData>("delete", `deals/${dealId}`),
   };
 }
 
