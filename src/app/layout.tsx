@@ -41,7 +41,7 @@ export default function RootLayout({
           >
             {children}
             <ThemeToggle />
-            <Toaster />
+            <Toaster richColors />
             <TailwindIndicator />
           </ThemeProvider>
         </body>
