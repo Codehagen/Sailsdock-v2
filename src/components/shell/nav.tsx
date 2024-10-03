@@ -1,29 +1,37 @@
-"use client"
+"use client";
 
-import type { SidebarNavItem } from "@/types"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { cn } from "@/lib/utils"
-import { Icons } from "@/components/shared/icons"
+import { cn } from "@/lib/utils";
+import { Icons } from "@/components/shared/icons";
 
-interface DashboardNavProps {
-  items: SidebarNavItem[]
-  slug?: string
-}
+type NavItem = {
+  href: string;
+  title: string;
+  disabled?: boolean;
+  icon?: keyof typeof Icons;
+  completed?: boolean;
+};
 
-export function DashboardNav({ items, slug }: DashboardNavProps) {
-  const path = usePathname()
+export function DashboardNav({
+  items,
+  slug,
+}: {
+  items: NavItem[];
+  slug?: string;
+}) {
+  const path = usePathname();
 
   if (!items.length) {
-    return null
+    return null;
   }
 
   return (
-    <nav className="grid items-start gap-2 max-md:grid-flow-col">
+    <nav className="grid items-start gap-2 max-md:grid-flow-col pl-0">
       {items.map((item) => {
-        const Icon = Icons[item.icon || "arrowRight"]
-        const CheckIcon = Icons.check
+        const Icon = Icons[item.icon || "arrowRight"];
+        const CheckIcon = Icons.check;
         return (
           <div key={item.href}>
             <Link
@@ -37,7 +45,7 @@ export function DashboardNav({ items, slug }: DashboardNavProps) {
                 className={cn(
                   "group flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
                   path === item.href ? "bg-accent" : "transparent",
-                  item.disabled && "cursor-not-allowed opacity-80",
+                  item.disabled && "cursor-not-allowed opacity-80"
                 )}
               >
                 <div className="flex items-center">
@@ -50,8 +58,8 @@ export function DashboardNav({ items, slug }: DashboardNavProps) {
               </span>
             </Link>
           </div>
-        )
+        );
       })}
     </nav>
-  )
+  );
 }

@@ -4,7 +4,7 @@ import { DashboardShell } from "@/components/shell/shell";
 import { DashboardHeader } from "@/components/shell/header";
 import { Button } from "@/components/ui/button";
 
-export default async function DashboardPage() {
+export default async function PeoplePage() {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -15,17 +15,17 @@ export default async function DashboardPage() {
   return (
     <DashboardShell>
       <DashboardHeader
-        heading={`Velkommen, ${user.first_name}!`}
-        text="Ditt Dashboard"
+        heading={"Personer"}
+        text="Dine personer"
       ></DashboardHeader>
       <EmptyPlaceholder>
-        <EmptyPlaceholder.Icon name="layout" />
-        <EmptyPlaceholder.Title>Finn ditt workspace</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Icon name="user" />
+        <EmptyPlaceholder.Title>Legg til person</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Du har ikke lagt til et workspace ennå. Legg til et workspace for å
+          Du har ikke lagt til noen personer ennå. Legg til en person for å
           komme i gang.
         </EmptyPlaceholder.Description>
-        <Button className="mt-4">Legg til workspace</Button>
+        <Button className="mt-4">Legg til person</Button>
       </EmptyPlaceholder>
     </DashboardShell>
   );

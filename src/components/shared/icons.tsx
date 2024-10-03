@@ -18,6 +18,7 @@ import {
   FileSignature,
   FileText,
   FileTextIcon,
+  Goal,
   HandIcon,
   HelpCircle,
   Home,
@@ -26,10 +27,12 @@ import {
   Laptop,
   LayoutDashboard,
   LineChart,
+  ListTodo,
   Loader2,
   Map,
   Moon,
   MoreVertical,
+  Notebook,
   PartyPopper,
   Pen,
   Percent,
@@ -98,6 +101,9 @@ export const Icons = {
   file: File,
   layout: LayoutDashboard,
   pen: Pen,
+  goal: Goal,
+  listTodo: ListTodo,
+  notebook: Notebook,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
