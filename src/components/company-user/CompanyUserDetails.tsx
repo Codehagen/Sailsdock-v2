@@ -193,6 +193,46 @@ export function CompanyUserDetails({
               </span>
             </div>
           </div>
+          <Separator className="my-4" />
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">
+              Muligheter
+            </h4>
+            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2">
+              <div
+                className={cn(
+                  "flex items-center justify-center",
+                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                  "text-xs font-medium"
+                )}
+              >
+                {ownerInfo.contactPerson.charAt(0)}
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">
+                {ownerInfo.contactPerson}
+              </span>
+            </div>
+          </div>
+          <Separator className="my-4" />
+          <div>
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">
+              Personer
+            </h4>
+            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2">
+              <div
+                className={cn(
+                  "flex items-center justify-center",
+                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                  "text-xs font-medium"
+                )}
+              >
+                {ownerInfo.contactPerson.charAt(0)}
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">
+                {ownerInfo.contactPerson}
+              </span>
+            </div>
+          </div>
         </div>
       </CardContent>
       <CardFooter>
