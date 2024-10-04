@@ -25,7 +25,7 @@ export default async function DashboardPage() {
           Du har ikke lagt til et workspace ennå. Legg til et workspace for å
           komme i gang.
         </EmptyPlaceholder.Description>
-        <Button className="mt-4">Legg til workspace</Button>
+        <Button className="mt-4"></Button>
       </EmptyPlaceholder>
     </DashboardShell>
   );
