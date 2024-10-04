@@ -4,6 +4,7 @@ import { DashboardHeader } from "@/components/shell/header";
 import { Button } from "@/components/ui/button";
 import { getCompanies } from "@/actions/company/get-companies";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { AddCompanySheet } from "@/components/company/AddCompanySheet";
 
 export default async function CompanyPage() {
   const companies = await getCompanies();
@@ -11,7 +12,7 @@ export default async function CompanyPage() {
   return (
     <DashboardShell>
       <DashboardHeader heading="Selskaper" text="Dine selskaper">
-        <Button>Legg til selskap</Button>
+        <AddCompanySheet />
       </DashboardHeader>
 
       {companies && companies.length > 0 ? (
