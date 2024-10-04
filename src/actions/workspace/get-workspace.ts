@@ -1,10 +1,10 @@
 "use server";
 
 import { apiClient } from "@/lib/internal-api/api-client";
-import { CompanyData } from "@/lib/internal-api/types";
+import { WorkspaceData } from "@/lib/internal-api/types";
 import { getCurrentUser } from "@/actions/user/get-user-data";
 
-export async function getCompanies(): Promise<CompanyData[] | null> {
+export async function getCompanies(): Promise<WorkspaceData[] | null> {
   try {
     const currentUser = await getCurrentUser();
 
@@ -16,10 +16,10 @@ export async function getCompanies(): Promise<CompanyData[] | null> {
     }
 
     const companyId = currentUser.company_details.uuid;
-    const response = await apiClient.company.getAll(companyId);
+    const response = await apiClient.workspaces.get(companyId);
 
-    if (response.success && Array.isArray(response.data)) {
-      return response.data.flat();
+    if (response.success && response.data.length > 0) {
+      return response.data;
     } else {
       console.error("Companies not found:", response.status);
       return null;

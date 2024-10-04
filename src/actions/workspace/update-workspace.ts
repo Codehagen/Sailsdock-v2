@@ -16,7 +16,7 @@ export async function updateCompany(
   }
 
   try {
-    const response = await apiClient.company.update(companyId, companyData);
+    const response = await apiClient.companies.update(companyId, companyData);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

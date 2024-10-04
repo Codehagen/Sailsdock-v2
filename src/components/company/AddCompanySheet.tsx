@@ -20,10 +20,9 @@ import { toast } from "sonner";
 const companySchema = z.object({
   name: z.string().min(1, "Selskapsnavn er påkrevd"),
   orgnr: z.string().min(9, "Organisasjonsnummer må være 9 siffer").max(9),
-  address_1: z.string().optional(),
-  address_2: z.string().optional(),
-  city: z.string().optional(),
-  zip: z.string().optional(),
+  address_street: z.string().optional(),
+  address_city: z.string().optional(),
+  address_zip: z.string().optional(),
 });
 
 type CompanyFormData = z.infer<typeof companySchema>;
@@ -31,10 +30,9 @@ type CompanyFormData = z.infer<typeof companySchema>;
 const defaultValues: CompanyFormData = {
   name: "Test AS",
   orgnr: "123456789",
-  address_1: "Testveien 1",
-  address_2: "",
-  city: "Oslo",
-  zip: "0123",
+  address_street: "Testveien 1",
+  address_city: "Oslo",
+  address_zip: "0123",
 };
 
 export function AddCompanySheet() {
@@ -96,20 +94,16 @@ export function AddCompanySheet() {
             )}
           </div>
           <div>
-            <Label htmlFor="address_1">Adresse 1</Label>
-            <Input id="address_1" {...register("address_1")} />
+            <Label htmlFor="address_street">Adresse</Label>
+            <Input id="address_street" {...register("address_street")} />
           </div>
           <div>
-            <Label htmlFor="address_2">Adresse 2</Label>
-            <Input id="address_2" {...register("address_2")} />
+            <Label htmlFor="address_city">By</Label>
+            <Input id="address_city" {...register("address_city")} />
           </div>
           <div>
-            <Label htmlFor="city">By</Label>
-            <Input id="city" {...register("city")} />
-          </div>
-          <div>
-            <Label htmlFor="zip">Postnummer</Label>
-            <Input id="zip" {...register("zip")} />
+            <Label htmlFor="address_zip">Postnummer</Label>
+            <Input id="address_zip" {...register("address_zip")} />
           </div>
           <Button type="submit">Opprett selskap</Button>
         </form>
