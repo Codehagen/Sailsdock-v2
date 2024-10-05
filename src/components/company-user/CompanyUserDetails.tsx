@@ -1,18 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Building,
-  ExternalLink,
-  Mail,
-  Phone,
-  User,
   MapPin,
   DollarSign,
   Calendar,
@@ -21,17 +10,15 @@ import {
   Linkedin,
   Clock,
   Twitter,
-  Plus,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { cn, extractDomain } from "@/lib/utils";
 import Link from "next/link";
 import { AccountOwnerCombobox } from "./AccountOwnerComboBox";
-import { extractDomain } from "@/lib/utils"; // Add this import
 
 interface OwnerInfo {
   name: string;
@@ -180,7 +167,7 @@ export function CompanyUserDetails({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-4">
           {infoItems.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               <item.icon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
@@ -221,31 +208,33 @@ export function CompanyUserDetails({
             </div>
           ))}
           <Separator className="my-4" />
-          <div className="flex justify-between items-center">
-            <h4 className="text-sm font-medium text-muted-foreground">
-              Account Owner
-            </h4>
-            <AccountOwnerCombobox />
-          </div>
-          <Link
-            href={`/people/${ownerInfo.contactPersonUuid}`}
-            className="inline-block"
-          >
-            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-              <div
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                  "text-xs font-medium"
-                )}
-              >
-                {ownerInfo.contactPerson.charAt(0)}
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {ownerInfo.contactPerson}
-              </span>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Account Owner
+              </h4>
+              <AccountOwnerCombobox />
             </div>
-          </Link>
+            <Link
+              href={`/people/${ownerInfo.contactPersonUuid}`}
+              className="inline-block"
+            >
+              <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                <div
+                  className={cn(
+                    "flex items-center justify-center",
+                    "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                    "text-xs font-medium"
+                  )}
+                >
+                  {ownerInfo.contactPerson.charAt(0)}
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {ownerInfo.contactPerson}
+                </span>
+              </div>
+            </Link>
+          </div>
           <Separator className="my-4" />
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-2">
@@ -288,12 +277,6 @@ export function CompanyUserDetails({
           </div>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button variant="outline" className="w-full">
-          <ExternalLink className="mr-2 h-4 w-4" />
-          Se full eierinformasjon
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
