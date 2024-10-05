@@ -28,6 +28,7 @@ import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface OwnerInfo {
   name: string;
@@ -44,6 +45,7 @@ interface OwnerInfo {
   lastUpdated: string;
   twitter: string;
   addedDate: string;
+  contactPersonUuid: string; // Add this new property
 }
 
 export function CompanyUserDetails({
@@ -68,6 +70,7 @@ export function CompanyUserDetails({
     name: "Propdock AS",
     orgNumber: "912345678",
     contactPerson: "Christer Hagen",
+    contactPersonUuid: "123e4567-e89b-12d3-a456-426614174000", // Example UUID
     email: "christer@propdock.no",
     phone: "+47 123 45 678",
     address: "Storgata 1, 0123 Oslo",
@@ -178,20 +181,25 @@ export function CompanyUserDetails({
             <h4 className="text-sm font-medium text-muted-foreground mb-2">
               Account Owner
             </h4>
-            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2">
-              <div
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                  "text-xs font-medium"
-                )}
-              >
-                {ownerInfo.contactPerson.charAt(0)}
+            <Link
+              href={`/people/${ownerInfo.contactPersonUuid}`}
+              className="inline-block"
+            >
+              <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                <div
+                  className={cn(
+                    "flex items-center justify-center",
+                    "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                    "text-xs font-medium"
+                  )}
+                >
+                  {ownerInfo.contactPerson.charAt(0)}
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {ownerInfo.contactPerson}
+                </span>
               </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {ownerInfo.contactPerson}
-              </span>
-            </div>
+            </Link>
           </div>
           <Separator className="my-4" />
           <div>
