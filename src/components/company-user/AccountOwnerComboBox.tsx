@@ -34,7 +34,7 @@ const accountOwners: AccountOwner[] = [
 
 export function AccountOwnerCombobox() {
   const [open, setOpen] = React.useState(false);
-  const isDesktop = useMediaQuery();
+  const { isDesktop } = useMediaQuery();
   const [selectedOwner, setSelectedOwner] = React.useState<AccountOwner | null>(
     null
   );

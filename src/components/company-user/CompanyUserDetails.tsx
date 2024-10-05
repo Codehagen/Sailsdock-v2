@@ -31,6 +31,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { AccountOwnerCombobox } from "./AccountOwnerComboBox";
+import { extractDomain } from "@/lib/utils"; // Add this import
 
 interface OwnerInfo {
   name: string;
@@ -48,6 +49,16 @@ interface OwnerInfo {
   twitter: string;
   addedDate: string;
   contactPersonUuid: string; // Add this new property
+}
+
+interface InfoItem {
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+  label: string;
+  value: string;
+  isLink?: boolean;
+  isBadge?: boolean;
+  linkPrefix?: string;
+  displayValue?: string; // Add this property
 }
 
 export function CompanyUserDetails({
@@ -72,7 +83,7 @@ export function CompanyUserDetails({
     name: "Propdock AS",
     orgNumber: "912345678",
     contactPerson: "Christer Hagen",
-    contactPersonUuid: "123e4567-e89b-12d3-a456-426614174000", // Example UUID
+    contactPersonUuid: "123e4567-e89b-12d3-a456-426614174000",
     email: "christer@propdock.no",
     phone: "+47 123 45 678",
     address: "Storgata 1, 0123 Oslo",
@@ -98,40 +109,56 @@ export function CompanyUserDetails({
 
   const addedTimeAgo = getTimeAgo(ownerInfo.addedDate);
 
-  const infoItems = [
+  const infoItems: InfoItem[] = [
     { icon: Building, label: "Org.nr", value: ownerInfo.orgNumber },
     { icon: MapPin, label: "Adresse", value: ownerInfo.address },
     { icon: DollarSign, label: "ARR", value: ownerInfo.arr },
     { icon: Calendar, label: "Opprettet av", value: ownerInfo.createdBy },
-    { icon: Globe, label: "Nettside", value: ownerInfo.website, isLink: true },
+    {
+      icon: Globe,
+      label: "Nettside",
+      value: ownerInfo.website,
+      isLink: true,
+      isBadge: true,
+      displayValue: extractDomain(ownerInfo.website), // Add this line
+    },
     { icon: Users, label: "Ansatte", value: ownerInfo.employees },
     {
       icon: Linkedin,
       label: "LinkedIn",
       value: ownerInfo.linkedin,
       isLink: true,
+      isBadge: true,
+      displayValue: extractDomain(ownerInfo.linkedin), // Add this line
     },
     {
       icon: Clock,
       label: "Sist oppdatert",
       value: formatDate(ownerInfo.lastUpdated),
     },
-    { icon: Twitter, label: "Twitter", value: ownerInfo.twitter, isLink: true },
-    // Remove the contact person from this array
     {
-      icon: Mail,
-      label: "E-post",
-      value: ownerInfo.email,
+      icon: Twitter,
+      label: "Twitter",
+      value: ownerInfo.twitter,
       isLink: true,
-      linkPrefix: "mailto:",
+      isBadge: true,
+      displayValue: extractDomain(ownerInfo.twitter), // Add this line
     },
-    {
-      icon: Phone,
-      label: "Telefon",
-      value: ownerInfo.phone,
-      isLink: true,
-      linkPrefix: "tel:",
-    },
+    // Commented out items
+    // {
+    //   icon: Mail,
+    //   label: "E-post",
+    //   value: ownerInfo.email,
+    //   isLink: true,
+    //   linkPrefix: "mailto:",
+    // },
+    // {
+    //   icon: Phone,
+    //   label: "Telefon",
+    //   value: ownerInfo.phone,
+    //   isLink: true,
+    //   linkPrefix: "tel:",
+    // },
   ];
 
   return (
@@ -161,20 +188,35 @@ export function CompanyUserDetails({
                 {item.label}:
               </span>
               {item.isLink ? (
-                <a
-                  href={
-                    item.linkPrefix
-                      ? `${item.linkPrefix}${item.value}`
-                      : item.value
-                  }
-                  target={item.linkPrefix ? "_self" : "_blank"}
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  {item.value}
-                </a>
+                item.isBadge ? (
+                  <Badge variant="secondary" className="font-normal">
+                    <a
+                      href={item.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm hover:underline text-muted-foreground"
+                    >
+                      {item.displayValue || item.value}
+                    </a>
+                  </Badge>
+                ) : (
+                  <a
+                    href={
+                      item.linkPrefix
+                        ? `${item.linkPrefix}${item.value}`
+                        : item.value
+                    }
+                    target={item.linkPrefix ? "_self" : "_blank"}
+                    rel="noopener noreferrer"
+                    className="text-sm text-muted-foreground hover:underline"
+                  >
+                    {item.displayValue || item.value}
+                  </a>
+                )
               ) : (
-                <span className="text-sm">{item.value}</span>
+                <span className="text-sm text-muted-foreground">
+                  {item.value}
+                </span>
               )}
             </div>
           ))}
