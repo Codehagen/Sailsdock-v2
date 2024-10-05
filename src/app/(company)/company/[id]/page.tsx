@@ -4,6 +4,14 @@ import { getCompanyDetails } from "@/actions/company/get-details-companies";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { CompanyUserDetails } from "@/components/company-user/CompanyUserDetails";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Activity,
+  CheckSquare,
+  FileText,
+  File,
+  Mail,
+  Calendar,
+} from "lucide-react";
 
 export default async function CompanyUserPage({
   params,
@@ -37,12 +45,30 @@ export default async function CompanyUserPage({
         <div className="md:col-span-2">
           <Tabs defaultValue="timeline" className="w-full">
             <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="tasks">Tasks</TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
-              <TabsTrigger value="files">Files</TabsTrigger>
-              <TabsTrigger value="emails">Emails</TabsTrigger>
-              <TabsTrigger value="calendar">Calendar</TabsTrigger>
+              <TabsTrigger value="timeline" className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                <span>Timeline</span>
+              </TabsTrigger>
+              <TabsTrigger value="tasks" className="flex items-center gap-2">
+                <CheckSquare className="h-4 w-4" />
+                <span>Tasks</span>
+              </TabsTrigger>
+              <TabsTrigger value="notes" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>Notes</span>
+              </TabsTrigger>
+              <TabsTrigger value="files" className="flex items-center gap-2">
+                <File className="h-4 w-4" />
+                <span>Files</span>
+              </TabsTrigger>
+              <TabsTrigger value="emails" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span>Emails</span>
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <span>Calendar</span>
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="timeline">
               <div className="space-y-4">
