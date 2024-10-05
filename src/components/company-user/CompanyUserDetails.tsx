@@ -21,6 +21,7 @@ import {
   Linkedin,
   Clock,
   Twitter,
+  Plus,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
@@ -29,6 +30,7 @@ import { nb } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { AccountOwnerCombobox } from "./AccountOwnerComboBox";
 
 interface OwnerInfo {
   name: string;
@@ -177,30 +179,31 @@ export function CompanyUserDetails({
             </div>
           ))}
           <Separator className="my-4" />
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">
+          <div className="flex justify-between items-center">
+            <h4 className="text-sm font-medium text-muted-foreground">
               Account Owner
             </h4>
-            <Link
-              href={`/people/${ownerInfo.contactPersonUuid}`}
-              className="inline-block"
-            >
-              <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                <div
-                  className={cn(
-                    "flex items-center justify-center",
-                    "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                    "text-xs font-medium"
-                  )}
-                >
-                  {ownerInfo.contactPerson.charAt(0)}
-                </div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {ownerInfo.contactPerson}
-                </span>
-              </div>
-            </Link>
+            <AccountOwnerCombobox />
           </div>
+          <Link
+            href={`/people/${ownerInfo.contactPersonUuid}`}
+            className="inline-block"
+          >
+            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+              <div
+                className={cn(
+                  "flex items-center justify-center",
+                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                  "text-xs font-medium"
+                )}
+              >
+                {ownerInfo.contactPerson.charAt(0)}
+              </div>
+              <span className="text-sm font-medium text-muted-foreground">
+                {ownerInfo.contactPerson}
+              </span>
+            </div>
+          </Link>
           <Separator className="my-4" />
           <div>
             <h4 className="text-sm font-medium text-muted-foreground mb-2">
