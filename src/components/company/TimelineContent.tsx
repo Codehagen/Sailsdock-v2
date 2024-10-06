@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import {
   Paperclip,
@@ -29,6 +29,7 @@ interface TimelineItem {
     | "domain"
     | "status"
     | "creation";
+  user: string; // Add this line
 }
 
 const iconMap = {
@@ -55,29 +56,32 @@ export function TimelineContent() {
   const [timelineItems, setTimelineItems] = useState<TimelineItem[]>([
     {
       id: "1",
-      action: "Du oppdaterte en relatert oppgave Uten tittel",
+      action: "oppdaterte en relatert oppgave Uten tittel",
       timestamp: "2024-10-06T10:00:00Z",
       icon: "task",
+      user: "Christer",
     },
     {
       id: "2",
-      action: "Du oppdaterte ICP → ✗ Usann",
+      action: "oppdaterte ICP → ✗ Usann",
       timestamp: "2024-10-05T14:30:00Z",
       icon: "status",
+      user: "Vegard",
     },
     {
       id: "3",
-      action: "Du oppdaterte 2 felt på Vegard Enterprises",
+      action: "oppdaterte felt på Vegard Enterprises",
       details: "Linkedin → sailsdock.no\nARR → $",
       timestamp: "2024-10-05T09:00:00Z",
       icon: "company",
+      user: "Steffen",
     },
-    // Add the Propdock creation item as the last (oldest) item
     {
       id: "creation",
-      action: "Propdock ble laget av deg",
-      timestamp: "2024-01-01T00:00:00Z", // Set this to the actual creation date
+      action: "Propdock ble laget",
+      timestamp: "2024-01-01T00:00:00Z",
       icon: "creation",
+      user: "Vegard",
     },
   ]);
 
@@ -132,7 +136,21 @@ export function TimelineContent() {
                 <div className="flex justify-between items-start">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">{item.action}</span>
+                      {item.id === "creation" ? (
+                        <>
+                          {item.action} av{" "}
+                          <span className="font-medium">{item.user}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="font-medium">{item.user}</span>{" "}
+                          {item.details
+                            ? `oppdaterte ${
+                                item.details.split("\n").length
+                              } felt på ${item.action.split(" på ")[1]}`
+                            : item.action}
+                        </>
+                      )}
                     </p>
                     {item.details && (
                       <div className="mt-2 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground">
@@ -172,15 +190,10 @@ export function TimelineContent() {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
-                    {item.id === "creation"
-                      ? ""
-                      : format(
-                          parseISO(item.timestamp),
-                          "'for' d 'dager siden'",
-                          {
-                            locale: nb,
-                          }
-                        )}
+                    {formatDistanceToNow(parseISO(item.timestamp), {
+                      addSuffix: true,
+                      locale: nb,
+                    })}
                   </p>
                 </div>
               </li>
