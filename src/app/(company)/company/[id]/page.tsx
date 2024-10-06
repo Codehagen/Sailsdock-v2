@@ -15,6 +15,7 @@ import { NotesContent } from "@/components/company/NotesContent";
 import { FilesContent } from "@/components/company/FilesContent";
 import { EmailsContent } from "@/components/company/EmailsContent";
 import { CalendarContent } from "@/components/company/CalendarContent";
+import { TimelineContent } from "@/components/company/TimelineContent";
 
 export default async function CompanyUserPage({
   params,
@@ -68,19 +69,7 @@ export default async function CompanyUserPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value="timeline">
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium">October 2024</h4>
-                <div className="space-y-2">
-                  <p className="text-sm">
-                    You updated 3 fields on Vegard Enterprises
-                  </p>
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
-                    <li>Employees → 20</li>
-                    <li>Domain Name → vg.no</li>
-                    <li>LinkedIn → sailsdock.no</li>
-                  </ul>
-                </div>
-              </div>
+              <TimelineContent />
             </TabsContent>
             <TabsContent value="tasks">
               <TasksContent />

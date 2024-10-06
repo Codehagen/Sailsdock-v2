@@ -9,7 +9,7 @@ export function NotesContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="file" />
-        <EmptyPlaceholder.Title>Ingen notater ennå</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen notater</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
           Begynn å legge til notater for dette selskapet.
         </EmptyPlaceholder.Description>

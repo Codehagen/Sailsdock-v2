@@ -9,7 +9,7 @@ export function EmailsContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="mail" />
-        <EmptyPlaceholder.Title>Ingen e-poster ennå</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen e-poster</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
           Begynn å spore e-poster for dette selskapet.
         </EmptyPlaceholder.Description>

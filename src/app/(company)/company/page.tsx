@@ -59,8 +59,8 @@ export default async function CompanyPage() {
             Ingen selskaper funnet
           </EmptyPlaceholder.Title>
           <EmptyPlaceholder.Description>
-            Du har ikke lagt til noen selskaper ennå. Legg til et selskap for å
-            komme i gang.
+            Du har ikke lagt til noen selskaper. Legg til et selskap for å komme
+            i gang.
           </EmptyPlaceholder.Description>
           <Button className="mt-4">Legg til selskap</Button>
         </EmptyPlaceholder>

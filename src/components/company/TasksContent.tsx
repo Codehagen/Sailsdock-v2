@@ -42,7 +42,7 @@ export function TasksContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="checkSquare" />
-        <EmptyPlaceholder.Title>Ingen oppgaver ennå</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen oppgaver</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
           Opprett din første oppgave for dette selskapet.
         </EmptyPlaceholder.Description>
