@@ -10,7 +10,8 @@ import {
   Building2,
   Globe,
   CheckSquare,
-  Rocket, // Add this import
+  Rocket,
+  Linkedin,
 } from "lucide-react";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { Button } from "@/components/ui/button";
@@ -135,7 +136,38 @@ export function TimelineContent() {
                     </p>
                     {item.details && (
                       <div className="mt-2 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground">
-                        {item.details}
+                        {item.details.split("\n").map((detail, index) => {
+                          const [key, value] = detail
+                            .split("→")
+                            .map((s) => s.trim());
+                          let Icon;
+                          switch (key.toLowerCase()) {
+                            case "employees":
+                              Icon = Users;
+                              break;
+                            case "domain name":
+                              Icon = Globe;
+                              break;
+                            case "linkedin":
+                              Icon = Linkedin;
+                              break;
+                            default:
+                              Icon = Building2;
+                          }
+                          return (
+                            <div
+                              key={index}
+                              className="flex items-center mb-1 last:mb-0"
+                            >
+                              <Icon className="w-4 h-4 mr-2 text-gray-500" />
+                              <span className="font-medium mr-2">{key}</span>
+                              <span className="text-gray-500">→</span>
+                              <span className="ml-2 bg-white px-2 py-0.5 rounded">
+                                {value}
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
