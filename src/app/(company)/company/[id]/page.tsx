@@ -1,7 +1,5 @@
 import { DashboardShell } from "@/components/shell/shell";
-import { DashboardHeader } from "@/components/shell/header";
 import { getCompanyDetails } from "@/actions/company/get-details-companies";
-import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { CompanyUserDetails } from "@/components/company-user/CompanyUserDetails";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,6 +10,11 @@ import {
   Mail,
   Calendar,
 } from "lucide-react";
+import { TasksContent } from "@/components/company/TasksContent";
+import { NotesContent } from "@/components/company/NotesContent";
+import { FilesContent } from "@/components/company/FilesContent";
+import { EmailsContent } from "@/components/company/EmailsContent";
+import { CalendarContent } from "@/components/company/CalendarContent";
 
 export default async function CompanyUserPage({
   params,
@@ -24,20 +27,14 @@ export default async function CompanyUserPage({
   if (!companyDetails) {
     return (
       <DashboardShell>
-        <DashboardHeader
-          heading="Company not found"
-          text="No company found with the provided ID."
-        />
+        <h1 className="text-2xl font-bold">Company not found</h1>
+        <p>No company found with the provided ID.</p>
       </DashboardShell>
     );
   }
 
   return (
     <DashboardShell>
-      {/* <DashboardHeader
-        heading={companyDetails.name}
-        text={`Details for company with ID: ${companyId}`}
-      /> */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-1">
           <CompanyUserDetails companyDetails={companyDetails} />
@@ -83,23 +80,22 @@ export default async function CompanyUserPage({
                     <li>LinkedIn → sailsdock.no</li>
                   </ul>
                 </div>
-                {/* Add more timeline items as needed */}
               </div>
             </TabsContent>
             <TabsContent value="tasks">
-              <p>Tasks content</p>
+              <TasksContent />
             </TabsContent>
             <TabsContent value="notes">
-              <p>Notes content</p>
+              <NotesContent />
             </TabsContent>
             <TabsContent value="files">
-              <p>Files content</p>
+              <FilesContent />
             </TabsContent>
             <TabsContent value="emails">
-              <p>Emails content</p>
+              <EmailsContent />
             </TabsContent>
             <TabsContent value="calendar">
-              <p>Calendar content</p>
+              <CalendarContent />
             </TabsContent>
           </Tabs>
         </div>
