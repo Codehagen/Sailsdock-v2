@@ -48,6 +48,9 @@ interface OwnerInfo {
   twitter: string;
   addedDate: string;
   contactPersonUuid: string; // Add this new property
+  accountOwners: string[]; // Add this new property
+  opportunities: string[]; // Add this new property
+  people: string[]; // Add this new property
 }
 
 interface InfoItem {
@@ -83,6 +86,9 @@ export function CompanyUserDetails({
     lastUpdated: "2023-04-15",
     twitter: "https://twitter.com/propdock",
     addedDate: "2023-05-15T10:30:00Z",
+    accountOwners: ["Christer Hagen"],
+    opportunities: ["Mulighet 1", "Mulighet 2"],
+    people: ["Christer Hagen", "John Doe", "Jane Doe"],
   });
 
   const [isOrgNumberPopoverOpen, setIsOrgNumberPopoverOpen] = useState(false);
@@ -268,68 +274,85 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Account Owner
+                Account Owner ({ownerInfo.accountOwners.length})
               </h4>
               <AccountOwnerCombobox />
             </div>
-            <Link
-              href={`/people/${ownerInfo.contactPersonUuid}`}
-              className="inline-block"
-            >
-              <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                <div
-                  className={cn(
-                    "flex items-center justify-center",
-                    "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                    "text-xs font-medium"
-                  )}
-                >
-                  {ownerInfo.contactPerson.charAt(0)}
+            {ownerInfo.accountOwners.map((owner, index) => (
+              <Link
+                key={index}
+                href={`/people/${ownerInfo.contactPersonUuid}`}
+                className="inline-block"
+              >
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                      "text-xs font-medium"
+                    )}
+                  >
+                    {owner.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {owner}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-muted-foreground">
-                  {ownerInfo.contactPerson}
-                </span>
-              </div>
-            </Link>
+              </Link>
+            ))}
           </div>
           <Separator className="my-4" />
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">
-              Muligheter
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-muted-foreground">
+              Muligheter ({ownerInfo.opportunities.length})
             </h4>
-            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2">
-              <div
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                  "text-xs font-medium"
-                )}
-              >
-                {ownerInfo.contactPerson.charAt(0)}
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {ownerInfo.contactPerson}
-              </span>
+            <div className="grid grid-cols-2 gap-2">
+              {ownerInfo.opportunities.map((opportunity, index) => (
+                <div
+                  key={index}
+                  className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2"
+                >
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                      "text-xs font-medium"
+                    )}
+                  >
+                    {opportunity.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {opportunity}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
           <Separator className="my-4" />
-          <div>
-            <h4 className="text-sm font-medium text-muted-foreground mb-2">
-              Personer
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium text-muted-foreground">
+              Personer ({ownerInfo.people.length})
             </h4>
-            <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2">
-              <div
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                  "text-xs font-medium"
-                )}
-              >
-                {ownerInfo.contactPerson.charAt(0)}
-              </div>
-              <span className="text-sm font-medium text-muted-foreground">
-                {ownerInfo.contactPerson}
-              </span>
+            <div className="grid grid-cols-2 gap-2">
+              {ownerInfo.people.map((person, index) => (
+                <div
+                  key={index}
+                  className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2"
+                >
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                      "text-xs font-medium"
+                    )}
+                  >
+                    {person.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {person}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
