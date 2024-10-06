@@ -9,16 +9,16 @@ export function FilesContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="file" />
-        <EmptyPlaceholder.Title>No files uploaded</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen filer lastet opp</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Upload your first file for this company.
+          Last opp din første fil for dette selskapet.
         </EmptyPlaceholder.Description>
         <Button className="mt-4">
-          <Plus className="mr-2 h-4 w-4" /> Upload file
+          <Plus className="mr-2 h-4 w-4" /> Last opp fil
         </Button>
       </EmptyPlaceholder>
     );
   }
 
-  return <p>Files content</p>; // Replace with actual files content
+  return <p>Filinnhold</p>; // Replace with actual files content
 }

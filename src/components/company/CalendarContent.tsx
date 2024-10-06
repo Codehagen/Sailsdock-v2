@@ -9,16 +9,18 @@ export function CalendarContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="calendar" />
-        <EmptyPlaceholder.Title>No events scheduled</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>
+          Ingen hendelser planlagt
+        </EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Schedule your first event for this company.
+          Planlegg din første hendelse for dette selskapet.
         </EmptyPlaceholder.Description>
         <Button className="mt-4">
-          <Plus className="mr-2 h-4 w-4" /> Add event
+          <Plus className="mr-2 h-4 w-4" /> Legg til hendelse
         </Button>
       </EmptyPlaceholder>
     );
   }
 
-  return <p>Calendar content</p>; // Replace with actual calendar content
+  return <p>Kalenderinnhold</p>; // Replace with actual calendar content
 }

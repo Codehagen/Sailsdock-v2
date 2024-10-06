@@ -9,16 +9,16 @@ export function NotesContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="file" />
-        <EmptyPlaceholder.Title>No notes yet</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen notater ennå</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Start adding notes for this company.
+          Begynn å legge til notater for dette selskapet.
         </EmptyPlaceholder.Description>
         <Button className="mt-4">
-          <Plus className="mr-2 h-4 w-4" /> Add note
+          <Plus className="mr-2 h-4 w-4" /> Legg til notat
         </Button>
       </EmptyPlaceholder>
     );
   }
 
-  return <p>Notes content</p>; // Replace with actual notes content
+  return <p>Notatinnhold</p>; // Replace with actual notes content
 }

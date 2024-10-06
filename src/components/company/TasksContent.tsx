@@ -1,6 +1,5 @@
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { AddTaskSheet } from "./AddTaskSheet";
 
 export function TasksContent() {
   const hasTasks = false; // This should be replaced with actual data check
@@ -9,16 +8,22 @@ export function TasksContent() {
     return (
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="checkSquare" />
-        <EmptyPlaceholder.Title>No tasks yet</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Title>Ingen oppgaver ennå</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Create your first task for this company.
+          Opprett din første oppgave for dette selskapet.
         </EmptyPlaceholder.Description>
-        <Button className="mt-4">
-          <Plus className="mr-2 h-4 w-4" /> Add task
-        </Button>
+        <AddTaskSheet />
       </EmptyPlaceholder>
     );
   }
 
-  return <p>Tasks content</p>; // Replace with actual tasks content
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Oppgaver</h2>
+        <AddTaskSheet />
+      </div>
+      <p>Oppgaveinnhold</p> {/* Replace with actual tasks content */}
+    </div>
+  );
 }
