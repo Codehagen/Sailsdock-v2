@@ -29,7 +29,8 @@ interface TimelineItem {
     | "domain"
     | "status"
     | "creation";
-  user: string; // Add this line
+  user: string;
+  showInBox?: boolean; // New property to determine if the item should be shown in the box
 }
 
 const iconMap = {
@@ -71,10 +72,20 @@ export function TimelineContent() {
     {
       id: "3",
       action: "oppdaterte felt på Vegard Enterprises",
-      details: "Linkedin → sailsdock.no\nARR → $",
+      details: "Linkedin → sailsdock.no",
       timestamp: "2024-10-05T09:00:00Z",
       icon: "company",
       user: "Steffen",
+      showInBox: true,
+    },
+    {
+      id: "4",
+      action: "oppdaterte felt på Vegard Enterprises",
+      details: "ARR → 1.000.000 NOK",
+      timestamp: "2024-10-05T09:00:00Z",
+      icon: "company",
+      user: "Steffen",
+      showInBox: true,
     },
     {
       id: "creation",
@@ -113,94 +124,157 @@ export function TimelineContent() {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Tidslinje</h2>
       </div>
-      {Object.entries(groupedItems).map(([date, dateItems], groupIndex) => (
-        <div key={date} className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-500 mb-4">{date}</h2>
-          <ul className="space-y-4 relative">
-            <div
-              className="absolute left-4 top-0 h-full w-0.5 bg-gray-200"
-              aria-hidden="true"
-            />
-            {dateItems.map((item, index) => (
-              <li key={item.id} className="relative pl-10">
-                <div className="absolute left-0 top-0.5">
-                  <TimelineIcon type={item.icon} />
-                </div>
-                {(index < dateItems.length - 1 ||
-                  groupIndex < Object.keys(groupedItems).length - 1) && (
-                  <div
-                    className="absolute left-4 top-9 h-full w-0.5 bg-gray-200"
-                    aria-hidden="true"
-                  />
-                )}
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      {item.id === "creation" ? (
-                        <>
-                          {item.action} av{" "}
-                          <span className="font-medium">{item.user}</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="font-medium">{item.user}</span>{" "}
-                          {item.details
-                            ? `oppdaterte ${
-                                item.details.split("\n").length
-                              } felt på ${item.action.split(" på ")[1]}`
-                            : item.action}
-                        </>
-                      )}
-                    </p>
-                    {item.details && (
-                      <div className="mt-2 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground">
-                        {item.details.split("\n").map((detail, index) => {
-                          const [key, value] = detail
-                            .split("→")
-                            .map((s) => s.trim());
-                          let Icon;
-                          switch (key.toLowerCase()) {
-                            case "employees":
-                              Icon = Users;
-                              break;
-                            case "domain name":
-                              Icon = Globe;
-                              break;
-                            case "linkedin":
-                              Icon = Linkedin;
-                              break;
-                            default:
-                              Icon = Building2;
-                          }
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center mb-1 last:mb-0"
-                            >
-                              <Icon className="w-4 h-4 mr-2 text-gray-500" />
-                              <span className="font-medium mr-2">{key}</span>
-                              <span className="text-gray-500">→</span>
-                              <span className="ml-2 bg-white px-2 py-0.5 rounded">
-                                {value}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
+      {Object.entries(groupedItems).map(([date, dateItems], groupIndex) => {
+        const allDetailsForDay = dateItems
+          .filter((item) => item.showInBox)
+          .flatMap((item) => (item.details ? item.details.split("\n") : []));
+
+        // Group actions by user for items that should be shown in the box
+        const groupedActions = dateItems.reduce((acc, item) => {
+          if (item.showInBox) {
+            if (!acc[item.user]) {
+              acc[item.user] = {
+                count: 0,
+                action: item.action,
+                timestamp: item.timestamp,
+              };
+            }
+            acc[item.user].count += item.details
+              ? item.details.split("\n").length
+              : 1;
+          }
+          return acc;
+        }, {} as Record<string, { count: number; action: string; timestamp: string }>);
+
+        return (
+          <div key={date} className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-500 mb-4">{date}</h2>
+            <ul className="space-y-4 relative">
+              <div
+                className="absolute left-4 top-0 h-full w-0.5 bg-gray-200"
+                aria-hidden="true"
+              />
+              {dateItems.map((item, index) => {
+                if (item.showInBox) {
+                  const groupedAction = groupedActions[item.user];
+                  if (
+                    groupedAction &&
+                    groupedAction.timestamp === item.timestamp
+                  ) {
+                    // Remove the grouped action so it's not rendered again
+                    delete groupedActions[item.user];
+                    return (
+                      <li key={item.id} className="relative pl-10">
+                        <div className="absolute left-0 top-0.5">
+                          <TimelineIcon type={item.icon} />
+                        </div>
+                        {(index < dateItems.length - 1 ||
+                          groupIndex <
+                            Object.keys(groupedItems).length - 1) && (
+                          <div
+                            className="absolute left-4 top-9 h-full w-0.5 bg-gray-200"
+                            aria-hidden="true"
+                          />
+                        )}
+                        <div className="flex justify-between items-start">
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm text-muted-foreground">
+                              <span className="font-medium">{item.user}</span>{" "}
+                              oppdaterte {groupedAction.count} felt på{" "}
+                              {item.action.split(" på ")[1]}
+                            </p>
+                          </div>
+                          <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
+                            {formatDistanceToNow(parseISO(item.timestamp), {
+                              addSuffix: true,
+                              locale: nb,
+                            })}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  }
+                  return null;
+                }
+                return (
+                  <li key={item.id} className="relative pl-10">
+                    <div className="absolute left-0 top-0.5">
+                      <TimelineIcon type={item.icon} />
+                    </div>
+                    {(index < dateItems.length - 1 ||
+                      groupIndex < Object.keys(groupedItems).length - 1) && (
+                      <div
+                        className="absolute left-4 top-9 h-full w-0.5 bg-gray-200"
+                        aria-hidden="true"
+                      />
                     )}
-                  </div>
-                  <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
-                    {formatDistanceToNow(parseISO(item.timestamp), {
-                      addSuffix: true,
-                      locale: nb,
-                    })}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm text-muted-foreground">
+                          {item.id === "creation" ? (
+                            <>
+                              {item.action} av{" "}
+                              <span className="font-medium">{item.user}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-medium">{item.user}</span>{" "}
+                              {item.action}
+                            </>
+                          )}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
+                        {formatDistanceToNow(parseISO(item.timestamp), {
+                          addSuffix: true,
+                          locale: nb,
+                        })}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {allDetailsForDay.length > 0 && (
+              <div className="mt-4 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground">
+                {allDetailsForDay.map((detail, index) => {
+                  const [key, value] = detail.split("→").map((s) => s.trim());
+                  let Icon;
+                  switch (key.toLowerCase()) {
+                    case "employees":
+                      Icon = Users;
+                      break;
+                    case "domain name":
+                      Icon = Globe;
+                      break;
+                    case "linkedin":
+                      Icon = Linkedin;
+                      break;
+                    case "arr":
+                      Icon = Building2;
+                      break;
+                    default:
+                      return null; // Don't render other fields in the box
+                  }
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center mb-1 last:mb-0"
+                    >
+                      <Icon className="w-4 h-4 mr-2 text-gray-500" />
+                      <span className="font-medium mr-2">{key}</span>
+                      <span className="text-gray-500">→</span>
+                      <span className="ml-2 bg-white px-2 py-0.5 rounded">
+                        {value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
       {/* For testing purposes */}
       <Button
         onClick={() => setHasTimelineItems(!hasTimelineItems)}
