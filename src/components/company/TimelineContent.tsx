@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import {
@@ -88,6 +88,15 @@ export function TimelineContent() {
       showInBox: true,
     },
     {
+      id: "5",
+      action: "oppdaterte felt på Vegard Enterprises",
+      details: "ARR → 1.000.000 NOK",
+      timestamp: "2024-10-02T09:00:00Z",
+      icon: "company",
+      user: "Steffen",
+      showInBox: true,
+    },
+    {
       id: "creation",
       action: "Propdock ble laget",
       timestamp: "2024-01-01T00:00:00Z",
@@ -125,153 +134,149 @@ export function TimelineContent() {
         <h2 className="text-xl font-bold">Tidslinje</h2>
       </div>
       {Object.entries(groupedItems).map(([date, dateItems], groupIndex) => {
-        const allDetailsForDay = dateItems
-          .filter((item) => item.showInBox)
-          .flatMap((item) => (item.details ? item.details.split("\n") : []));
-
-        // Group actions by user for items that should be shown in the box
-        const groupedActions = dateItems.reduce((acc, item) => {
-          if (item.showInBox) {
-            if (!acc[item.user]) {
-              acc[item.user] = {
-                count: 0,
-                action: item.action,
-                timestamp: item.timestamp,
-              };
-            }
-            acc[item.user].count += item.details
-              ? item.details.split("\n").length
-              : 1;
+        // Group items by date and user
+        const groupedByDateAndUser = dateItems.reduce((acc, item) => {
+          const key = `${format(parseISO(item.timestamp), "yyyy-MM-dd")}-${
+            item.user
+          }`;
+          if (!acc[key]) {
+            acc[key] = [];
           }
+          acc[key].push(item);
           return acc;
-        }, {} as Record<string, { count: number; action: string; timestamp: string }>);
+        }, {} as Record<string, TimelineItem[]>);
 
         return (
           <div key={date} className="mb-8">
             <h2 className="text-lg font-semibold text-gray-500 mb-4">{date}</h2>
             <ul className="space-y-4 relative">
               <div
-                className="absolute left-4 top-0 h-full w-0.5 bg-gray-200"
+                className="absolute left-4 top-0 h-full w-0.5 bg-gray-200 z-0"
                 aria-hidden="true"
               />
-              {dateItems.map((item, index) => {
-                if (item.showInBox) {
-                  const groupedAction = groupedActions[item.user];
-                  if (
-                    groupedAction &&
-                    groupedAction.timestamp === item.timestamp
-                  ) {
-                    // Remove the grouped action so it's not rendered again
-                    delete groupedActions[item.user];
-                    return (
-                      <li key={item.id} className="relative pl-10">
-                        <div className="absolute left-0 top-0.5">
-                          <TimelineIcon type={item.icon} />
-                        </div>
-                        {(index < dateItems.length - 1 ||
-                          groupIndex <
-                            Object.keys(groupedItems).length - 1) && (
-                          <div
-                            className="absolute left-4 top-9 h-full w-0.5 bg-gray-200"
-                            aria-hidden="true"
-                          />
-                        )}
-                        <div className="flex justify-between items-start">
-                          <div className="flex flex-col space-y-1">
-                            <p className="text-sm text-muted-foreground">
-                              <span className="font-medium">{item.user}</span>{" "}
-                              oppdaterte {groupedAction.count} felt på{" "}
-                              {item.action.split(" på ")[1]}
+              {Object.entries(groupedByDateAndUser).map(
+                ([dateUserKey, items]) => {
+                  const boxItems = items.filter((item) => item.showInBox);
+                  const nonBoxItems = items.filter((item) => !item.showInBox);
+
+                  return (
+                    <React.Fragment key={dateUserKey}>
+                      {nonBoxItems.map((item) => (
+                        <li key={item.id} className="relative pl-10">
+                          {/* Render non-box items */}
+                          <div className="absolute left-0 top-0.5">
+                            <TimelineIcon type={item.icon} />
+                          </div>
+                          <div className="flex justify-between items-start">
+                            <div className="flex flex-col space-y-1">
+                              <p className="text-sm text-muted-foreground">
+                                {item.id === "creation" ? (
+                                  <>
+                                    {item.action} av{" "}
+                                    <span className="font-medium">
+                                      {item.user}
+                                    </span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span className="font-medium">
+                                      {item.user}
+                                    </span>{" "}
+                                    {item.action}
+                                  </>
+                                )}
+                              </p>
+                            </div>
+                            <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
+                              {formatDistanceToNow(parseISO(item.timestamp), {
+                                addSuffix: true,
+                                locale: nb,
+                              })}
                             </p>
                           </div>
-                          <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
-                            {formatDistanceToNow(parseISO(item.timestamp), {
-                              addSuffix: true,
-                              locale: nb,
-                            })}
-                          </p>
-                        </div>
-                      </li>
-                    );
-                  }
-                  return null;
-                }
-                return (
-                  <li key={item.id} className="relative pl-10">
-                    <div className="absolute left-0 top-0.5">
-                      <TimelineIcon type={item.icon} />
-                    </div>
-                    {(index < dateItems.length - 1 ||
-                      groupIndex < Object.keys(groupedItems).length - 1) && (
-                      <div
-                        className="absolute left-4 top-9 h-full w-0.5 bg-gray-200"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <div className="flex justify-between items-start">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm text-muted-foreground">
-                          {item.id === "creation" ? (
-                            <>
-                              {item.action} av{" "}
-                              <span className="font-medium">{item.user}</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="font-medium">{item.user}</span>{" "}
-                              {item.action}
-                            </>
-                          )}
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
-                        {formatDistanceToNow(parseISO(item.timestamp), {
-                          addSuffix: true,
-                          locale: nb,
-                        })}
-                      </p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            {allDetailsForDay.length > 0 && (
-              <div className="mt-4 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground">
-                {allDetailsForDay.map((detail, index) => {
-                  const [key, value] = detail.split("→").map((s) => s.trim());
-                  let Icon;
-                  switch (key.toLowerCase()) {
-                    case "employees":
-                      Icon = Users;
-                      break;
-                    case "domain name":
-                      Icon = Globe;
-                      break;
-                    case "linkedin":
-                      Icon = Linkedin;
-                      break;
-                    case "arr":
-                      Icon = Building2;
-                      break;
-                    default:
-                      return null; // Don't render other fields in the box
-                  }
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center mb-1 last:mb-0"
-                    >
-                      <Icon className="w-4 h-4 mr-2 text-gray-500" />
-                      <span className="font-medium mr-2">{key}</span>
-                      <span className="text-gray-500">→</span>
-                      <span className="ml-2 bg-white px-2 py-0.5 rounded">
-                        {value}
-                      </span>
-                    </div>
+                        </li>
+                      ))}
+                      {boxItems.length > 0 && (
+                        <>
+                          <li className="relative pl-10 z-10">
+                            <div className="absolute left-0 top-0.5">
+                              <TimelineIcon type={boxItems[0].icon} />
+                            </div>
+                            <div className="flex justify-between items-start">
+                              <div className="flex flex-col space-y-1">
+                                <p className="text-sm text-muted-foreground">
+                                  <span className="font-medium">
+                                    {boxItems[0].user}
+                                  </span>{" "}
+                                  oppdaterte {boxItems.length} felt på{" "}
+                                  {boxItems[0].action.split(" på ")[1]}
+                                </p>
+                              </div>
+                              <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
+                                {formatDistanceToNow(
+                                  parseISO(boxItems[0].timestamp),
+                                  {
+                                    addSuffix: true,
+                                    locale: nb,
+                                  }
+                                )}
+                              </p>
+                            </div>
+                          </li>
+                          <div className="mt-4 p-2 bg-gray-50 rounded-md text-sm text-muted-foreground relative z-10">
+                            {boxItems.flatMap((item) =>
+                              item.details
+                                ? item.details
+                                    .split("\n")
+                                    .map((detail, index) => {
+                                      const [key, value] = detail
+                                        .split("→")
+                                        .map((s) => s.trim());
+                                      let Icon;
+                                      switch (key.toLowerCase()) {
+                                        case "employees":
+                                          Icon = Users;
+                                          break;
+                                        case "domain name":
+                                          Icon = Globe;
+                                          break;
+                                        case "linkedin":
+                                          Icon = Linkedin;
+                                          break;
+                                        case "arr":
+                                          Icon = Building2;
+                                          break;
+                                        default:
+                                          return null;
+                                      }
+                                      return (
+                                        <div
+                                          key={`${item.id}-${index}`}
+                                          className="flex items-center mb-1 last:mb-0"
+                                        >
+                                          <Icon className="w-4 h-4 mr-2 text-gray-500" />
+                                          <span className="font-medium mr-2">
+                                            {key}
+                                          </span>
+                                          <span className="text-gray-500">
+                                            →
+                                          </span>
+                                          <span className="ml-2 bg-white px-2 py-0.5 rounded">
+                                            {value}
+                                          </span>
+                                        </div>
+                                      );
+                                    })
+                                : []
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </React.Fragment>
                   );
-                })}
-              </div>
-            )}
+                }
+              )}
+            </ul>
           </div>
         );
       })}

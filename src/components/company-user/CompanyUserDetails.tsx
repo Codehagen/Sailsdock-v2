@@ -13,6 +13,8 @@ import {
   Linkedin,
   Clock,
   Twitter,
+  Check,
+  X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -23,6 +25,13 @@ import Link from "next/link";
 import { AccountOwnerCombobox } from "./AccountOwnerComboBox";
 import { OpportunityCombobox } from "./OpportunityCombobox";
 import { PersonCombobox } from "./PersonCombobox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface OwnerInfo {
   name: string;
@@ -52,6 +61,7 @@ interface InfoItem {
   isBadge?: boolean;
   linkPrefix?: string;
   displayValue?: string;
+  editable?: boolean;
 }
 
 export function CompanyUserDetails({
@@ -66,7 +76,7 @@ export function CompanyUserDetails({
     email: "christer@propdock.no",
     phone: "+47 123 45 678",
     address: "Storgata 1, 0123 Oslo",
-    arr: "10 000 000 NOK",
+    arr: "1 000 000 NOK",
     createdBy: "John Doe",
     website: "https://propdock.no",
     employees: "50",
@@ -88,6 +98,22 @@ export function CompanyUserDetails({
     ],
   });
 
+  const [isOrgNumberPopoverOpen, setIsOrgNumberPopoverOpen] = useState(false);
+  const [editedOrgNumber, setEditedOrgNumber] = useState(ownerInfo.orgNumber);
+
+  const handleUpdateOrgNumber = () => {
+    setOwnerInfo((prevInfo) => ({
+      ...prevInfo,
+      orgNumber: editedOrgNumber,
+    }));
+    setIsOrgNumberPopoverOpen(false);
+  };
+
+  const handleCancelOrgNumberEdit = () => {
+    setEditedOrgNumber(ownerInfo.orgNumber);
+    setIsOrgNumberPopoverOpen(false);
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     return format(date, "d. MMMM yyyy", { locale: nb });
@@ -101,7 +127,12 @@ export function CompanyUserDetails({
   const addedTimeAgo = getTimeAgo(ownerInfo.addedDate);
 
   const infoItems: InfoItem[] = [
-    { icon: Building, label: "Org.nr", value: ownerInfo.orgNumber },
+    {
+      icon: Building,
+      label: "Org.nr",
+      value: ownerInfo.orgNumber,
+      editable: true,
+    },
     { icon: MapPin, label: "Adresse", value: ownerInfo.address },
     { icon: DollarSign, label: "ARR", value: ownerInfo.arr },
     { icon: Calendar, label: "Opprettet av", value: ownerInfo.createdBy },
@@ -163,7 +194,42 @@ export function CompanyUserDetails({
               <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
                 {item.label}:
               </span>
-              {item.isLink ? (
+              {item.editable ? (
+                <Popover
+                  open={isOrgNumberPopoverOpen}
+                  onOpenChange={setIsOrgNumberPopoverOpen}
+                >
+                  <PopoverTrigger asChild>
+                    <Button variant="ghost" className="p-0 h-auto font-normal">
+                      <span className="text-sm text-muted-foreground">
+                        {item.value}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="space-y-2">
+                      <Input
+                        value={editedOrgNumber}
+                        onChange={(e) => setEditedOrgNumber(e.target.value)}
+                      />
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={handleCancelOrgNumberEdit}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancel
+                        </Button>
+                        <Button size="sm" onClick={handleUpdateOrgNumber}>
+                          <Check className="h-4 w-4 mr-1" />
+                          Confirm
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              ) : item.isLink ? (
                 item.isBadge ? (
                   <Badge variant="secondary" className="font-normal">
                     <a
