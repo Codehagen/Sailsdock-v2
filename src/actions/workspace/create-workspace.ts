@@ -1,13 +1,12 @@
 "use server";
 
 import { apiClient } from "@/lib/internal-api/api-client";
-import { CompanyData } from "@/lib/internal-api/types";
+import { WorkspaceData } from "@/lib/internal-api/types";
 import { auth } from "@clerk/nextjs/server";
 
-export async function updateCompany(
-  companyId: string,
-  companyData: Partial<CompanyData>
-): Promise<CompanyData | null> {
+export async function createCompany(
+  companyData: Partial<WorkspaceData>
+): Promise<WorkspaceData | null> {
   const { userId } = auth();
 
   if (!userId) {
@@ -16,16 +15,16 @@ export async function updateCompany(
   }
 
   try {
-    const response = await apiClient.company.update(companyId, companyData);
+    const response = await apiClient.workspaces.create(companyData);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
     } else {
-      console.error("Failed to update company:", response.status);
+      console.error("Failed to create company:", response.status);
       return null;
     }
   } catch (error: any) {
-    console.error("Error in updateCompany:", error.message);
+    console.error("Error in createCompany:", error.message);
     return null;
   }
 }

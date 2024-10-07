@@ -160,3 +160,12 @@ export const timeAgo = (
   }
   return `${ms(diff)}${withAgo ? " ago" : ""}`;
 };
+
+export function extractDomain(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname.replace(/^www\./, '');
+  } catch {
+    return url; // Return the original string if it's not a valid URL
+  }
+}

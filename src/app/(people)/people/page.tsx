@@ -22,8 +22,8 @@ export default async function PeoplePage() {
         <EmptyPlaceholder.Icon name="user" />
         <EmptyPlaceholder.Title>Legg til person</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Du har ikke lagt til noen personer ennå. Legg til en person for å
-          komme i gang.
+          Du har ikke lagt til noen personer. Legg til en person for å komme i
+          gang.
         </EmptyPlaceholder.Description>
         <Button className="mt-4">Legg til person</Button>
       </EmptyPlaceholder>

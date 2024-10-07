@@ -22,8 +22,8 @@ export default async function DashboardPage() {
         <EmptyPlaceholder.Icon name="layout" />
         <EmptyPlaceholder.Title>Finn ditt workspace</EmptyPlaceholder.Title>
         <EmptyPlaceholder.Description>
-          Du har ikke lagt til et workspace ennå. Legg til et workspace for å
-          komme i gang.
+          Du har ikke lagt til et workspace. Legg til et workspace for å komme i
+          gang.
         </EmptyPlaceholder.Description>
         <Button className="mt-4"></Button>
       </EmptyPlaceholder>

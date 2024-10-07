@@ -16,10 +16,10 @@ export async function getCompanies(): Promise<CompanyData[] | null> {
     }
 
     const companyId = currentUser.company_details.uuid;
-    const response = await apiClient.companies.get(companyId);
+    const response = await apiClient.company.getAll(companyId);
 
-    if (response.success && response.data.length > 0) {
-      return response.data;
+    if (response.success && Array.isArray(response.data)) {
+      return response.data.flat();
     } else {
       console.error("Companies not found:", response.status);
       return null;

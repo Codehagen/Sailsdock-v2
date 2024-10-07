@@ -4,9 +4,8 @@ import { apiClient } from "@/lib/internal-api/api-client";
 import { CompanyData } from "@/lib/internal-api/types";
 import { auth } from "@clerk/nextjs/server";
 
-export async function updateCompany(
-  companyId: string,
-  companyData: Partial<CompanyData>
+export async function getAllCompanies(
+  companyId: string
 ): Promise<CompanyData | null> {
   const { userId } = auth();
 
@@ -16,16 +15,16 @@ export async function updateCompany(
   }
 
   try {
-    const response = await apiClient.company.update(companyId, companyData);
+    const response = await apiClient.companies.get(companyId);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
     } else {
-      console.error("Failed to update company:", response.status);
+      console.error("Company not found:", response.status);
       return null;
     }
   } catch (error: any) {
-    console.error("Error in updateCompany:", error.message);
+    console.error("Error in getCompany:", error.message);
     return null;
   }
 }

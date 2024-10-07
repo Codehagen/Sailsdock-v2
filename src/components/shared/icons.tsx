@@ -29,6 +29,7 @@ import {
   LineChart,
   ListTodo,
   Loader2,
+  Mail,
   Map,
   Moon,
   MoreVertical,
@@ -50,6 +51,8 @@ import {
   Upload,
   User,
   X,
+  CheckSquare,
+  Calendar,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -104,6 +107,9 @@ export const Icons = {
   goal: Goal,
   listTodo: ListTodo,
   notebook: Notebook,
+  mail: Mail,
+  checkSquare: CheckSquare,
+  calendar: Calendar,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"

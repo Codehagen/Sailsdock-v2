@@ -1,6 +1,12 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
 import { auth } from "@clerk/nextjs/server";
-import { ApiResponse, UserData, CompanyData, DealData } from "./types";
+import {
+  ApiResponse,
+  UserData,
+  WorkspaceData,
+  DealData,
+  CompanyData,
+} from "./types";
 
 class ApiClient {
   private axiosInstance: AxiosInstance;
@@ -91,11 +97,11 @@ class ApiClient {
     delete: (userId: string) => this.request<UserData>("delete", `users/${userId}`),
   };
   // prettier-ignore
-  companies = {
-    get: (companyId: string) => this.request<CompanyData>("get", `companies/${companyId}`),
-    create: (companyData: Partial<CompanyData>) => this.request<CompanyData>("post", "companies/", companyData),
-    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `companies/${companyId}`, companyData),
-    delete: (companyId: string) => this.request<CompanyData>("delete", `companies/${companyId}`),
+  workspaces = {
+    get: (workspaceId: string) => this.request<WorkspaceData>("get", `companies/${workspaceId}`),
+    create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "companies/", workspaceData),
+    update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `companies/${workspaceId}`, workspaceData),
+    delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `companies/${workspaceId}`),
   };
   // prettier-ignore
   deals = {
@@ -103,6 +109,15 @@ class ApiClient {
     create: (dealData: Partial<DealData>) => this.request<DealData>("post", "deals/", dealData),
     update: (dealId: string, dealData: Partial<DealData>) => this.request<DealData>("patch", `deals/${dealId}`, dealData),
     delete: (dealId: string) => this.request<DealData>("delete", `deals/${dealId}`),
+  };
+  //TODO Change URL ENDPOINT WHEN @grax is ready
+  // prettier-ignore
+  company = {
+    getAll: (companyId: string) => this.request<CompanyData[]>("get", `companies/${companyId}/customers`),
+    get:    (customerId: string) => this.request<CompanyData>("get", `/customers/${customerId}`),
+    create: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `companies/${companyId}/customers/`, companyData),
+    update: (customerId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/customers/${customerId}`, companyData),
+    delete: (customerId: string) => this.request<CompanyData>("delete", `/customers/${customerId}`),
   };
 }
 
