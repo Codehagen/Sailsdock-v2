@@ -24,10 +24,18 @@ export interface ColumnDragData {
 interface BoardColumnProps {
   column: Column;
   tasks: Task[];
-  isOverlay?: boolean;
+  children?: React.ReactNode; // Add this line
+  isOverlay?: boolean; // Add this line
+  onStatusChange: (taskId: UniqueIdentifier, newStatus: string) => void; // Add this line
 }
 
-export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
+export function BoardColumn({
+  column,
+  tasks,
+  children,
+  isOverlay,
+  onStatusChange, // Add this parameter
+}: BoardColumnProps) {
   const tasksIds = useMemo(() => {
     return tasks.map((task) => task.id);
   }, [tasks]);
@@ -92,7 +100,11 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         <CardContent className="flex flex-grow flex-col gap-2 p-2">
           <SortableContext items={tasksIds}>
             {tasks.map((task) => (
-              <TaskCard key={task.id} task={task} />
+              <TaskCard
+                key={task.id}
+                task={task}
+                onStatusChange={onStatusChange} // Pass the onStatusChange prop
+              />
             ))}
           </SortableContext>
         </CardContent>

@@ -1,14 +1,13 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useMemo, useRef, useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 
 import { BoardColumn, BoardContainer } from "./BoardColumn";
 import {
   DndContext,
   type DragEndEvent,
   type DragOverEvent,
-  DragOverlay,
   type DragStartEvent,
   useSensor,
   useSensors,
@@ -19,10 +18,16 @@ import {
   MouseSensor,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { type Task, TaskCard } from "./TaskCard";
+import { TaskCard, Task } from "./TaskCard";
 import type { Column } from "./BoardColumn";
 import { hasDraggableData } from "./kanban-utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
+
+// Dynamically import DragOverlay to use it only on the client side
+const DynamicDragOverlay = dynamic(
+  () => import("@dnd-kit/core").then((mod) => mod.DragOverlay),
+  { ssr: false }
+);
 
 const defaultCols = [
   {
@@ -45,67 +50,132 @@ const initialTasks: Task[] = [
   {
     id: "task1",
     columnId: "done",
-    content: "Project initiation and planning",
+    title: "Avtale navn",
+    status: "To do",
+    dueDate: "2024-05-15",
+    assignee: {
+      name: "Christer",
+    },
   },
   {
     id: "task2",
     columnId: "done",
-    content: "Gather requirements from stakeholders",
+    title: "Samle krav fra interessenter",
+    status: "To do",
+    dueDate: "2024-06-01",
+    assignee: {
+      name: "Vegard",
+    },
   },
   {
     id: "task3",
     columnId: "done",
-    content: "Create wireframes and mockups",
+    title: "Lage trådskisser og mockups",
+    status: "To do",
+    dueDate: "2024-06-15",
+    assignee: {
+      name: "Steffen",
+    },
   },
   {
     id: "task4",
     columnId: "in-progress",
-    content: "Develop homepage layout",
+    title: "Utvikle hjemmeside layout",
+    status: "To do",
+    dueDate: "2024-07-01",
+    assignee: {
+      name: "Christer",
+    },
   },
   {
     id: "task5",
     columnId: "in-progress",
-    content: "Design color scheme and typography",
+    title: "Designe fargepalett og typografi",
+    status: "To do",
+    dueDate: "2024-07-15",
+    assignee: {
+      name: "Vegard",
+    },
   },
   {
     id: "task6",
     columnId: "todo",
-    content: "Implement user authentication",
+    title: "Implementere brukerautentisering",
+    status: "To do",
+    dueDate: "2024-08-01",
+    assignee: {
+      name: "Steffen",
+    },
   },
   {
     id: "task7",
     columnId: "todo",
-    content: "Build contact us page",
+    title: "Bygge kontakt oss side",
+    status: "To do",
+    dueDate: "2024-08-15",
+    assignee: {
+      name: "Christer",
+    },
   },
   {
     id: "task8",
     columnId: "todo",
-    content: "Create product catalog",
+    title: "Lage produktkatalog",
+    status: "To do",
+    dueDate: "2024-09-01",
+    assignee: {
+      name: "Vegard",
+    },
   },
   {
     id: "task9",
     columnId: "todo",
-    content: "Develop about us page",
+    title: "Utvikle om oss side",
+    status: "To do",
+    dueDate: "2024-09-15",
+    assignee: {
+      name: "Steffen",
+    },
   },
   {
     id: "task10",
     columnId: "todo",
-    content: "Optimize website for mobile devices",
+    title: "Optimalisere nettsted for mobile enheter",
+    status: "To do",
+    dueDate: "2024-10-01",
+    assignee: {
+      name: "Christer",
+    },
   },
   {
     id: "task11",
     columnId: "todo",
-    content: "Integrate payment gateway",
+    title: "Integrere betalingsløsning",
+    status: "To do",
+    dueDate: "2024-10-15",
+    assignee: {
+      name: "Vegard",
+    },
   },
   {
     id: "task12",
     columnId: "todo",
-    content: "Perform testing and bug fixing",
+    title: "Utføre testing og feilretting",
+    status: "To do",
+    dueDate: "2024-11-01",
+    assignee: {
+      name: "Steffen",
+    },
   },
   {
     id: "task13",
     columnId: "todo",
-    content: "Launch website and deploy to server",
+    title: "Lansere nettsted og distribuere til server",
+    status: "To do",
+    dueDate: "2024-11-08",
+    assignee: {
+      name: "Christer",
+    },
   },
 ];
 export function KanbanBoard() {
@@ -233,6 +303,23 @@ export function KanbanBoard() {
     },
   };
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleStatusChange = (taskId: UniqueIdentifier, newStatus: string) => {
+    setTasks((prevTasks) => {
+      return prevTasks.map((task) => {
+        if (task.id === taskId) {
+          return { ...task, status: newStatus };
+        }
+        return task;
+      });
+    });
+  };
+
   return (
     <DndContext
       accessibility={{
@@ -250,27 +337,52 @@ export function KanbanBoard() {
               key={col.id}
               column={col}
               tasks={tasks.filter((task) => task.columnId === col.id)}
-            />
+              onStatusChange={handleStatusChange} // Pass the onStatusChange prop
+            >
+              {tasks
+                .filter((task) => task.columnId === col.id)
+                .map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onStatusChange={handleStatusChange}
+                  />
+                ))}
+            </BoardColumn>
           ))}
         </SortableContext>
       </BoardContainer>
 
-      {"document" in window &&
-        createPortal(
-          <DragOverlay>
-            {activeColumn && (
-              <BoardColumn
-                isOverlay
-                column={activeColumn}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
-                )}
-              />
-            )}
-            {activeTask && <TaskCard task={activeTask} isOverlay />}
-          </DragOverlay>,
-          document.body
-        )}
+      {isClient && (
+        <DynamicDragOverlay>
+          {activeColumn && (
+            <BoardColumn
+              isOverlay
+              column={activeColumn}
+              tasks={tasks.filter((task) => task.columnId === activeColumn.id)}
+              onStatusChange={handleStatusChange} // Pass the onStatusChange prop
+            >
+              {tasks
+                .filter((task) => task.columnId === activeColumn.id)
+                .map((task) => (
+                  <TaskCard
+                    key={task.id}
+                    task={task}
+                    onStatusChange={handleStatusChange}
+                    isOverlay
+                  />
+                ))}
+            </BoardColumn>
+          )}
+          {activeTask && (
+            <TaskCard
+              task={activeTask}
+              onStatusChange={handleStatusChange}
+              isOverlay
+            />
+          )}
+        </DynamicDragOverlay>
+      )}
     </DndContext>
   );
 
