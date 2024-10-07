@@ -56,6 +56,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Christer",
     },
+    arr: "100 000 NOK",
+    company: "Propdock AS",
+    pointOfContact: "John Doe",
   },
   {
     id: "task2",
@@ -66,6 +69,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Vegard",
     },
+    arr: "250 000 NOK",
+    company: "TechCorp Inc.",
+    pointOfContact: "Jane Smith",
   },
   {
     id: "task3",
@@ -76,6 +82,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Steffen",
     },
+    arr: "150 000 NOK",
+    company: "DesignPro Ltd.",
+    pointOfContact: "Alice Johnson",
   },
   {
     id: "task4",
@@ -86,6 +95,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Christer",
     },
+    arr: "200 000 NOK",
+    company: "WebDev Solutions",
+    pointOfContact: "Bob Williams",
   },
   {
     id: "task5",
@@ -96,6 +108,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Vegard",
     },
+    arr: "120 000 NOK",
+    company: "CreativeDesigns Co.",
+    pointOfContact: "Emma Brown",
   },
   {
     id: "task6",
@@ -106,6 +121,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Steffen",
     },
+    arr: "300 000 NOK",
+    company: "SecureTech Systems",
+    pointOfContact: "David Lee",
   },
   {
     id: "task7",
@@ -116,6 +134,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Christer",
     },
+    arr: "80 000 NOK",
+    company: "ContactPro Services",
+    pointOfContact: "Sarah Davis",
   },
   {
     id: "task8",
@@ -126,6 +147,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Vegard",
     },
+    arr: "180 000 NOK",
+    company: "CatalogMasters Inc.",
+    pointOfContact: "Michael Wilson",
   },
   {
     id: "task9",
@@ -136,6 +160,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Steffen",
     },
+    arr: "90 000 NOK",
+    company: "AboutUs Experts",
+    pointOfContact: "Emily Taylor",
   },
   {
     id: "task10",
@@ -146,6 +173,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Christer",
     },
+    arr: "220 000 NOK",
+    company: "MobileOptimize Co.",
+    pointOfContact: "Daniel Brown",
   },
   {
     id: "task11",
@@ -156,6 +186,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Vegard",
     },
+    arr: "350 000 NOK",
+    company: "PaymentTech Solutions",
+    pointOfContact: "Olivia Martinez",
   },
   {
     id: "task12",
@@ -166,6 +199,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Steffen",
     },
+    arr: "280 000 NOK",
+    company: "QualityAssure Ltd.",
+    pointOfContact: "James Anderson",
   },
   {
     id: "task13",
@@ -176,6 +212,9 @@ const initialTasks: Task[] = [
     assignee: {
       name: "Christer",
     },
+    arr: "400 000 NOK",
+    company: "LaunchPad Enterprises",
+    pointOfContact: "Sophia Garcia",
   },
 ];
 export function KanbanBoard() {

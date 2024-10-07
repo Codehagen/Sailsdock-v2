@@ -4,7 +4,13 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
-import { GripVertical, Calendar, User } from "lucide-react";
+import {
+  GripVertical,
+  Calendar,
+  User,
+  Building,
+  DollarSign,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ColumnId } from "./KanbanBoard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -12,7 +18,6 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
 
 export interface Task {
-  [x: string]: any;
   id: UniqueIdentifier;
   columnId: ColumnId;
   title: string;
@@ -22,6 +27,9 @@ export interface Task {
     name: string;
     avatar?: string;
   };
+  arr?: string; // New field for ARR
+  company?: string; // New field for Company
+  pointOfContact?: string; // New field for Point of Contact
 }
 
 export interface TaskCardProps {
@@ -113,6 +121,24 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
             </div>
           )}
         </div>
+        {task.company && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Building className="h-3 w-3" />
+            <span>{task.company}</span>
+          </div>
+        )}
+        {task.arr && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <DollarSign className="h-3 w-3" />
+            <span>{task.arr}</span>
+          </div>
+        )}
+        {task.pointOfContact && (
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <User className="h-3 w-3" />
+            <span>{task.pointOfContact}</span>
+          </div>
+        )}
         {task.assignee && (
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Avatar className="h-5 w-5">
