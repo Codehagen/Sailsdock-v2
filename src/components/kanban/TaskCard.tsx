@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical } from "lucide-react";
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 import { ColumnId } from "./KanbanBoard";
 
 export interface Task {
