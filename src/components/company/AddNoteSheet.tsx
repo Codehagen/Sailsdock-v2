@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,21 +66,45 @@ const NoteForm = React.memo(
 
 NoteForm.displayName = "NoteForm";
 
-export function AddNoteSheet() {
+interface AddNoteSheetProps {
+  onNoteAdded: (note: { title: string; content: Content }) => void;
+  onNoteEdited: (id: string, note: { title: string; content: Content }) => void;
+  noteToEdit?: { id: string; title: string; content: Content } | null;
+}
+
+export function AddNoteSheet({
+  onNoteAdded,
+  onNoteEdited,
+  noteToEdit,
+}: AddNoteSheetProps) {
   const [open, setOpen] = useState(false);
-  const [noteTitle, setNoteTitle] = useState("");
-  const [noteContent, setNoteContent] = useState<Content>("");
+  const [noteTitle, setNoteTitle] = useState(noteToEdit?.title || "");
+  const [noteContent, setNoteContent] = useState<Content>(
+    noteToEdit?.content || ""
+  );
   const { isDesktop } = useMediaQuery();
+
+  useEffect(() => {
+    if (noteToEdit) {
+      setNoteTitle(noteToEdit.title);
+      setNoteContent(noteToEdit.content);
+      setOpen(true);
+    }
+  }, [noteToEdit]);
 
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
       event.preventDefault();
-      console.log("Note created:", { noteTitle, noteContent });
+      if (noteToEdit) {
+        onNoteEdited(noteToEdit.id, { title: noteTitle, content: noteContent });
+      } else {
+        onNoteAdded({ title: noteTitle, content: noteContent });
+      }
       setNoteTitle("");
       setNoteContent("");
       setOpen(false);
     },
-    [noteTitle, noteContent]
+    [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit]
   );
 
   const handleNoteContentChange = useCallback((newContent: Content) => {
@@ -96,9 +120,13 @@ export function AddNoteSheet() {
   const sheetContent = (
     <>
       <SheetHeader>
-        <SheetTitle>Legg til nytt notat</SheetTitle>
+        <SheetTitle>
+          {noteToEdit ? "Rediger notat" : "Legg til nytt notat"}
+        </SheetTitle>
         <SheetDescription>
-          Fyll ut detaljene for det nye notatet her.
+          {noteToEdit
+            ? "Rediger detaljene for notatet her."
+            : "Fyll ut detaljene for det nye notatet her."}
         </SheetDescription>
       </SheetHeader>
       <NoteForm
