@@ -7,7 +7,7 @@ import {
   CrossCircledIcon,
   QuestionMarkCircledIcon,
   StopwatchIcon,
-} from "@radix-ui/react-icons"
+} from "@radix-ui/react-icons";
 
 export const labels = [
   {
@@ -22,7 +22,7 @@ export const labels = [
     value: "documentation",
     label: "Documentation",
   },
-]
+];
 
 export const statuses = [
   {
@@ -50,7 +50,7 @@ export const statuses = [
     label: "Canceled",
     icon: CrossCircledIcon,
   },
-]
+];
 
 export const priorities = [
   {
@@ -68,4 +68,54 @@ export const priorities = [
     value: "high",
     icon: ArrowUpIcon,
   },
-]
+];
+
+import { BuildingIcon, UserIcon, UsersIcon } from "lucide-react";
+
+export const companyTypes = [
+  {
+    value: "CUSTOMER",
+    label: "Kunde",
+    icon: BuildingIcon,
+  },
+  {
+    value: "LEAD",
+    label: "Lead",
+    icon: UserIcon,
+  },
+  {
+    value: "PARTNER",
+    label: "Partner",
+    icon: UsersIcon,
+  },
+];
+
+export const companyStatuses = [
+  {
+    value: "ACTIVE",
+    label: "Aktiv",
+  },
+  {
+    value: "INACTIVE",
+    label: "Inaktiv",
+  },
+  {
+    value: "PROSPECT",
+    label: "Prospekt",
+  },
+];
+
+export const companyPriorities = [
+  {
+    value: "HIGH",
+    label: "Høy",
+  },
+  {
+    value: "MEDIUM",
+    label: "Medium",
+  },
+  {
+    value: "LOW",
+    label: "Lav",
+  },
+];
