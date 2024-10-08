@@ -3,20 +3,47 @@
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { AddNoteSheet } from "@/components/company/AddNoteSheet";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { MinimalTiptapEditor } from "@/components/notes/minimal-tiptap/minimal-tiptap";
 import { useState } from "react";
 import { Content } from "@tiptap/react";
+import { NoteCard } from "@/components/company/NoteCard";
 
-export function NotesContent() {
-  const [hasNotes, setHasNotes] = useState(false); // This should be replaced with actual data check
+interface NotesContentProps {
+  hasNotes?: boolean;
+}
+
+// Mock data for testing
+const mockNotes = [
+  {
+    id: "1",
+    title: "Important Meeting Notes",
+    description: "Discussed Q4 targets and strategies for the upcoming year.",
+    companyName: "Acme Corp",
+  },
+  {
+    id: "2",
+    title: "Product Launch Plan",
+    description: "Outlined key milestones for the new product launch in Q2.",
+    companyName: "TechStart Inc",
+  },
+  {
+    id: "3",
+    title: "Client Feedback",
+    description: "Positive feedback received on the latest project delivery.",
+    companyName: "Global Services Ltd",
+  },
+  {
+    id: "4",
+    title: "Team Performance Review",
+    description: "Quarterly performance review for the development team.",
+    companyName: "DevOps Solutions",
+  },
+];
+
+export function NotesContent({ hasNotes = true }: NotesContentProps) {
   const [noteContent, setNoteContent] = useState<Content>("");
 
   const handleNoteChange = (newContent: Content) => {
     setNoteContent(newContent);
-    // If there's any content, set hasNotes to true
-    if (newContent && Object.keys(newContent).length > 0) {
-      setHasNotes(true);
-    }
   };
 
   return (
@@ -29,28 +56,19 @@ export function NotesContent() {
             Begynn å legge til notater for dette selskapet.
           </EmptyPlaceholder.Description>
           <AddNoteSheet />
-          <div className="mt-4 w-full max-w-2xl">
-            <MinimalTiptapEditor
-              value={noteContent}
-              onChange={handleNoteChange}
-              className="min-h-[200px]"
-              placeholder="Skriv notatinnholdet her..."
-              editable={true}
-              autofocus={true}
-            />
-          </div>
         </EmptyPlaceholder>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <AddNoteSheet />
-          <div className="w-full max-w-2xl">
-            <MinimalTiptapEditor
-              value={noteContent}
-              onChange={handleNoteChange}
-              className="min-h-[200px]"
-              placeholder="Skriv notatinnholdet her..."
-              editable={true}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {mockNotes.map((note) => (
+              <NoteCard
+                key={note.id}
+                title={note.title}
+                description={note.description}
+                companyName={note.companyName}
+              />
+            ))}
           </div>
         </div>
       )}
