@@ -51,7 +51,7 @@ const initialTasks: Task[] = [
     id: "task1",
     columnId: "done",
     title: "Avtale navn",
-    status: "To do",
+    status: "Done",
     dueDate: "2024-05-15",
     assignee: {
       name: "Christer",
@@ -64,7 +64,7 @@ const initialTasks: Task[] = [
     id: "task2",
     columnId: "done",
     title: "Samle krav fra interessenter",
-    status: "To do",
+    status: "Done",
     dueDate: "2024-06-01",
     assignee: {
       name: "Vegard",
@@ -77,7 +77,7 @@ const initialTasks: Task[] = [
     id: "task3",
     columnId: "done",
     title: "Lage trådskisser og mockups",
-    status: "To do",
+    status: "Done",
     dueDate: "2024-06-15",
     assignee: {
       name: "Steffen",
@@ -90,7 +90,7 @@ const initialTasks: Task[] = [
     id: "task4",
     columnId: "in-progress",
     title: "Utvikle hjemmeside layout",
-    status: "To do",
+    status: "In progress",
     dueDate: "2024-07-01",
     assignee: {
       name: "Christer",
@@ -103,7 +103,7 @@ const initialTasks: Task[] = [
     id: "task5",
     columnId: "in-progress",
     title: "Designe fargepalett og typografi",
-    status: "To do",
+    status: "In progress",
     dueDate: "2024-07-15",
     assignee: {
       name: "Vegard",
@@ -116,7 +116,7 @@ const initialTasks: Task[] = [
     id: "task6",
     columnId: "todo",
     title: "Implementere brukerautentisering",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-08-01",
     assignee: {
       name: "Steffen",
@@ -129,7 +129,7 @@ const initialTasks: Task[] = [
     id: "task7",
     columnId: "todo",
     title: "Bygge kontakt oss side",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-08-15",
     assignee: {
       name: "Christer",
@@ -142,7 +142,7 @@ const initialTasks: Task[] = [
     id: "task8",
     columnId: "todo",
     title: "Lage produktkatalog",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-09-01",
     assignee: {
       name: "Vegard",
@@ -155,7 +155,7 @@ const initialTasks: Task[] = [
     id: "task9",
     columnId: "todo",
     title: "Utvikle om oss side",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-09-15",
     assignee: {
       name: "Steffen",
@@ -168,7 +168,7 @@ const initialTasks: Task[] = [
     id: "task10",
     columnId: "todo",
     title: "Optimalisere nettsted for mobile enheter",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-10-01",
     assignee: {
       name: "Christer",
@@ -181,7 +181,7 @@ const initialTasks: Task[] = [
     id: "task11",
     columnId: "todo",
     title: "Integrere betalingsløsning",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-10-15",
     assignee: {
       name: "Vegard",
@@ -194,7 +194,7 @@ const initialTasks: Task[] = [
     id: "task12",
     columnId: "todo",
     title: "Utføre testing og feilretting",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-11-01",
     assignee: {
       name: "Steffen",
@@ -207,7 +207,7 @@ const initialTasks: Task[] = [
     id: "task13",
     columnId: "todo",
     title: "Lansere nettsted og distribuere til server",
-    status: "To do",
+    status: "Todo",
     dueDate: "2024-11-08",
     assignee: {
       name: "Christer",

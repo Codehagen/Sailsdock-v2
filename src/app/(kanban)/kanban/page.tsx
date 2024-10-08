@@ -17,7 +17,6 @@ export default async function DashboardPage() {
     <DashboardShell>
       <DashboardHeader
         heading={`Velkommen, ${user.first_name}!`}
-        // text="Ditt Kanban"
       ></DashboardHeader>
       <KanbanBoard />
     </DashboardShell>

@@ -2,7 +2,6 @@ import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import {
   GripVertical,
@@ -84,11 +83,6 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
     return formatDistanceToNow(date, { addSuffix: true, locale: nb });
   };
 
-  // Add a function to handle status change
-  const handleStatusChange = (newStatus: string) => {
-    onStatusChange(task.id, newStatus);
-  };
-
   return (
     <Card
       ref={setNodeRef}
@@ -96,19 +90,12 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
       className={variants({
         dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
       })}
+      {...attributes}
+      {...listeners}
     >
-      <CardContent className="p-3 space-y-2">
+      <CardContent className="p-3 space-y-2 cursor-grab active:cursor-grabbing">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium">{task.title}</h3>
-          <Button
-            variant="ghost"
-            {...attributes}
-            {...listeners}
-            className="p-1 text-secondary-foreground/50 h-auto cursor-grab"
-          >
-            <span className="sr-only">Move task</span>
-            <GripVertical className="h-4 w-4" />
-          </Button>
         </div>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <Badge variant="secondary" className="text-xs font-normal">

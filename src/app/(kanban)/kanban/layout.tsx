@@ -51,6 +51,11 @@ export default async function DashboardLayout({
       href: `/notes`,
       icon: "notebook",
     },
+    {
+      title: "Kanban",
+      href: `/kanban`,
+      icon: "arrowRight",
+    },
 
     // {
     //   title: "Dokumenter",
