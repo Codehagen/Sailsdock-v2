@@ -62,7 +62,7 @@ export default async function DashboardLayout({
     //   href: `/tenant/${params.id}/files`,
     //   icon: "file",
     // },
-  ] satisfies NavItem[];
+  ] as NavItem[];
 
   return (
     <div className="flex flex-col min-h-screen">

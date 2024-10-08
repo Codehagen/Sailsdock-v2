@@ -1,4 +1,5 @@
 import Header from "@/components/sections/header";
+import { Icons } from "@/components/shared/icons";
 import { DashboardNav } from "@/components/shell/nav";
 import { notFound } from "next/navigation";
 
@@ -6,6 +7,14 @@ interface DashboardLayoutProps {
   children?: React.ReactNode;
   params: { id: string };
 }
+
+type NavItem = {
+  href: string;
+  title: string;
+  disabled?: boolean;
+  icon?: keyof typeof Icons;
+  completed?: boolean;
+};
 
 export default async function DashboardLayout({
   children,
@@ -42,13 +51,18 @@ export default async function DashboardLayout({
       href: `/notes`,
       icon: "notebook",
     },
+    {
+      title: "Kanban",
+      href: `/kanban`,
+      icon: "arrowRight",
+    },
 
     // {
     //   title: "Dokumenter",
     //   href: `/tenant/${params.id}/files`,
     //   icon: "file",
     // },
-  ];
+  ] satisfies NavItem[];
 
   return (
     <div className="flex flex-col min-h-screen">
