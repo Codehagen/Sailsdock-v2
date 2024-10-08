@@ -262,11 +262,9 @@ export function KanbanBoard() {
           active.id,
           pickedUpTaskColumn.current
         );
-        return `Picked up Task ${
-          active.data.current.task.content
-        } at position: ${taskPosition + 1} of ${
-          tasksInColumn.length
-        } in column ${column?.title}`;
+        return `Picked up Task ${active.data.current.task.title} at position: ${
+          taskPosition + 1
+        } of  ${tasksInColumn.length} in column ${column?.title}`;
       }
     },
     onDragOver({ active, over }) {
@@ -290,7 +288,7 @@ export function KanbanBoard() {
         );
         if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
           return `Task ${
-            active.data.current.task.content
+            active.data.current.task.title
           } was moved over column ${column?.title} in position ${
             taskPosition + 1
           } of ${tasksInColumn.length}`;
