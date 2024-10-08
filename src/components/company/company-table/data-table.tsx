@@ -27,16 +27,21 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+import { getCompanies } from "@/actions/company/get-companies";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  initialData: TData[];
+  initialTotalCount: number;
 }
 
 export function CompanyTable<TData, TValue>({
   columns,
-  data,
+  initialData,
+  initialTotalCount,
 }: DataTableProps<TData, TValue>) {
+  const [data, setData] = React.useState(initialData);
+  const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -65,7 +70,27 @@ export function CompanyTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
   });
+
+  React.useEffect(() => {
+    async function fetchData() {
+      const pageIndex = table.getState().pagination.pageIndex;
+      const pageSize = table.getState().pagination.pageSize;
+      const { data: newData, totalCount: newTotalCount } = await getCompanies(
+        pageSize,
+        pageIndex + 1
+      );
+      if (newData) {
+        setData(newData as TData[]);
+        setTotalCount(newTotalCount);
+      }
+    }
+    fetchData();
+  }, [
+    table.getState().pagination.pageIndex,
+    table.getState().pagination.pageSize,
+  ]);
 
   return (
     <div className="space-y-4">

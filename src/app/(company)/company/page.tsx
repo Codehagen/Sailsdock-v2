@@ -6,8 +6,7 @@ import { CompanyTable } from "@/components/company/company-table/data-table";
 import { columns } from "@/components/company/company-table/columns";
 
 export default async function CompanyPage() {
-  const companies = await getCompanies();
-  console.log(companies);
+  const { data: companies, totalCount } = await getCompanies(10, 1);
 
   return (
     <DashboardShell>
@@ -16,7 +15,11 @@ export default async function CompanyPage() {
       </DashboardHeader>
 
       {companies ? (
-        <CompanyTable columns={columns} data={companies} />
+        <CompanyTable
+          columns={columns}
+          initialData={companies}
+          initialTotalCount={totalCount}
+        />
       ) : (
         <p>Ingen selskaper funnet.</p>
       )}

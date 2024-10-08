@@ -3,9 +3,12 @@ export interface Company {
   uuid: string;
   name: string;
   orgnr: string;
-  type: string;
-  status: string;
-  priority: string;
-  last_contacted: string;
+  url: string;
+  user_name: string;
+  num_employees?: number;
+  some_linked: string;
+  address_street: string;
+  address_zip: string;
+  address_city: string;
   // ... other fields
 }
