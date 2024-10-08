@@ -7,5 +7,5 @@ export interface Company {
   status: string;
   priority: string;
   last_contacted: string;
-  // Add other fields as needed
+  // ... other fields
 }

@@ -7,10 +7,11 @@ import { columns } from "@/components/company/company-table/columns";
 
 export default async function CompanyPage() {
   const companies = await getCompanies();
+  console.log(companies);
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Selskaper" text="Dine selskaper">
+      <DashboardHeader heading="Bedrifter" text="Dine bedrifter">
         <AddCompanySheet />
       </DashboardHeader>
 
