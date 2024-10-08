@@ -113,7 +113,13 @@ class ApiClient {
   //TODO Change URL ENDPOINT WHEN @grax is ready
   // prettier-ignore
   company = {
-    getAll: (companyId: string) => this.request<CompanyData[]>("get", `companies/${companyId}/customers`),
+    getAll: (companyId: string, pageSize?: number, page?: number) => {
+      let url = `companies/${companyId}/customers`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<CompanyData[]>("get", url);
+    },
     get:    (customerId: string) => this.request<CompanyData>("get", `/customers/${customerId}`),
     create: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `companies/${companyId}/customers/`, companyData),
     update: (customerId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/customers/${customerId}`, companyData),
