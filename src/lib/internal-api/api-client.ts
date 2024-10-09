@@ -93,7 +93,7 @@ class ApiClient {
   users = {
     get: (userId: string) => this.request<UserData>("get", `users/${userId}`),
     create: (userData: Partial<UserData>) => this.request<UserData>("post", "users/", userData),
-    update: (userId: string, userData: Partial<UserData>) => this.request<UserData>("patch", `users/${userId}`, userData),
+    update: (userId: string, userData: Partial<UserData>) => this.request<UserData>("patch", `users/${userId}/`, userData),
     delete: (userId: string) => this.request<UserData>("delete", `users/${userId}`),
   };
   // prettier-ignore
