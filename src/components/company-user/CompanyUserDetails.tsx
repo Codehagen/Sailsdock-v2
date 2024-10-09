@@ -175,6 +175,55 @@ export function CompanyUserDetails({
     setIsAddressPopoverOpen(false);
   };
 
+  const [isArrPopoverOpen, setIsArrPopoverOpen] = useState(false);
+  const [editedArr, setEditedArr] = useState(ownerInfo.arr);
+
+  const handleUpdateArr = () => {
+    setOwnerInfo((prevInfo) => ({
+      ...prevInfo,
+      arr: editedArr,
+    }));
+    setIsArrPopoverOpen(false);
+  };
+
+  const handleCancelArrEdit = () => {
+    setEditedArr(ownerInfo.arr);
+    setIsArrPopoverOpen(false);
+  };
+
+  const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
+  const [editedEmployees, setEditedEmployees] = useState(ownerInfo.employees);
+
+  const handleUpdateEmployees = () => {
+    setOwnerInfo((prevInfo) => ({
+      ...prevInfo,
+      employees: editedEmployees,
+    }));
+    setIsEmployeesPopoverOpen(false);
+  };
+
+  const handleCancelEmployeesEdit = () => {
+    setEditedEmployees(ownerInfo.employees);
+    setIsEmployeesPopoverOpen(false);
+  };
+
+  const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
+    useState(false);
+  const [editedCompanyName, setEditedCompanyName] = useState(ownerInfo.name);
+
+  const handleUpdateCompanyName = () => {
+    setOwnerInfo((prevInfo) => ({
+      ...prevInfo,
+      name: editedCompanyName,
+    }));
+    setIsCompanyNamePopoverOpen(false);
+  };
+
+  const handleCancelCompanyNameEdit = () => {
+    setEditedCompanyName(ownerInfo.name);
+    setIsCompanyNamePopoverOpen(false);
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     return format(date, "d. MMMM yyyy", { locale: nb });
@@ -200,7 +249,12 @@ export function CompanyUserDetails({
       value: ownerInfo.address,
       editable: true,
     },
-    { icon: DollarSign, label: "ARR", value: ownerInfo.arr },
+    {
+      icon: DollarSign,
+      label: "ARR",
+      value: ownerInfo.arr,
+      editable: true,
+    },
     { icon: Calendar, label: "Opprettet av", value: ownerInfo.createdBy },
     {
       icon: Globe,
@@ -210,7 +264,12 @@ export function CompanyUserDetails({
       isBadge: true,
       displayValue: extractDomain(ownerInfo.website),
     },
-    { icon: Users, label: "Ansatte", value: ownerInfo.employees },
+    {
+      icon: Users,
+      label: "Ansatte",
+      value: ownerInfo.employees,
+      editable: true,
+    },
     {
       icon: Linkedin,
       label: "LinkedIn",
@@ -222,7 +281,8 @@ export function CompanyUserDetails({
     {
       icon: Clock,
       label: "Sist oppdatert",
-      value: formatDate(ownerInfo.lastUpdated),
+      value: ownerInfo.lastUpdated,
+      displayValue: getTimeAgo(ownerInfo.lastUpdated),
     },
     {
       icon: Twitter,
@@ -245,7 +305,38 @@ export function CompanyUserDetails({
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="text-lg font-semibold">{ownerInfo.name}</h3>
+            <Popover
+              open={isCompanyNamePopoverOpen}
+              onOpenChange={setIsCompanyNamePopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="p-0 h-auto font-normal">
+                  <h3 className="text-lg font-semibold">{ownerInfo.name}</h3>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-2">
+                  <Input
+                    value={editedCompanyName}
+                    onChange={(e) => setEditedCompanyName(e.target.value)}
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCancelCompanyNameEdit}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Avbryt
+                    </Button>
+                    <Button size="sm" onClick={handleUpdateCompanyName}>
+                      <Check className="h-4 w-4 mr-1" />
+                      Bekreft
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>
@@ -289,11 +380,11 @@ export function CompanyUserDetails({
                             onClick={handleCancelOrgNumberEdit}
                           >
                             <X className="h-4 w-4 mr-1" />
-                            Cancel
+                            Avbryt
                           </Button>
                           <Button size="sm" onClick={handleUpdateOrgNumber}>
                             <Check className="h-4 w-4 mr-1" />
-                            Confirm
+                            Bekreft
                           </Button>
                         </div>
                       </div>
@@ -426,6 +517,83 @@ export function CompanyUserDetails({
                       </form>
                     </PopoverContent>
                   </Popover>
+                ) : item.label === "ARR" ? (
+                  <Popover
+                    open={isArrPopoverOpen}
+                    onOpenChange={setIsArrPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="p-0 h-auto font-normal"
+                      >
+                        <span className="text-sm text-muted-foreground">
+                          {item.value}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <Input
+                          value={editedArr}
+                          onChange={(e) => setEditedArr(e.target.value)}
+                        />
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelArrEdit}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Avbryt
+                          </Button>
+                          <Button size="sm" onClick={handleUpdateArr}>
+                            <Check className="h-4 w-4 mr-1" />
+                            Bekreft
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                ) : item.label === "Ansatte" ? (
+                  <Popover
+                    open={isEmployeesPopoverOpen}
+                    onOpenChange={setIsEmployeesPopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="p-0 h-auto font-normal"
+                      >
+                        <span className="text-sm text-muted-foreground">
+                          {item.value}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <Input
+                          type="number"
+                          value={editedEmployees}
+                          onChange={(e) => setEditedEmployees(e.target.value)}
+                        />
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={handleCancelEmployeesEdit}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Avbryt
+                          </Button>
+                          <Button size="sm" onClick={handleUpdateEmployees}>
+                            <Check className="h-4 w-4 mr-1" />
+                            Bekreft
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                   <span className="text-sm text-muted-foreground">
                     {item.value}
@@ -459,7 +627,7 @@ export function CompanyUserDetails({
                 )
               ) : (
                 <span className="text-sm text-muted-foreground">
-                  {item.value}
+                  {item.displayValue || item.value}
                 </span>
               )}
             </div>
