@@ -13,7 +13,7 @@ class ApiClient {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: "https://crm.vegardenterprises.com/internal/v1/",
+      baseURL: "https://crm.vegardenterprises.com/internal/v2/",
       headers: {
         "Content-Type": "application/json",
         "X-CITADEL-LOCK": process.env.FRONTEND_LOCK || "",
@@ -69,17 +69,37 @@ class ApiClient {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
+        const errorInfo = {
+          message: axiosError.message,
+          status: axiosError.response?.status,
+          config: {
+            baseURL: axiosError.config?.baseURL,
+            method: axiosError.config?.method,
+            url: axiosError.config?.url,
+            data: axiosError.config?.data,
+          },
+          data:
+            axiosError.response?.data &&
+            typeof axiosError.response.data === "object"
+              ? JSON.stringify(axiosError.response.data).slice(0, 100)
+              : "Response data not available or not in expected format",
+        };
+
         console.error(
-          `API client error for ${method} ${url}:`,
-          axiosError.message
+          `API client error for ${method.toUpperCase()} ${url}:`,
+          errorInfo
         );
+
         return {
           success: false,
           status: axiosError.response?.status || 500,
           data: [],
         };
       } else {
-        console.error(`Unexpected error for ${method} ${url}:`, error);
+        console.error(
+          `Unexpected error for ${method.toUpperCase()} ${url}:`,
+          error
+        );
         return {
           success: false,
           status: 500,
@@ -113,17 +133,19 @@ class ApiClient {
   //TODO Change URL ENDPOINT WHEN @grax is ready
   // prettier-ignore
   company = {
-    getAll: (companyId: string, pageSize?: number, page?: number) => {
-      let url = `companies/${companyId}/customers`;
+    getAll: (workspaceId: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/companies`;
       if (pageSize !== undefined && page !== undefined) {
         url += `?page_size=${pageSize}&page=${page}`;
       }
       return this.request<CompanyData[]>("get", url);
     },
-    get:    (customerId: string) => this.request<CompanyData>("get", `/customers/${customerId}`),
-    create: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `companies/${companyId}/customers/`, companyData),
-    update: (customerId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/customers/${customerId}`, companyData),
-    delete: (customerId: string) => this.request<CompanyData>("delete", `/customers/${customerId}`),
+    get:    (companyId: string) => this.request<CompanyData>("get", `/companies/${companyId}`),
+    create: (workspaceId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `/companies/`, companyData),
+    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/companies/${companyId}`, companyData),
+    delete: (companyId: string) => this.request<CompanyData>("delete", `/companies/${companyId}`),
+    getDetails: (companyId: string) => 
+      this.request<CompanyData>("get", `/companies/${companyId}/details`),
   };
 }
 
