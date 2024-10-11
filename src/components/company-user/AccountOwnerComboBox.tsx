@@ -22,15 +22,8 @@ import { Separator } from "@/components/ui/separator";
 import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
+import { AccountOwner } from "@/lib/internal-api/types";
 
-type AccountOwner = {
-  id: number;
-  clerk_id: string;
-  email: string;
-  username: string | null;
-  first_name: string | null;
-  last_name: string | null;
-};
 
 export function AccountOwnerCombobox({
   companyId,
@@ -61,8 +54,7 @@ export function AccountOwnerCombobox({
     }
   }, [open, accountOwners.length]);
 
-  React.useEffect(() => {
-  }, [accountOwners]);
+  React.useEffect(() => {}, [accountOwners]);
 
   const handleSelectOwner = async (owner: AccountOwner) => {
     setSelectedOwner(owner);
@@ -142,7 +134,6 @@ function OwnerList({
   isLoading: boolean;
   handleSelectOwner: (owner: AccountOwner) => void;
 }) {
-
   return (
     <Command>
       <CommandInput placeholder="Search account owners..." />

@@ -47,94 +47,7 @@ import { useForm, Controller } from "react-hook-form";
 import countries from "@/lib/countries";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
-
-interface CompanyDetails {
-  id: number;
-  last_contacted: string;
-  potential_revenue: number;
-  contact_points: number;
-  num_tasks: number;
-  notes: any[];
-  default_contact: null | any;
-  contacts: any[];
-  labels_details: any[];
-  opportunities: Array<{
-    id: number;
-    uuid: string;
-    name: string;
-  }>;
-  people: Array<{
-    id: number;
-    uuid: string;
-    date_created: string;
-    last_modified: string;
-    name: string;
-    title: string;
-    phone: string;
-    email: string;
-    department: string;
-    address_street: string;
-    address_zip: string;
-    address_city: string;
-    pref_com: string;
-    url: string;
-    user: number;
-    workspace: number;
-    company: number;
-  }>;
-  account_owners: Array<{
-    id: number;
-    clerk_id: string;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-  }>;
-  timeline: any[];
-  type: string;
-  business: boolean;
-  uuid: string;
-  date_created: string;
-  name: string;
-  orgnr: string;
-  address_street: string;
-  address_zip: string;
-  address_city: string;
-  address_municipalty: string;
-  url: string;
-  some_linked: string;
-  some_face: string;
-  some_insta: string;
-  some_twitter: string;
-  status: string;
-  label: string;
-  priority: string;
-  stage: number;
-  date_converted: string;
-  arr: number;
-  contact_person: string;
-  title: string;
-  phone: string;
-  email: string;
-  all_contacts: null | any;
-  current_business: string;
-  preferred_communication: string;
-  region: string;
-  ceo: string;
-  adm_manager: string;
-  adm_board: string[];
-  orgform: string;
-  sections: string;
-  comments_1: string;
-  comments_2: string;
-  num_employees: number;
-  company: number;
-  user: number;
-  lead: null | any;
-  contact: null | any;
-  department: any[];
-  labels: any[];
-}
+import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -160,7 +73,7 @@ type AddressFormData = z.infer<typeof addressSchema>;
 export function CompanyUserDetails({
   companyDetails,
 }: {
-  companyDetails: CompanyDetails;
+  companyDetails: CompanyData;
 }) {
   const [editedCompanyName, setEditedCompanyName] = useState(
     companyDetails.name

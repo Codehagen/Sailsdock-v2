@@ -16,7 +16,6 @@ import { FilesContent } from "@/components/company/FilesContent";
 import { EmailsContent } from "@/components/company/EmailsContent";
 import { CalendarContent } from "@/components/company/CalendarContent";
 import { TimelineContent } from "@/components/company/TimelineContent";
-import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 
 export default async function CompanyUserPage({
   params,
@@ -25,7 +24,6 @@ export default async function CompanyUserPage({
 }) {
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
-  const workspaceUsers = await getWorkspaceUsers();
 
   if (!companyDetails) {
     return (
