@@ -118,10 +118,11 @@ class ApiClient {
   };
   // prettier-ignore
   workspaces = {
-    get: (workspaceId: string) => this.request<WorkspaceData>("get", `companies/${workspaceId}`),
-    create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "companies/", workspaceData),
-    update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `companies/${workspaceId}`, workspaceData),
-    delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `companies/${workspaceId}`),
+    get: (workspaceId: string) => this.request<WorkspaceData>("get", `workspaces/${workspaceId}/`),
+    getUsers: (workspaceId: string) => this.request<UserData[]>("get", `workspaces/${workspaceId}/users/`),
+    create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "workspaces/", workspaceData),
+    update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `workspaces/${workspaceId}/`, workspaceData),
+    delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `workspaces/${workspaceId}/`),
   };
   // prettier-ignore
   deals = {

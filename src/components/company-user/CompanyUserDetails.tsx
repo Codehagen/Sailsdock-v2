@@ -172,8 +172,12 @@ export function CompanyUserDetails({
   );
   const [isUrlPopoverOpen, setIsUrlPopoverOpen] = useState(false);
   const [editedUrl, setEditedUrl] = useState(companyDetails.url);
-  const [editedLinkedIn, setEditedLinkedIn] = useState(companyDetails.some_linked);
-  const [editedTwitter, setEditedTwitter] = useState(companyDetails.some_twitter);
+  const [editedLinkedIn, setEditedLinkedIn] = useState(
+    companyDetails.some_linked
+  );
+  const [editedTwitter, setEditedTwitter] = useState(
+    companyDetails.some_twitter
+  );
   const [isLinkedInPopoverOpen, setIsLinkedInPopoverOpen] = useState(false);
   const [isTwitterPopoverOpen, setIsTwitterPopoverOpen] = useState(false);
 
@@ -183,6 +187,10 @@ export function CompanyUserDetails({
   const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
   const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
     useState(false);
+
+  const [accountOwners, setAccountOwners] = useState<AccountOwner[]>(
+    companyDetails.account_owners || []
+  );
 
   const {
     register,
@@ -395,6 +403,17 @@ export function CompanyUserDetails({
     setIsTwitterPopoverOpen(false);
   };
 
+  const handleOwnerAdded = (newOwner: AccountOwner) => {
+    setAccountOwners((prevOwners) => {
+      // Check if the owner already exists
+      const ownerExists = prevOwners.some((owner) => owner.id === newOwner.id);
+      if (ownerExists) {
+        return prevOwners; // Don't add duplicate owners
+      }
+      return [...prevOwners, newOwner];
+    });
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     return format(date, "d. MMMM yyyy", { locale: nb });
@@ -533,8 +552,14 @@ export function CompanyUserDetails({
               <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
                 {item.label}:
               </span>
-              {item.editable && (item.label === "Nettside" || item.label === "LinkedIn" || item.label === "Twitter") ? (
-                <Badge variant="secondary" className="font-normal flex items-center">
+              {item.editable &&
+              (item.label === "Nettside" ||
+                item.label === "LinkedIn" ||
+                item.label === "Twitter") ? (
+                <Badge
+                  variant="secondary"
+                  className="font-normal flex items-center"
+                >
                   {item.value ? (
                     <a
                       href={item.value}
@@ -886,13 +911,17 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Account Owner ({companyDetails.account_owners.length})
+                Account Owner ({accountOwners.length})
               </h4>
-              <AccountOwnerCombobox />
+              <AccountOwnerCombobox
+                companyId={companyDetails.uuid}
+                onOwnerAdded={handleOwnerAdded}
+                currentAccountOwners={accountOwners.map((owner) => owner.id)}
+              />
             </div>
-            {companyDetails.account_owners.map((owner, index) => (
+            {accountOwners.map((owner, index) => (
               <Link
-                key={index}
+                key={owner.id}
                 href={`/people/${owner.clerk_id}`}
                 className="inline-block"
               >
@@ -904,10 +933,10 @@ export function CompanyUserDetails({
                       "text-xs font-medium"
                     )}
                   >
-                    {owner.first_name.charAt(0)}
+                    {owner.first_name?.charAt(0) || owner.email.charAt(0)}
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">
-                    {`${owner.first_name} ${owner.last_name}`}
+                    {`${owner.first_name || ""} ${owner.last_name || ""}`}
                   </span>
                 </div>
               </Link>
