@@ -24,7 +24,6 @@ export default async function CompanyUserPage({
 }) {
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
-  console.log(companyDetails);
 
   if (!companyDetails) {
     return (

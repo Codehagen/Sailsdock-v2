@@ -142,7 +142,7 @@ class ApiClient {
     },
     get:    (companyId: string) => this.request<CompanyData>("get", `/companies/${companyId}`),
     create: (workspaceId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `/companies/`, companyData),
-    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/companies/${companyId}`, companyData),
+    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/companies/${companyId}/`, companyData),
     delete: (companyId: string) => this.request<CompanyData>("delete", `/companies/${companyId}`),
     getDetails: (companyId: string) => 
       this.request<CompanyData>("get", `/companies/${companyId}/details`),

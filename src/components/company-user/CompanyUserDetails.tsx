@@ -44,25 +44,95 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import countries from "@/lib/countries";
+import { updateCompany } from "@/actions/company/update-companies";
+import { toast } from "sonner";
 
-interface OwnerInfo {
+interface CompanyDetails {
+  id: number;
+  last_contacted: string;
+  potential_revenue: number;
+  contact_points: number;
+  num_tasks: number;
+  notes: any[];
+  default_contact: null | any;
+  contacts: any[];
+  labels_details: any[];
+  opportunities: Array<{
+    id: number;
+    uuid: string;
+    name: string;
+  }>;
+  people: Array<{
+    id: number;
+    uuid: string;
+    date_created: string;
+    last_modified: string;
+    name: string;
+    title: string;
+    phone: string;
+    email: string;
+    department: string;
+    address_street: string;
+    address_zip: string;
+    address_city: string;
+    pref_com: string;
+    url: string;
+    user: number;
+    workspace: number;
+    company: number;
+  }>;
+  account_owners: Array<{
+    id: number;
+    clerk_id: string;
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+  }>;
+  timeline: any[];
+  type: string;
+  business: boolean;
+  uuid: string;
+  date_created: string;
   name: string;
-  orgNumber: string;
-  contactPerson: string;
-  email: string;
+  orgnr: string;
+  address_street: string;
+  address_zip: string;
+  address_city: string;
+  address_municipalty: string;
+  url: string;
+  some_linked: string;
+  some_face: string;
+  some_insta: string;
+  some_twitter: string;
+  status: string;
+  label: string;
+  priority: string;
+  stage: number;
+  date_converted: string;
+  arr: number;
+  contact_person: string;
+  title: string;
   phone: string;
-  address: string;
-  arr: string;
-  createdBy: string;
-  website: string;
-  employees: string;
-  linkedin: string;
-  lastUpdated: string;
-  twitter: string;
-  addedDate: string;
-  accountOwners: Array<{ name: string; uuid: string }>;
-  opportunities: Array<{ name: string; uuid: string }>;
-  people: Array<{ name: string; uuid: string }>;
+  email: string;
+  all_contacts: null | any;
+  current_business: string;
+  preferred_communication: string;
+  region: string;
+  ceo: string;
+  adm_manager: string;
+  adm_board: string[];
+  orgform: string;
+  sections: string;
+  comments_1: string;
+  comments_2: string;
+  num_employees: number;
+  company: number;
+  user: number;
+  lead: null | any;
+  contact: null | any;
+  department: any[];
+  labels: any[];
 }
 
 interface InfoItem {
@@ -82,7 +152,6 @@ const addressSchema = z.object({
   address2: z.string().optional(),
   postcode: z.string().min(4, "Postnummer må være minst 4 siffer"),
   city: z.string().min(1, "By er påkrevd"),
-  country: z.string().min(1, "Land er påkrevd"),
 });
 
 type AddressFormData = z.infer<typeof addressSchema>;
@@ -90,54 +159,23 @@ type AddressFormData = z.infer<typeof addressSchema>;
 export function CompanyUserDetails({
   companyDetails,
 }: {
-  companyDetails: { name: string };
+  companyDetails: CompanyDetails;
 }) {
-  const [ownerInfo, setOwnerInfo] = useState<OwnerInfo>({
-    name: "Propdock AS",
-    orgNumber: "912345678",
-    contactPerson: "Christer Hagen",
-    email: "christer@propdock.no",
-    phone: "+47 123 45 678",
-    address: "Storgata 1, 0123 Oslo",
-    arr: "1 000 000 NOK",
-    createdBy: "John Doe",
-    website: "https://propdock.no",
-    employees: "50",
-    linkedin: "https://linkedin.com/company/propdock",
-    lastUpdated: "2023-04-15",
-    twitter: "https://twitter.com/propdock",
-    addedDate: "2023-05-15T10:30:00Z",
-    accountOwners: [
-      { name: "Christer Hagen", uuid: "123e4567-e89b-12d3-a456-426614174000" },
-    ],
-    opportunities: [
-      { name: "Mulighet 1", uuid: "123e4567-e89b-12d3-a456-426614174001" },
-      { name: "Mulighet 2", uuid: "123e4567-e89b-12d3-a456-426614174002" },
-    ],
-    people: [
-      { name: "Christer Hagen", uuid: "123e4567-e89b-12d3-a456-426614174003" },
-      { name: "John Doe", uuid: "123e4567-e89b-12d3-a456-426614174004" },
-      { name: "Jane Doe", uuid: "123e4567-e89b-12d3-a456-426614174005" },
-    ],
-  });
+  const [editedCompanyName, setEditedCompanyName] = useState(
+    companyDetails.name
+  );
+  const [editedOrgNumber, setEditedOrgNumber] = useState(companyDetails.orgnr);
+  const [editedArr, setEditedArr] = useState(companyDetails.arr.toString());
+  const [editedEmployees, setEditedEmployees] = useState(
+    companyDetails.num_employees.toString()
+  );
 
   const [isOrgNumberPopoverOpen, setIsOrgNumberPopoverOpen] = useState(false);
-  const [editedOrgNumber, setEditedOrgNumber] = useState(ownerInfo.orgNumber);
-
-  const handleUpdateOrgNumber = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      orgNumber: editedOrgNumber,
-    }));
-    setIsOrgNumberPopoverOpen(false);
-  };
-
-  const handleCancelOrgNumberEdit = () => {
-    setEditedOrgNumber(ownerInfo.orgNumber);
-    setIsOrgNumberPopoverOpen(false);
-  };
-
   const [isAddressPopoverOpen, setIsAddressPopoverOpen] = useState(false);
+  const [isArrPopoverOpen, setIsArrPopoverOpen] = useState(false);
+  const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
+  const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
+    useState(false);
 
   const {
     register,
@@ -148,24 +186,61 @@ export function CompanyUserDetails({
   } = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address1: "",
-      address2: "",
-      postcode: "",
-      city: "",
-      country: "",
+      address1: companyDetails.address_street,
+      address2: "", // Assuming there's no address2 in the companyDetails
+      postcode: companyDetails.address_zip,
+      city: companyDetails.address_city,
     },
   });
 
-  const handleUpdateAddress = (data: AddressFormData) => {
-    const selectedCountry = countries.find(
-      (country) => country.code === data.country
-    );
-    const countryName = selectedCountry ? selectedCountry.name : data.country;
+  const handleUpdateOrgNumber = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        orgnr: editedOrgNumber,
+      });
+      if (updatedCompany) {
+        setEditedOrgNumber(updatedCompany.orgnr);
+        toast.success("Organization number updated successfully");
+      } else {
+        toast.error("Failed to update organization number");
+      }
+    } catch (error) {
+      console.error("Error updating organization number:", error);
+      toast.error("An error occurred while updating organization number");
+    }
+    setIsOrgNumberPopoverOpen(false);
+  };
 
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      address: `${data.address1}, ${data.postcode} ${data.city}, ${countryName}`,
-    }));
+  const handleCancelOrgNumberEdit = () => {
+    setEditedOrgNumber(companyDetails.orgnr);
+    setIsOrgNumberPopoverOpen(false);
+  };
+
+  const handleUpdateAddress = async (data: AddressFormData) => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        address_street: data.address1,
+        address_zip: data.postcode,
+        address_city: data.city,
+      });
+
+      if (updatedCompany) {
+        // Update local state with the new address details
+        setCompanyDetails((prevDetails) => ({
+          ...prevDetails,
+          address_street: updatedCompany.address_street,
+          address_zip: updatedCompany.address_zip,
+          address_city: updatedCompany.address_city,
+        }));
+        toast.success("Address updated successfully");
+      } else {
+        toast.error("Failed to update address");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+      toast.error("An error occurred while updating address");
+    }
+
     setIsAddressPopoverOpen(false);
     reset();
   };
@@ -175,52 +250,72 @@ export function CompanyUserDetails({
     setIsAddressPopoverOpen(false);
   };
 
-  const [isArrPopoverOpen, setIsArrPopoverOpen] = useState(false);
-  const [editedArr, setEditedArr] = useState(ownerInfo.arr);
-
-  const handleUpdateArr = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      arr: editedArr,
-    }));
+  const handleUpdateArr = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        arr: parseFloat(editedArr),
+      });
+      if (updatedCompany) {
+        setEditedArr(updatedCompany.arr.toString());
+        toast.success("ARR updated successfully");
+      } else {
+        toast.error("Failed to update ARR");
+      }
+    } catch (error) {
+      console.error("Error updating ARR:", error);
+      toast.error("An error occurred while updating ARR");
+    }
     setIsArrPopoverOpen(false);
   };
 
   const handleCancelArrEdit = () => {
-    setEditedArr(ownerInfo.arr);
+    setEditedArr(companyDetails.arr.toString());
     setIsArrPopoverOpen(false);
   };
 
-  const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
-  const [editedEmployees, setEditedEmployees] = useState(ownerInfo.employees);
-
-  const handleUpdateEmployees = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      employees: editedEmployees,
-    }));
+  const handleUpdateEmployees = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        num_employees: parseInt(editedEmployees, 10),
+      });
+      if (updatedCompany) {
+        setEditedEmployees(updatedCompany.num_employees.toString());
+        toast.success("Number of employees updated successfully");
+      } else {
+        toast.error("Failed to update number of employees");
+      }
+    } catch (error) {
+      console.error("Error updating number of employees:", error);
+      toast.error("An error occurred while updating number of employees");
+    }
     setIsEmployeesPopoverOpen(false);
   };
 
   const handleCancelEmployeesEdit = () => {
-    setEditedEmployees(ownerInfo.employees);
+    setEditedEmployees(companyDetails.num_employees.toString());
     setIsEmployeesPopoverOpen(false);
   };
 
-  const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
-    useState(false);
-  const [editedCompanyName, setEditedCompanyName] = useState(ownerInfo.name);
-
-  const handleUpdateCompanyName = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      name: editedCompanyName,
-    }));
+  const handleUpdateCompanyName = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        name: editedCompanyName,
+      });
+      if (updatedCompany) {
+        setEditedCompanyName(updatedCompany.name);
+        toast.success("Company name updated successfully");
+      } else {
+        toast.error("Failed to update company name");
+      }
+    } catch (error) {
+      console.error("Error updating company name:", error);
+      toast.error("An error occurred while updating company name");
+    }
     setIsCompanyNamePopoverOpen(false);
   };
 
   const handleCancelCompanyNameEdit = () => {
-    setEditedCompanyName(ownerInfo.name);
+    setEditedCompanyName(companyDetails.name);
     setIsCompanyNamePopoverOpen(false);
   };
 
@@ -234,63 +329,67 @@ export function CompanyUserDetails({
     return formatDistanceToNow(date, { addSuffix: true, locale: nb });
   };
 
-  const addedTimeAgo = getTimeAgo(ownerInfo.addedDate);
+  const addedTimeAgo = getTimeAgo(companyDetails.date_created);
 
   const infoItems: InfoItem[] = [
     {
       icon: Building,
       label: "Org.nr",
-      value: ownerInfo.orgNumber,
+      value: companyDetails.orgnr,
       editable: true,
     },
     {
       icon: MapPin,
       label: "Adresse",
-      value: ownerInfo.address,
+      value: `${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`,
       editable: true,
     },
     {
       icon: DollarSign,
       label: "ARR",
-      value: ownerInfo.arr,
+      value: `${companyDetails.arr} NOK`,
       editable: true,
     },
-    { icon: Calendar, label: "Opprettet av", value: ownerInfo.createdBy },
+    {
+      icon: Calendar,
+      label: "Opprettet",
+      value: formatDate(companyDetails.date_created),
+    },
     {
       icon: Globe,
       label: "Nettside",
-      value: ownerInfo.website,
+      value: companyDetails.url,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.website),
+      displayValue: extractDomain(companyDetails.url),
     },
     {
       icon: Users,
       label: "Ansatte",
-      value: ownerInfo.employees,
+      value: companyDetails.num_employees.toString(),
       editable: true,
     },
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: ownerInfo.linkedin,
+      value: companyDetails.some_linked,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.linkedin),
+      displayValue: extractDomain(companyDetails.some_linked),
     },
     {
       icon: Clock,
-      label: "Sist oppdatert",
-      value: ownerInfo.lastUpdated,
-      displayValue: getTimeAgo(ownerInfo.lastUpdated),
+      label: "Sist kontaktet",
+      value: companyDetails.last_contacted,
+      displayValue: getTimeAgo(companyDetails.last_contacted),
     },
     {
       icon: Twitter,
       label: "Twitter",
-      value: ownerInfo.twitter,
+      value: companyDetails.some_twitter,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.twitter),
+      displayValue: extractDomain(companyDetails.some_twitter),
     },
   ];
 
@@ -299,9 +398,12 @@ export function CompanyUserDetails({
       <CardHeader>
         <CardTitle className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="/path-to-company-logo.png" alt={ownerInfo.name} />
+            <AvatarImage
+              src="/path-to-company-logo.png"
+              alt={companyDetails.name}
+            />
             <AvatarFallback>
-              {ownerInfo.name.slice(0, 2).toUpperCase()}
+              {companyDetails.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -311,7 +413,7 @@ export function CompanyUserDetails({
             >
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="p-0 h-auto font-normal">
-                  <h3 className="text-lg font-semibold">{ownerInfo.name}</h3>
+                  <h3 className="text-lg font-semibold">{editedCompanyName}</h3>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -363,7 +465,7 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {editedOrgNumber}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -401,7 +503,7 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {`${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -467,38 +569,6 @@ export function CompanyUserDetails({
                             )}
                           </div>
                         </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="country">Land</Label>
-                          <Controller
-                            name="country"
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                              >
-                                <SelectTrigger id="country">
-                                  <SelectValue placeholder="Velg land" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {countries.map((country) => (
-                                    <SelectItem
-                                      key={country.code}
-                                      value={country.code}
-                                    >
-                                      {country.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                          {errors.country && (
-                            <p className="text-sm text-red-500">
-                              {errors.country.message}
-                            </p>
-                          )}
-                        </div>
                         <div className="flex justify-end space-x-2">
                           <Button
                             type="button"
@@ -528,16 +598,23 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {parseFloat(editedArr).toLocaleString("no-NO")} NOK
                         </span>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <div className="space-y-2">
-                        <Input
-                          value={editedArr}
-                          onChange={(e) => setEditedArr(e.target.value)}
-                        />
+                        <div className="flex items-center">
+                          <Input
+                            type="number"
+                            value={editedArr}
+                            onChange={(e) => setEditedArr(e.target.value)}
+                            className="pr-12"
+                          />
+                          <span className="ml-[-40px] text-sm text-muted-foreground">
+                            NOK
+                          </span>
+                        </div>
                         <div className="flex justify-end space-x-2">
                           <Button
                             size="sm"
@@ -566,7 +643,9 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {parseInt(editedEmployees, 10).toLocaleString(
+                            "no-NO"
+                          )}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -636,14 +715,14 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Account Owner ({ownerInfo.accountOwners.length})
+                Account Owner ({companyDetails.account_owners.length})
               </h4>
               <AccountOwnerCombobox />
             </div>
-            {ownerInfo.accountOwners.map((owner, index) => (
+            {companyDetails.account_owners.map((owner, index) => (
               <Link
                 key={index}
-                href={`/people/${owner.uuid}`}
+                href={`/people/${owner.clerk_id}`}
                 className="inline-block"
               >
                 <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
@@ -654,10 +733,10 @@ export function CompanyUserDetails({
                       "text-xs font-medium"
                     )}
                   >
-                    {owner.name.charAt(0)}
+                    {owner.first_name.charAt(0)}
                   </div>
                   <span className="text-sm font-medium text-muted-foreground">
-                    {owner.name}
+                    {`${owner.first_name} ${owner.last_name}`}
                   </span>
                 </div>
               </Link>
@@ -667,11 +746,11 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Muligheter ({ownerInfo.opportunities.length})
+                Muligheter ({companyDetails.opportunities.length})
               </h4>
               <OpportunityCombobox />
             </div>
-            {ownerInfo.opportunities.map((opportunity, index) => (
+            {companyDetails.opportunities.map((opportunity, index) => (
               <Link
                 key={index}
                 href={`/opportunity/${opportunity.uuid}`}
@@ -698,11 +777,11 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Personer ({ownerInfo.people.length})
+                Personer ({companyDetails.people.length})
               </h4>
               <PersonCombobox />
             </div>
-            {ownerInfo.people.map((person, index) => (
+            {companyDetails.people.map((person, index) => (
               <Link
                 key={index}
                 href={`/people/${person.uuid}`}
