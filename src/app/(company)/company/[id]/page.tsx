@@ -24,6 +24,7 @@ export default async function CompanyUserPage({
 }) {
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
+  console.log(companyDetails);
 
   if (!companyDetails) {
     return (
@@ -69,7 +70,7 @@ export default async function CompanyUserPage({
               </TabsTrigger>
             </TabsList>
             <TabsContent value="timeline">
-              <TimelineContent />
+              <TimelineContent timelineItems={companyDetails.timeline} />
             </TabsContent>
             <TabsContent value="tasks">
               <TasksContent />
