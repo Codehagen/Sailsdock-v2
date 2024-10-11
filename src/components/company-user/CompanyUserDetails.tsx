@@ -15,6 +15,7 @@ import {
   Twitter,
   Check,
   X,
+  Pen,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -169,6 +170,12 @@ export function CompanyUserDetails({
   const [editedEmployees, setEditedEmployees] = useState(
     companyDetails.num_employees.toString()
   );
+  const [isUrlPopoverOpen, setIsUrlPopoverOpen] = useState(false);
+  const [editedUrl, setEditedUrl] = useState(companyDetails.url);
+  const [editedLinkedIn, setEditedLinkedIn] = useState(companyDetails.some_linked);
+  const [editedTwitter, setEditedTwitter] = useState(companyDetails.some_twitter);
+  const [isLinkedInPopoverOpen, setIsLinkedInPopoverOpen] = useState(false);
+  const [isTwitterPopoverOpen, setIsTwitterPopoverOpen] = useState(false);
 
   const [isOrgNumberPopoverOpen, setIsOrgNumberPopoverOpen] = useState(false);
   const [isAddressPopoverOpen, setIsAddressPopoverOpen] = useState(false);
@@ -319,6 +326,75 @@ export function CompanyUserDetails({
     setIsCompanyNamePopoverOpen(false);
   };
 
+  const handleUpdateUrl = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        url: editedUrl,
+      });
+      if (updatedCompany) {
+        setEditedUrl(updatedCompany.url);
+        toast.success("URL updated successfully");
+      } else {
+        toast.error("Failed to update URL");
+      }
+    } catch (error) {
+      console.error("Error updating URL:", error);
+      toast.error("An error occurred while updating URL");
+    }
+    setIsUrlPopoverOpen(false);
+  };
+
+  const handleCancelUrlEdit = () => {
+    setEditedUrl(companyDetails.url);
+    setIsUrlPopoverOpen(false);
+  };
+
+  const handleUpdateLinkedIn = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        some_linked: editedLinkedIn,
+      });
+      if (updatedCompany) {
+        setEditedLinkedIn(updatedCompany.some_linked);
+        toast.success("LinkedIn URL updated successfully");
+      } else {
+        toast.error("Failed to update LinkedIn URL");
+      }
+    } catch (error) {
+      console.error("Error updating LinkedIn URL:", error);
+      toast.error("An error occurred while updating LinkedIn URL");
+    }
+    setIsLinkedInPopoverOpen(false);
+  };
+
+  const handleCancelLinkedInEdit = () => {
+    setEditedLinkedIn(companyDetails.some_linked);
+    setIsLinkedInPopoverOpen(false);
+  };
+
+  const handleUpdateTwitter = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        some_twitter: editedTwitter,
+      });
+      if (updatedCompany) {
+        setEditedTwitter(updatedCompany.some_twitter);
+        toast.success("Twitter URL updated successfully");
+      } else {
+        toast.error("Failed to update Twitter URL");
+      }
+    } catch (error) {
+      console.error("Error updating Twitter URL:", error);
+      toast.error("An error occurred while updating Twitter URL");
+    }
+    setIsTwitterPopoverOpen(false);
+  };
+
+  const handleCancelTwitterEdit = () => {
+    setEditedTwitter(companyDetails.some_twitter);
+    setIsTwitterPopoverOpen(false);
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     return format(date, "d. MMMM yyyy", { locale: nb });
@@ -354,14 +430,16 @@ export function CompanyUserDetails({
       icon: Calendar,
       label: "Opprettet",
       value: formatDate(companyDetails.date_created),
+      displayValue: getTimeAgo(companyDetails.date_created),
     },
     {
       icon: Globe,
       label: "Nettside",
-      value: companyDetails.url,
+      value: editedUrl,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(companyDetails.url),
+      displayValue: editedUrl ? extractDomain(editedUrl) : "Tom",
+      editable: true,
     },
     {
       icon: Users,
@@ -372,10 +450,11 @@ export function CompanyUserDetails({
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: companyDetails.some_linked,
+      value: editedLinkedIn,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(companyDetails.some_linked),
+      displayValue: editedLinkedIn ? extractDomain(editedLinkedIn) : "Tom",
+      editable: true,
     },
     {
       icon: Clock,
@@ -386,10 +465,11 @@ export function CompanyUserDetails({
     {
       icon: Twitter,
       label: "Twitter",
-      value: companyDetails.some_twitter,
+      value: editedTwitter,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(companyDetails.some_twitter),
+      displayValue: editedTwitter ? extractDomain(editedTwitter) : "Tom",
+      editable: true,
     },
   ];
 
@@ -453,7 +533,98 @@ export function CompanyUserDetails({
               <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
                 {item.label}:
               </span>
-              {item.editable ? (
+              {item.editable && (item.label === "Nettside" || item.label === "LinkedIn" || item.label === "Twitter") ? (
+                <Badge variant="secondary" className="font-normal flex items-center">
+                  {item.value ? (
+                    <a
+                      href={item.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm hover:underline text-muted-foreground"
+                    >
+                      {item.displayValue}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Tom</span>
+                  )}
+                  <Separator orientation="vertical" className="mx-2 h-4" />
+                  <Popover
+                    open={
+                      item.label === "Nettside"
+                        ? isUrlPopoverOpen
+                        : item.label === "LinkedIn"
+                        ? isLinkedInPopoverOpen
+                        : isTwitterPopoverOpen
+                    }
+                    onOpenChange={
+                      item.label === "Nettside"
+                        ? setIsUrlPopoverOpen
+                        : item.label === "LinkedIn"
+                        ? setIsLinkedInPopoverOpen
+                        : setIsTwitterPopoverOpen
+                    }
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                      >
+                        <Pen className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <Input
+                          value={
+                            item.label === "Nettside"
+                              ? editedUrl
+                              : item.label === "LinkedIn"
+                              ? editedLinkedIn
+                              : editedTwitter
+                          }
+                          onChange={(e) =>
+                            item.label === "Nettside"
+                              ? setEditedUrl(e.target.value)
+                              : item.label === "LinkedIn"
+                              ? setEditedLinkedIn(e.target.value)
+                              : setEditedTwitter(e.target.value)
+                          }
+                        />
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={
+                              item.label === "Nettside"
+                                ? handleCancelUrlEdit
+                                : item.label === "LinkedIn"
+                                ? handleCancelLinkedInEdit
+                                : handleCancelTwitterEdit
+                            }
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Avbryt
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={
+                              item.label === "Nettside"
+                                ? handleUpdateUrl
+                                : item.label === "LinkedIn"
+                                ? handleUpdateLinkedIn
+                                : handleUpdateTwitter
+                            }
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Bekreft
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Badge>
+              ) : item.editable ? (
                 item.label === "Org.nr" ? (
                   <Popover
                     open={isOrgNumberPopoverOpen}
