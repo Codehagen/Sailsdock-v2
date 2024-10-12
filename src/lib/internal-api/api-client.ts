@@ -6,6 +6,7 @@ import {
   WorkspaceData,
   DealData,
   CompanyData,
+  NoteData,
 } from "./types";
 
 class ApiClient {
@@ -13,7 +14,7 @@ class ApiClient {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: "https://crm.vegardenterprises.com/internal/v1/",
+      baseURL: "https://crm.vegardenterprises.com/internal/v2/",
       headers: {
         "Content-Type": "application/json",
         "X-CITADEL-LOCK": process.env.FRONTEND_LOCK || "",
@@ -69,17 +70,37 @@ class ApiClient {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
+        const errorInfo = {
+          message: axiosError.message,
+          status: axiosError.response?.status,
+          config: {
+            baseURL: axiosError.config?.baseURL,
+            method: axiosError.config?.method,
+            url: axiosError.config?.url,
+            data: axiosError.config?.data,
+          },
+          data:
+            axiosError.response?.data &&
+            typeof axiosError.response.data === "object"
+              ? JSON.stringify(axiosError.response.data).slice(0, 100)
+              : "Response data not available or not in expected format",
+        };
+
         console.error(
-          `API client error for ${method} ${url}:`,
-          axiosError.message
+          `API client error for ${method.toUpperCase()} ${url}:`,
+          errorInfo
         );
+
         return {
           success: false,
           status: axiosError.response?.status || 500,
           data: [],
         };
       } else {
-        console.error(`Unexpected error for ${method} ${url}:`, error);
+        console.error(
+          `Unexpected error for ${method.toUpperCase()} ${url}:`,
+          error
+        );
         return {
           success: false,
           status: 500,
@@ -98,10 +119,11 @@ class ApiClient {
   };
   // prettier-ignore
   workspaces = {
-    get: (workspaceId: string) => this.request<WorkspaceData>("get", `companies/${workspaceId}`),
-    create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "companies/", workspaceData),
-    update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `companies/${workspaceId}`, workspaceData),
-    delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `companies/${workspaceId}`),
+    get: (workspaceId: string) => this.request<WorkspaceData>("get", `workspaces/${workspaceId}/`),
+    getUsers: (workspaceId: string) => this.request<UserData[]>("get", `workspaces/${workspaceId}/users/`),
+    create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "workspaces/", workspaceData),
+    update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `workspaces/${workspaceId}/`, workspaceData),
+    delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `workspaces/${workspaceId}/`),
   };
   // prettier-ignore
   deals = {
@@ -113,17 +135,38 @@ class ApiClient {
   //TODO Change URL ENDPOINT WHEN @grax is ready
   // prettier-ignore
   company = {
-    getAll: (companyId: string, pageSize?: number, page?: number) => {
-      let url = `companies/${companyId}/customers`;
+    getAll: (workspaceId: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/companies`;
       if (pageSize !== undefined && page !== undefined) {
         url += `?page_size=${pageSize}&page=${page}`;
       }
       return this.request<CompanyData[]>("get", url);
     },
-    get:    (customerId: string) => this.request<CompanyData>("get", `/customers/${customerId}`),
-    create: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `companies/${companyId}/customers/`, companyData),
-    update: (customerId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/customers/${customerId}`, companyData),
-    delete: (customerId: string) => this.request<CompanyData>("delete", `/customers/${customerId}`),
+    get:    (companyId: string) => this.request<CompanyData>("get", `/companies/${companyId}`),
+    create: (workspaceId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("post", `/companies/`, companyData),
+    update: (companyId: string, companyData: Partial<CompanyData>) => this.request<CompanyData>("patch", `/companies/${companyId}/`, companyData),
+    delete: (companyId: string) => this.request<CompanyData>("delete", `/companies/${companyId}`),
+    getDetails: (companyId: string) => 
+      this.request<CompanyData>("get", `/companies/${companyId}/details`),
+
+     // prettier-ignore
+    notes: {
+      getAll: (pageSize?: number, page?: number) => {
+        let url = "notes";
+        if (pageSize !== undefined && page !== undefined) {
+          url += `?page_size=${pageSize}&page=${page}`;
+        }
+        return this.request<NoteData[]>("get", url);
+      },
+      get: (noteId: string) => 
+        this.request<NoteData>("get", `notes/${noteId}/`),
+      create: (noteData: Partial<NoteData>) =>
+        this.request<NoteData>("post", `/notes/`, noteData),
+      update: (noteId: string, noteData: Partial<NoteData>) =>
+        this.request<NoteData>("patch", `notes/${noteId}/`, noteData),
+      delete: (noteId: string) => 
+        this.request<NoteData>("delete", `notes/${noteId}/`),
+    },
   };
 }
 

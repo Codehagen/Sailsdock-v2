@@ -16,28 +16,67 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { Separator } from "@/components/ui/separator";
+import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
+import { updateCompany } from "@/actions/company/update-companies";
+import { toast } from "sonner";
+import { AccountOwner } from "@/lib/internal-api/types";
 
-type AccountOwner = {
-  uuid: string;
-  name: string;
-};
 
-const accountOwners: AccountOwner[] = [
-  { uuid: "1", name: "John Doe" },
-  { uuid: "2", name: "Jane Smith" },
-  { uuid: "3", name: "Alice Johnson" },
-  // Add more account owners as needed
-];
-
-export function AccountOwnerCombobox() {
+export function AccountOwnerCombobox({
+  companyId,
+  onOwnerAdded,
+  currentAccountOwners,
+}: {
+  companyId: string;
+  onOwnerAdded: (owner: AccountOwner) => void;
+  currentAccountOwners: number[];
+}) {
   const [open, setOpen] = React.useState(false);
   const { isDesktop } = useMediaQuery();
   const [selectedOwner, setSelectedOwner] = React.useState<AccountOwner | null>(
     null
   );
+  const [accountOwners, setAccountOwners] = React.useState<AccountOwner[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open && accountOwners.length === 0) {
+      setIsLoading(true);
+      getWorkspaceUsers().then((response) => {
+        if (response) {
+          setAccountOwners(response);
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [open, accountOwners.length]);
+
+  React.useEffect(() => {}, [accountOwners]);
+
+  const handleSelectOwner = async (owner: AccountOwner) => {
+    setSelectedOwner(owner);
+    setOpen(false);
+    try {
+      const updatedAccountOwners = [...currentAccountOwners, owner.id];
+      const updatedCompany = await updateCompany(companyId, {
+        account_owners: updatedAccountOwners,
+      });
+      if (updatedCompany) {
+        onOwnerAdded(owner);
+        toast.success(
+          `${owner.first_name || owner.email} added as account owner`
+        );
+      } else {
+        toast.error("Failed to update account owner");
+      }
+    } catch (error) {
+      console.error("Error updating account owner:", error);
+      toast.error("An error occurred while updating account owner");
+    }
+  };
 
   if (isDesktop) {
     return (
@@ -48,7 +87,13 @@ export function AccountOwnerCombobox() {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
-          <OwnerList setOpen={setOpen} setSelectedOwner={setSelectedOwner} />
+          <OwnerList
+            setOpen={setOpen}
+            setSelectedOwner={setSelectedOwner}
+            accountOwners={accountOwners}
+            isLoading={isLoading}
+            handleSelectOwner={handleSelectOwner}
+          />
         </PopoverContent>
       </Popover>
     );
@@ -63,7 +108,13 @@ export function AccountOwnerCombobox() {
       </DrawerTrigger>
       <DrawerContent>
         <div className="mt-4 border-t">
-          <OwnerList setOpen={setOpen} setSelectedOwner={setSelectedOwner} />
+          <OwnerList
+            setOpen={setOpen}
+            setSelectedOwner={setSelectedOwner}
+            accountOwners={accountOwners}
+            isLoading={isLoading}
+            handleSelectOwner={handleSelectOwner}
+          />
         </div>
       </DrawerContent>
     </Drawer>
@@ -73,9 +124,15 @@ export function AccountOwnerCombobox() {
 function OwnerList({
   setOpen,
   setSelectedOwner,
+  accountOwners,
+  isLoading,
+  handleSelectOwner,
 }: {
   setOpen: (open: boolean) => void;
   setSelectedOwner: (owner: AccountOwner | null) => void;
+  accountOwners: AccountOwner[];
+  isLoading: boolean;
+  handleSelectOwner: (owner: AccountOwner) => void;
 }) {
   return (
     <Command>
@@ -83,23 +140,33 @@ function OwnerList({
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup>
-          {accountOwners.map((owner) => (
-            <CommandItem
-              key={owner.uuid}
-              value={owner.name}
-              onSelect={() => {
-                setSelectedOwner(owner);
-                setOpen(false);
-              }}
-            >
-              <div className="flex items-center">
-                <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2">
-                  {owner.name.charAt(0)}
-                </div>
-                {owner.name}
-              </div>
+          {isLoading ? (
+            <CommandItem>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading...
             </CommandItem>
-          ))}
+          ) : (
+            accountOwners.map((owner) => (
+              <CommandItem
+                key={owner.id}
+                value={`${owner.first_name || ""} ${owner.last_name || ""} ${
+                  owner.email
+                }`.trim()}
+                onSelect={() => handleSelectOwner(owner)}
+              >
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2">
+                    {owner.first_name
+                      ? owner.first_name.charAt(0).toUpperCase()
+                      : owner.email.charAt(0).toUpperCase()}
+                  </div>
+                  {owner.first_name && owner.last_name
+                    ? `${owner.first_name} ${owner.last_name}`
+                    : owner.email}
+                </div>
+              </CommandItem>
+            ))
+          )}
         </CommandGroup>
         <Separator className="my-2" />
         <CommandItem

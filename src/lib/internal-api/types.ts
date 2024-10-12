@@ -70,31 +70,151 @@ export interface DealData {
 }
 
 export interface CompanyData {
-  readonly id: string | number;
-  readonly uuid: string;
+  id: number;
+  last_contacted: string;
+  potential_revenue: number;
+  contact_points: number;
+  num_tasks: number;
+  notes: Array<{
+    id: number;
+    class_type: string;
+    uuid: string;
+    date_created: string;
+    title: string;
+    description: string;
+    status: string;
+    date: string;
+    type: string;
+    user: number;
+    customer: number;
+    deal: number | null;
+  }>;
+  default_contact: {
+    uuid: string;
+    title: string;
+    name: string;
+    phone: string;
+    email: string;
+    department: string;
+    url: string;
+    address_street: string;
+    address_zip: string;
+    address_city: string;
+    pref_com: string;
+  };
+  contacts: Array<{
+    id: number;
+    uuid: string;
+    title: string;
+    name: string;
+    department: string;
+  }>;
+  labels_details: any[]; // You might want to define a more specific type if needed
+  opportunities: any[]; // You might want to define a more specific type if needed
+  people: any[]; // You might want to define a more specific type if needed
+  account_owners: Array<{
+    id: number;
+    clerk_id: string;
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+  }>;
+  timeline: Array<{
+    id: number;
+    class_type: string;
+    user_details: {
+      id: number;
+      clerk_id: string;
+      email: string;
+      username: string;
+      first_name: string;
+      last_name: string;
+    };
+    uuid: string;
+    date_created: string;
+    title: string;
+    description: string;
+    status: string;
+    date: string;
+    type: string;
+    user: number;
+    customer: number;
+    deal: number | null;
+  }>;
   type: string;
+  business: boolean;
+  uuid: string;
+  date_created: string;
   name: string;
-  user_name?: string;
   orgnr: string;
-  contact_person: string;
-  title?: string;
-  url?: string;
   address_street: string;
   address_zip: string;
   address_city: string;
+  address_municipalty: string;
+  url: string;
+  some_linked: string;
+  some_face: string;
+  some_insta: string;
+  some_twitter: string;
+  status: string;
+  label: string;
+  priority: string;
+  stage: number;
+  date_converted: string | null;
+  arr: number;
+  contact_person: string;
+  title: string;
   phone: string;
   email: string;
-  label: string;
-  status: string;
-  priority: string;
+  all_contacts: any | null; // You might want to define a more specific type if needed
+  current_business: string;
   preferred_communication: string;
-  num_employees?: string;
-  board_members?: any;
-  last_contacted: string;
-  default_contact?: {
-    name: string;
-    // Add other properties of default_contact as needed
-  };
+  region: string;
+  ceo: string;
+  adm_manager: string;
+  adm_board: string[];
+  orgform: string;
+  sections: string;
+  comments_1: string;
+  comments_2: string;
+  num_employees: number;
+  company: number;
+  user: number;
+  lead: number | null;
+  contact: number;
+  department: any[]; // You might want to define a more specific type if needed
+  labels: any[]; // You might want to define a more specific type if needed
 }
 
 // You can add more interfaces or types here as needed
+
+export interface AccountOwner {
+  id: number;
+  clerk_id: string;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface WorkspaceData {
+  id: number;
+  clerk_id?: string;
+  email?: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  // ... any other properties ...
+}
+
+export interface NoteData {
+  id: string;
+  title: string;
+  description: string;
+  companyId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
