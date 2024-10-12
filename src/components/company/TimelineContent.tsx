@@ -15,6 +15,7 @@ import {
   Globe,
   Building2,
   Linkedin,
+  StickyNote,
 } from "lucide-react";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -32,7 +33,6 @@ interface TimelineItem {
   status: string;
   date: string;
   type: string;
-  // showInBox?: boolean; // Uncomment when implementing box feature
 }
 
 const iconMap: { [key: string]: React.ElementType } = {
@@ -43,6 +43,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   document: FileText,
   calendar: Calendar,
   call: Phone,
+  notes: StickyNote,
 };
 
 function TimelineIcon({
@@ -120,11 +121,13 @@ export function TimelineContent({
                         <span className="font-medium">
                           {`${item.user_details.first_name} ${item.user_details.last_name}`}
                         </span>{" "}
-                        {item.title}
+                        {item.type === "notes" ? "added a note:" : item.title}
                       </p>
                       {item.description && (
                         <p className="text-sm text-muted-foreground">
-                          {item.description}
+                          {item.type === "notes"
+                            ? item.title
+                            : item.description}
                         </p>
                       )}
                     </div>
@@ -137,66 +140,6 @@ export function TimelineContent({
                   </div>
                 </li>
               ))}
-              {/* Commented out box feature for future implementation
-              {boxItems.length > 0 && (
-                <>
-                  <li className="relative pl-10 z-10">
-                    <div className="absolute left-0 top-0.5">
-                      <TimelineIcon type={boxItems[0].type} classType={boxItems[0].class_type} />
-                    </div>
-                    <div className="flex justify-between items-start">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm text-muted-foreground">
-                          <span className="font-medium">
-                            {`${boxItems[0].user_details.first_name} ${boxItems[0].user_details.last_name}`}
-                          </span>{" "}
-                          oppdaterte {boxItems.length} felt
-                        </p>
-                      </div>
-                      <p className="text-sm text-muted-foreground ml-4 whitespace-nowrap">
-                        {formatDistanceToNow(parseISO(boxItems[0].date_created), {
-                          addSuffix: true,
-                          locale: nb,
-                        })}
-                      </p>
-                    </div>
-                  </li>
-                  <div className="mt-4 p-2 bg-gray-50 dark:bg-gray-800 rounded-md text-sm text-muted-foreground relative z-10">
-                    {boxItems.map((item, index) => {
-                      if (!item.description) return null;
-                      const [key, value] = item.description.split("→").map((s) => s.trim());
-                      let Icon;
-                      switch (key.toLowerCase()) {
-                        case "employees":
-                          Icon = Users;
-                          break;
-                        case "domain name":
-                          Icon = Globe;
-                          break;
-                        case "linkedin":
-                          Icon = Linkedin;
-                          break;
-                        case "arr":
-                          Icon = Building2;
-                          break;
-                        default:
-                          Icon = Paperclip;
-                      }
-                      return (
-                        <div key={`${item.id}-${index}`} className="flex items-center mb-1 last:mb-0">
-                          <Icon className="w-4 h-4 mr-2 text-gray-500 dark:text-gray-400" />
-                          <span className="font-medium mr-2">{key}</span>
-                          <span className="text-gray-500 dark:text-gray-400">→</span>
-                          <span className="ml-2 bg-white dark:bg-gray-700 px-2 py-0.5 rounded">
-                            {value}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-              */}
             </ul>
           </div>
         ))}

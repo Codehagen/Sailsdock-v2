@@ -7,75 +7,65 @@ import { useState, useMemo } from "react";
 import { Content } from "@tiptap/react";
 import { NoteCard } from "@/components/company/NoteCard";
 
-interface NotesContentProps {
-  hasNotes?: boolean;
+interface Note {
+  id: number;
+  class_type: string;
+  uuid: string;
+  date_created: string;
+  title: string;
+  description: string;
+  status: string;
+  date: string;
+  type: string;
+  user: number;
+  customer: number;
+  deal: number | null;
 }
 
-// Updated mock data to reflect AddNoteSheet output
-const mockNotes = [
-  {
-    id: "1",
-    title: "Viktige møtenotater",
-    content:
-      "<p>Diskuterte Q4-mål og strategier for det kommende året.</p><ul><li>Øke salget med 15%</li><li>Lansere ny produktlinje</li></ul>",
-    companyName: "Acme Corp",
-    createdAt: "2024-05-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    title: "Produktlanseringsplan",
-    content:
-      "<p>Skisserte viktige milepæler for den nye produktlanseringen i Q2:</p><ol><li>Ferdigstille design innen 15. april</li><li>Starte produksjon innen 1. mai</li><li>Starte markedsføringskampanje 1. juni</li></ol>",
-    companyName: "TechStart Inc",
-    createdAt: "2024-06-20T14:45:00Z",
-  },
-  {
-    id: "3",
-    title: "Kundetilbakemelding",
-    content:
-      "<p>Positiv tilbakemelding mottatt på den siste prosjektleveransen:</p><blockquote>Teamet overgikk våre forventninger. Flott jobb!</blockquote>",
-    companyName: "Global Services Ltd",
-    createdAt: "2024-08-05T09:15:00Z",
-  },
-  {
-    id: "4",
-    title: "Teamets ytelsesgjennomgang",
-    content:
-      "<p>Kvartalsvis ytelsesgjennomgang for utviklingsteamet:</p><ul><li>Forbedret kodekvalitet med 20%</li><li>Reduserte antall feil med 30%</li><li>Økte testdekning til 85%</li></ul>",
-    companyName: "DevOps Solutions",
-    createdAt: "2024-10-08T16:00:00Z",
-  },
-];
+interface NotesContentProps {
+  notes: Note[];
+  companyId: number; // Add this line
+}
 
-export function NotesContent({ hasNotes = true }: NotesContentProps) {
-  const [notes, setNotes] = useState(mockNotes);
+export function NotesContent({
+  notes: initialNotes,
+  companyId,
+}: NotesContentProps) {
+  const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [noteToEdit, setNoteToEdit] = useState<{
-    id: string;
+    id: number;
     title: string;
     content: Content;
   } | null>(null);
 
-  // Sort notes by createdAt date, newest first
+  // Sort notes by date_created, newest first
   const sortedNotes = useMemo(() => {
     return [...notes].sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.date_created).getTime() - new Date(a.date_created).getTime()
     );
   }, [notes]);
 
   const addNote = (newNote: { title: string; content: Content }) => {
-    const note = {
-      id: (notes.length + 1).toString(),
+    const note: Note = {
+      id: Math.max(...notes.map((n) => n.id)) + 1,
+      class_type: "ContactNote",
+      uuid: crypto.randomUUID(),
+      date_created: new Date().toISOString(),
       title: newNote.title,
-      content: newNote.content?.toString() ?? "", // Safely convert Content to string, default to empty string if null
-      companyName: "Current Company", // You might want to pass this as a prop
-      createdAt: new Date().toISOString(),
+      description: newNote.content?.toString() ?? "",
+      status: "completed",
+      date: new Date().toISOString(),
+      type: "email",
+      user: 1, // You might want to get this from the current user
+      customer: companyId, // Use the companyId passed as prop
+      deal: null,
     };
     setNotes([note, ...notes]);
   };
 
   const editNote = (
-    id: string,
+    id: number,
     updatedNote: { title: string; content: Content }
   ) => {
     setNotes(
@@ -84,8 +74,8 @@ export function NotesContent({ hasNotes = true }: NotesContentProps) {
           ? {
               ...note,
               title: updatedNote.title,
-              content: updatedNote.content?.toString() ?? "",
-              createdAt: new Date().toISOString(), // Update the createdAt date when editing
+              description: updatedNote.content?.toString() ?? "",
+              date_created: new Date().toISOString(), // Update the date_created when editing
             }
           : note
       )
@@ -93,13 +83,13 @@ export function NotesContent({ hasNotes = true }: NotesContentProps) {
     setNoteToEdit(null);
   };
 
-  const handleEditNote = (id: string) => {
+  const handleEditNote = (id: number) => {
     const noteToEdit = notes.find((note) => note.id === id);
     if (noteToEdit) {
       setNoteToEdit({
         id: noteToEdit.id,
         title: noteToEdit.title,
-        content: noteToEdit.content as Content,
+        content: noteToEdit.description as Content,
       });
     }
   };
@@ -117,6 +107,7 @@ export function NotesContent({ hasNotes = true }: NotesContentProps) {
             onNoteAdded={addNote}
             onNoteEdited={editNote}
             noteToEdit={noteToEdit}
+            companyId={companyId}
           />
         </EmptyPlaceholder>
       ) : (
@@ -126,6 +117,7 @@ export function NotesContent({ hasNotes = true }: NotesContentProps) {
               onNoteAdded={addNote}
               onNoteEdited={editNote}
               noteToEdit={noteToEdit}
+              companyId={companyId}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -134,10 +126,10 @@ export function NotesContent({ hasNotes = true }: NotesContentProps) {
                 key={note.id}
                 id={note.id}
                 title={note.title}
-                content={note.content}
-                companyName={note.companyName}
-                createdAt={note.createdAt}
-                onEdit={handleEditNote}
+                content={note.description}
+                companyName="" // You might want to pass this as a prop
+                createdAt={note.date_created}
+                onEdit={() => handleEditNote(note.id)}
               />
             ))}
           </div>

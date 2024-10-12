@@ -207,3 +207,14 @@ export interface WorkspaceData {
   last_name?: string;
   // ... any other properties ...
 }
+
+export interface NoteData {
+  id: string;
+  title: string;
+  description: string;
+  companyId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}

@@ -11,12 +11,12 @@ import { formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 
 interface NoteCardProps {
-  id: string;
+  id: number;
   title: string;
   content: string;
   companyName: string;
   createdAt: string;
-  onEdit: (id: string) => void;
+  onEdit: (id: number) => void;
 }
 
 export function NoteCard({

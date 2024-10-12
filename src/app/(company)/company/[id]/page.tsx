@@ -76,7 +76,10 @@ export default async function CompanyUserPage({
               <TasksContent />
             </TabsContent>
             <TabsContent value="notes">
-              <NotesContent />
+              <NotesContent
+                notes={companyDetails.notes}
+                companyId={companyDetails.id}
+              />
             </TabsContent>
             <TabsContent value="files">
               <FilesContent />

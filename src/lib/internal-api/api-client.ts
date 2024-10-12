@@ -6,6 +6,7 @@ import {
   WorkspaceData,
   DealData,
   CompanyData,
+  NoteData,
 } from "./types";
 
 class ApiClient {
@@ -147,6 +148,25 @@ class ApiClient {
     delete: (companyId: string) => this.request<CompanyData>("delete", `/companies/${companyId}`),
     getDetails: (companyId: string) => 
       this.request<CompanyData>("get", `/companies/${companyId}/details`),
+
+     // prettier-ignore
+    notes: {
+      getAll: (pageSize?: number, page?: number) => {
+        let url = "notes";
+        if (pageSize !== undefined && page !== undefined) {
+          url += `?page_size=${pageSize}&page=${page}`;
+        }
+        return this.request<NoteData[]>("get", url);
+      },
+      get: (noteId: string) => 
+        this.request<NoteData>("get", `notes/${noteId}/`),
+      create: (noteData: Partial<NoteData>) =>
+        this.request<NoteData>("post", `/notes/`, noteData),
+      update: (noteId: string, noteData: Partial<NoteData>) =>
+        this.request<NoteData>("patch", `notes/${noteId}/`, noteData),
+      delete: (noteId: string) => 
+        this.request<NoteData>("delete", `notes/${noteId}`),
+    },
   };
 }
 

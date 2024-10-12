@@ -18,6 +18,7 @@ import { Plus } from "lucide-react";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { MinimalTiptapEditor } from "@/components/notes/minimal-tiptap/minimal-tiptap";
 import { Content } from "@tiptap/react";
+import { createNotesCompany } from "@/actions/company/create-notes-companies";
 
 const MemoizedMinimalTiptapEditor = React.memo(MinimalTiptapEditor);
 
@@ -68,14 +69,16 @@ NoteForm.displayName = "NoteForm";
 
 interface AddNoteSheetProps {
   onNoteAdded: (note: { title: string; content: Content }) => void;
-  onNoteEdited: (id: string, note: { title: string; content: Content }) => void;
-  noteToEdit?: { id: string; title: string; content: Content } | null;
+  onNoteEdited: (id: number, note: { title: string; content: Content }) => void;
+  noteToEdit?: { id: number; title: string; content: Content } | null;
+  companyId: number;
 }
 
 export function AddNoteSheet({
   onNoteAdded,
   onNoteEdited,
   noteToEdit,
+  companyId,
 }: AddNoteSheetProps) {
   const [open, setOpen] = useState(false);
   const [noteTitle, setNoteTitle] = useState(noteToEdit?.title || "");
@@ -93,18 +96,25 @@ export function AddNoteSheet({
   }, [noteToEdit]);
 
   const handleSubmit = useCallback(
-    (event: React.FormEvent) => {
+    async (event: React.FormEvent) => {
       event.preventDefault();
       if (noteToEdit) {
         onNoteEdited(noteToEdit.id, { title: noteTitle, content: noteContent });
       } else {
-        onNoteAdded({ title: noteTitle, content: noteContent });
+        const newNote = await createNotesCompany({
+          title: noteTitle,
+          description: noteContent?.toString() ?? "",
+          customer: companyId,
+        });
+        if (newNote) {
+          onNoteAdded({ title: noteTitle, content: noteContent });
+        }
       }
       setNoteTitle("");
       setNoteContent("");
       setOpen(false);
     },
-    [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit]
+    [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit, companyId]
   );
 
   const handleNoteContentChange = useCallback((newContent: Content) => {
