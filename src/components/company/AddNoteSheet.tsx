@@ -69,8 +69,11 @@ NoteForm.displayName = "NoteForm";
 
 interface AddNoteSheetProps {
   onNoteAdded: (note: { title: string; content: Content }) => void;
-  onNoteEdited: (id: number, note: { title: string; content: Content }) => void;
-  noteToEdit?: { id: number; title: string; content: Content } | null;
+  onNoteEdited: (
+    uuid: string,
+    note: { title: string; content: Content }
+  ) => void;
+  noteToEdit?: { uuid: string; title: string; content: Content } | null;
   companyId: number;
 }
 
@@ -99,7 +102,10 @@ export function AddNoteSheet({
     async (event: React.FormEvent) => {
       event.preventDefault();
       if (noteToEdit) {
-        onNoteEdited(noteToEdit.id, { title: noteTitle, content: noteContent });
+        onNoteEdited(noteToEdit.uuid, {
+          title: noteTitle,
+          content: noteContent,
+        });
       } else {
         const newNote = await createNotesCompany({
           title: noteTitle,

@@ -3,14 +3,16 @@
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { AddNoteSheet } from "@/components/company/AddNoteSheet";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Content } from "@tiptap/react";
 import { NoteCard } from "@/components/company/NoteCard";
+import { createNotesCompany } from "@/actions/company/create-notes-companies";
+import { updateNotesCompany } from "@/actions/company/update-notes-companies";
 
 interface Note {
   id: number;
-  class_type: string;
   uuid: string;
+  class_type: string;
   date_created: string;
   title: string;
   description: string;
@@ -24,7 +26,7 @@ interface Note {
 
 interface NotesContentProps {
   notes: Note[];
-  companyId: number; // Add this line
+  companyId: number;
 }
 
 export function NotesContent({
@@ -33,12 +35,11 @@ export function NotesContent({
 }: NotesContentProps) {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [noteToEdit, setNoteToEdit] = useState<{
-    id: number;
+    uuid: string;
     title: string;
     content: Content;
   } | null>(null);
 
-  // Sort notes by date_created, newest first
   const sortedNotes = useMemo(() => {
     return [...notes].sort(
       (a, b) =>
@@ -46,53 +47,60 @@ export function NotesContent({
     );
   }, [notes]);
 
-  const addNote = (newNote: { title: string; content: Content }) => {
-    const note: Note = {
-      id: Math.max(...notes.map((n) => n.id)) + 1,
-      class_type: "ContactNote",
-      uuid: crypto.randomUUID(),
-      date_created: new Date().toISOString(),
-      title: newNote.title,
-      description: newNote.content?.toString() ?? "",
-      status: "completed",
-      date: new Date().toISOString(),
-      type: "email",
-      user: 1, // You might want to get this from the current user
-      customer: companyId, // Use the companyId passed as prop
-      deal: null,
-    };
-    setNotes([note, ...notes]);
-  };
-
-  const editNote = (
-    id: number,
-    updatedNote: { title: string; content: Content }
-  ) => {
-    setNotes(
-      notes.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              title: updatedNote.title,
-              description: updatedNote.content?.toString() ?? "",
-              date_created: new Date().toISOString(), // Update the date_created when editing
-            }
-          : note
-      )
-    );
-    setNoteToEdit(null);
-  };
-
-  const handleEditNote = (id: number) => {
-    const noteToEdit = notes.find((note) => note.id === id);
-    if (noteToEdit) {
-      setNoteToEdit({
-        id: noteToEdit.id,
-        title: noteToEdit.title,
-        content: noteToEdit.description as Content,
+  const addNote = useCallback(
+    async (newNote: { title: string; content: Content }) => {
+      const createdNote = await createNotesCompany({
+        title: newNote.title,
+        description: newNote.content?.toString() ?? "",
+        customer: companyId,
       });
-    }
-  };
+
+      if (createdNote) {
+        setNotes((prevNotes) => [createdNote as Note, ...prevNotes]);
+      }
+    },
+    [companyId]
+  );
+
+  const editNote = useCallback(
+    async (uuid: string, updatedNote: { title: string; content: Content }) => {
+      const updatedNoteData = await updateNotesCompany(uuid, {
+        title: updatedNote.title,
+        description: updatedNote.content?.toString() ?? "",
+        clientDate: new Date().toISOString(), // Add this line
+      });
+
+      if (updatedNoteData) {
+        setNotes((prevNotes) =>
+          prevNotes.map((note) =>
+            note.uuid === uuid
+              ? {
+                  ...note,
+                  ...updatedNoteData,
+                  date: updatedNoteData.date || note.date,
+                }
+              : note
+          )
+        );
+      }
+      setNoteToEdit(null);
+    },
+    []
+  );
+
+  const handleEditNote = useCallback(
+    (uuid: string) => {
+      const noteToEdit = notes.find((note) => note.uuid === uuid);
+      if (noteToEdit) {
+        setNoteToEdit({
+          uuid: noteToEdit.uuid,
+          title: noteToEdit.title,
+          content: noteToEdit.description as Content,
+        });
+      }
+    },
+    [notes]
+  );
 
   return (
     <TooltipProvider>
@@ -123,13 +131,14 @@ export function NotesContent({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {sortedNotes.map((note) => (
               <NoteCard
-                key={note.id}
+                key={note.uuid}
                 id={note.id}
+                uuid={note.uuid}
                 title={note.title}
                 content={note.description}
                 companyName="" // You might want to pass this as a prop
-                createdAt={note.date_created}
-                onEdit={() => handleEditNote(note.id)}
+                date={note.date} // Changed from createdAt to date
+                onEdit={() => handleEditNote(note.uuid)}
               />
             ))}
           </div>

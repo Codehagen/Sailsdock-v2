@@ -12,22 +12,24 @@ import { nb } from "date-fns/locale";
 
 interface NoteCardProps {
   id: number;
+  uuid: string;
   title: string;
   content: string;
   companyName: string;
-  createdAt: string;
-  onEdit: (id: number) => void;
+  date: string; // Changed from createdAt to date
+  onEdit: (uuid: string) => void;
 }
 
 export function NoteCard({
   id,
+  uuid,
   title,
   content,
   companyName,
-  createdAt,
+  date, // Changed from createdAt to date
   onEdit,
 }: NoteCardProps) {
-  const formattedDate = formatDistanceToNow(new Date(createdAt), {
+  const formattedDate = formatDistanceToNow(new Date(date), {
     addSuffix: true,
     locale: nb,
   });
@@ -36,7 +38,7 @@ export function NoteCard({
     <Card className="w-full h-[300px] flex flex-col overflow-hidden">
       <CardHeader
         className="pb-2 bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors"
-        onClick={() => onEdit(id)}
+        onClick={() => onEdit(uuid)}
       >
         <CardTitle className="text-lg line-clamp-2">{title}</CardTitle>
         <p className="text-xs text-muted-foreground">{formattedDate}</p>
