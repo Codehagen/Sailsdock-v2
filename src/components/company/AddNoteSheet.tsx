@@ -14,11 +14,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { Plus } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { MinimalTiptapEditor } from "@/components/notes/minimal-tiptap/minimal-tiptap";
 import { Content } from "@tiptap/react";
 import { createNotesCompany } from "@/actions/company/create-notes-companies";
+import { deleteNotesCompany } from "@/actions/company/delete-notes-companies";
+import { toast } from "sonner";
 
 const MemoizedMinimalTiptapEditor = React.memo(MinimalTiptapEditor);
 
@@ -73,6 +75,7 @@ interface AddNoteSheetProps {
     uuid: string,
     note: { title: string; content: Content }
   ) => void;
+  onNoteDeleted: (uuid: string) => void;
   noteToEdit?: { uuid: string; title: string; content: Content } | null;
   companyId: number;
 }
@@ -80,6 +83,7 @@ interface AddNoteSheetProps {
 export function AddNoteSheet({
   onNoteAdded,
   onNoteEdited,
+  onNoteDeleted,
   noteToEdit,
   companyId,
 }: AddNoteSheetProps) {
@@ -88,6 +92,8 @@ export function AddNoteSheet({
   const [noteContent, setNoteContent] = useState<Content>(
     noteToEdit?.content || ""
   );
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { isDesktop } = useMediaQuery();
 
   useEffect(() => {
@@ -101,27 +107,56 @@ export function AddNoteSheet({
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
-      if (noteToEdit) {
-        onNoteEdited(noteToEdit.uuid, {
-          title: noteTitle,
-          content: noteContent,
-        });
-      } else {
-        const newNote = await createNotesCompany({
-          title: noteTitle,
-          description: noteContent?.toString() ?? "",
-          customer: companyId,
-        });
-        if (newNote) {
-          onNoteAdded({ title: noteTitle, content: noteContent });
+      setIsSaving(true);
+      try {
+        if (noteToEdit) {
+          await onNoteEdited(noteToEdit.uuid, {
+            title: noteTitle,
+            content: noteContent,
+          });
+          toast.success("Note updated successfully");
+        } else {
+          const newNote = await createNotesCompany({
+            title: noteTitle,
+            description: noteContent?.toString() ?? "",
+            customer: companyId,
+          });
+          if (newNote) {
+            onNoteAdded({ title: noteTitle, content: noteContent });
+            toast.success("Note added successfully");
+          }
         }
+        setNoteTitle("");
+        setNoteContent("");
+        setOpen(false);
+      } catch (error) {
+        toast.error("Failed to save note. Please try again.");
+      } finally {
+        setIsSaving(false);
       }
-      setNoteTitle("");
-      setNoteContent("");
-      setOpen(false);
     },
     [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit, companyId]
   );
+
+  const handleDelete = useCallback(async () => {
+    if (noteToEdit) {
+      setIsDeleting(true);
+      try {
+        const deleted = await deleteNotesCompany(noteToEdit.uuid);
+        if (deleted) {
+          onNoteDeleted(noteToEdit.uuid);
+          setOpen(false);
+          toast.success("Note deleted successfully");
+        } else {
+          toast.error("Failed to delete note. Please try again.");
+        }
+      } catch (error) {
+        toast.error("An error occurred while deleting the note.");
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  }, [noteToEdit, onNoteDeleted]);
 
   const handleNoteContentChange = useCallback((newContent: Content) => {
     setNoteContent(newContent);
@@ -145,13 +180,60 @@ export function AddNoteSheet({
             : "Fyll ut detaljene for det nye notatet her."}
         </SheetDescription>
       </SheetHeader>
-      <NoteForm
-        noteTitle={noteTitle}
-        setNoteTitle={setNoteTitle}
-        noteContent={noteContent}
-        setNoteContent={handleNoteContentChange}
-        onSubmit={handleSubmit}
-      />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="noteTitle">Tittel</Label>
+          <Input
+            id="noteTitle"
+            value={noteTitle}
+            onChange={(e) => setNoteTitle(e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="noteContent">Innhold</Label>
+          <MinimalTiptapEditor
+            value={noteContent}
+            onChange={handleNoteContentChange}
+            className="min-h-[200px]"
+            placeholder="Skriv notatinnholdet her..."
+            editable={true}
+            autofocus={false}
+          />
+        </div>
+        <SheetFooter>
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Lagrer...
+              </>
+            ) : (
+              "Lagre notat"
+            )}
+          </Button>
+        </SheetFooter>
+      </form>
+      {noteToEdit && (
+        <SheetFooter>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="mt-4"
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sletter...
+              </>
+            ) : (
+              <>
+                <Trash2 className="mr-2 h-4 w-4" /> Slett notat
+              </>
+            )}
+          </Button>
+        </SheetFooter>
+      )}
     </>
   );
 

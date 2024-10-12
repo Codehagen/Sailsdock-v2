@@ -8,6 +8,8 @@ import { Content } from "@tiptap/react";
 import { NoteCard } from "@/components/company/NoteCard";
 import { createNotesCompany } from "@/actions/company/create-notes-companies";
 import { updateNotesCompany } from "@/actions/company/update-notes-companies";
+import { deleteNotesCompany } from "@/actions/company/delete-notes-companies";
+import { toast } from "sonner";
 
 interface Note {
   id: number;
@@ -49,14 +51,19 @@ export function NotesContent({
 
   const addNote = useCallback(
     async (newNote: { title: string; content: Content }) => {
-      const createdNote = await createNotesCompany({
-        title: newNote.title,
-        description: newNote.content?.toString() ?? "",
-        customer: companyId,
-      });
+      try {
+        const createdNote = await createNotesCompany({
+          title: newNote.title,
+          description: newNote.content?.toString() ?? "",
+          customer: companyId,
+        });
 
-      if (createdNote) {
-        setNotes((prevNotes) => [createdNote as Note, ...prevNotes]);
+        if (createdNote) {
+          setNotes((prevNotes) => [createdNote as Note, ...prevNotes]);
+          toast.success("Note added successfully");
+        }
+      } catch (error) {
+        toast.error("Failed to add note. Please try again.");
       }
     },
     [companyId]
@@ -64,24 +71,29 @@ export function NotesContent({
 
   const editNote = useCallback(
     async (uuid: string, updatedNote: { title: string; content: Content }) => {
-      const updatedNoteData = await updateNotesCompany(uuid, {
-        title: updatedNote.title,
-        description: updatedNote.content?.toString() ?? "",
-        clientDate: new Date().toISOString(), // Add this line
-      });
+      try {
+        const updatedNoteData = await updateNotesCompany(uuid, {
+          title: updatedNote.title,
+          description: updatedNote.content?.toString() ?? "",
+          clientDate: new Date().toISOString(),
+        });
 
-      if (updatedNoteData) {
-        setNotes((prevNotes) =>
-          prevNotes.map((note) =>
-            note.uuid === uuid
-              ? {
-                  ...note,
-                  ...updatedNoteData,
-                  date: updatedNoteData.date || note.date,
-                }
-              : note
-          )
-        );
+        if (updatedNoteData) {
+          setNotes((prevNotes) =>
+            prevNotes.map((note) =>
+              note.uuid === uuid
+                ? {
+                    ...note,
+                    ...updatedNoteData,
+                    date: updatedNoteData.date || note.date,
+                  }
+                : note
+            )
+          );
+          toast.success("Note updated successfully");
+        }
+      } catch (error) {
+        toast.error("Failed to update note. Please try again.");
       }
       setNoteToEdit(null);
     },
@@ -102,6 +114,20 @@ export function NotesContent({
     [notes]
   );
 
+  const deleteNote = useCallback(async (uuid: string) => {
+    try {
+      const deleted = await deleteNotesCompany(uuid);
+      if (deleted) {
+        setNotes((prevNotes) => prevNotes.filter((note) => note.uuid !== uuid));
+        toast.success("Note deleted successfully");
+      } else {
+        toast.error("Failed to delete note. Please try again.");
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting the note.");
+    }
+  }, []);
+
   return (
     <TooltipProvider>
       {sortedNotes.length === 0 ? (
@@ -114,6 +140,7 @@ export function NotesContent({
           <AddNoteSheet
             onNoteAdded={addNote}
             onNoteEdited={editNote}
+            onNoteDeleted={deleteNote}
             noteToEdit={noteToEdit}
             companyId={companyId}
           />
@@ -124,6 +151,7 @@ export function NotesContent({
             <AddNoteSheet
               onNoteAdded={addNote}
               onNoteEdited={editNote}
+              onNoteDeleted={deleteNote}
               noteToEdit={noteToEdit}
               companyId={companyId}
             />

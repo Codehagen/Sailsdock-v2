@@ -165,7 +165,7 @@ class ApiClient {
       update: (noteId: string, noteData: Partial<NoteData>) =>
         this.request<NoteData>("patch", `notes/${noteId}/`, noteData),
       delete: (noteId: string) => 
-        this.request<NoteData>("delete", `notes/${noteId}`),
+        this.request<NoteData>("delete", `notes/${noteId}/`),
     },
   };
 }
