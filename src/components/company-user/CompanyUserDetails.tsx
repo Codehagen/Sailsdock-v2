@@ -611,7 +611,7 @@ export function CompanyUserDetails({
                         variant="ghost"
                         className="p-0 h-auto font-normal"
                       >
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-muted-foreground truncate max-w-[150px]">
                           {`${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`}
                         </span>
                       </Button>
@@ -824,7 +824,7 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Account Owner ({accountOwners.length})
+                Ansvarlig ({accountOwners.length})
               </h4>
               <AccountOwnerCombobox
                 companyId={companyDetails.uuid}

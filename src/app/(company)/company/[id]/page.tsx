@@ -46,27 +46,27 @@ export default async function CompanyUserPage({
             <TabsList className="grid w-full grid-cols-6">
               <TabsTrigger value="timeline" className="flex items-center gap-2">
                 <Activity className="h-4 w-4" />
-                <span>Timeline</span>
+                <span>Tidslinje</span>
               </TabsTrigger>
               <TabsTrigger value="tasks" className="flex items-center gap-2">
                 <CheckSquare className="h-4 w-4" />
-                <span>Tasks</span>
+                <span>Oppgaver</span>
               </TabsTrigger>
               <TabsTrigger value="notes" className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                <span>Notes</span>
+                <span>Notater</span>
               </TabsTrigger>
               <TabsTrigger value="files" className="flex items-center gap-2">
                 <File className="h-4 w-4" />
-                <span>Files</span>
+                <span>Filer</span>
               </TabsTrigger>
               <TabsTrigger value="emails" className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span>Emails</span>
+                <span>E-post</span>
               </TabsTrigger>
               <TabsTrigger value="calendar" className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>Calendar</span>
+                <span>Kalender</span>
               </TabsTrigger>
             </TabsList>
             <TabsContent value="timeline">
