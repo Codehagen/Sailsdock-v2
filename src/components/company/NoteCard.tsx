@@ -11,12 +11,12 @@ import { formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 
 interface NoteCardProps {
-  id: number;
+  id: string; // Changed from number to string
   uuid: string;
   title: string;
   content: string;
   companyName: string;
-  date: string; // Changed from createdAt to date
+  date: string;
   onEdit: (uuid: string) => void;
 }
 
@@ -26,7 +26,7 @@ export function NoteCard({
   title,
   content,
   companyName,
-  date, // Changed from createdAt to date
+  date,
   onEdit,
 }: NoteCardProps) {
   const formattedDate = formatDistanceToNow(new Date(date), {

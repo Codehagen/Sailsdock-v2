@@ -12,7 +12,7 @@ import { deleteNotesCompany } from "@/actions/company/delete-notes-companies";
 import { toast } from "sonner";
 
 interface Note {
-  id: number;
+  id: string;
   uuid: string;
   class_type: string;
   date_created: string;
@@ -24,6 +24,11 @@ interface Note {
   user: number;
   customer: number;
   deal: number | null;
+  companyId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
 }
 
 interface NotesContentProps {
@@ -59,11 +64,14 @@ export function NotesContent({
         });
 
         if (createdNote) {
-          setNotes((prevNotes) => [createdNote as Note, ...prevNotes]);
-          toast.success("Note added successfully");
+          setNotes((prevNotes) => [
+            createdNote as unknown as Note,
+            ...prevNotes,
+          ]);
+          toast.success("Notat lagt til");
         }
       } catch (error) {
-        toast.error("Failed to add note. Please try again.");
+        toast.error("Kunne ikke legge til notat. Vennligst prøv igjen.");
       }
     },
     [companyId]
@@ -85,15 +93,15 @@ export function NotesContent({
                 ? {
                     ...note,
                     ...updatedNoteData,
-                    date: updatedNoteData.date || note.date,
+                    date: (updatedNoteData as any).date || note.date,
                   }
                 : note
             )
           );
-          toast.success("Note updated successfully");
+          toast.success("Notat oppdatert");
         }
       } catch (error) {
-        toast.error("Failed to update note. Please try again.");
+        toast.error("Kunne ikke oppdatere notat. Vennligst prøv igjen.");
       }
       setNoteToEdit(null);
     },
@@ -119,12 +127,10 @@ export function NotesContent({
       const deleted = await deleteNotesCompany(uuid);
       if (deleted) {
         setNotes((prevNotes) => prevNotes.filter((note) => note.uuid !== uuid));
-        toast.success("Note deleted successfully");
-      } else {
-        toast.error("Failed to delete note. Please try again.");
+        toast.success("Notat slettet");
       }
     } catch (error) {
-      toast.error("An error occurred while deleting the note.");
+      toast.error("En feil oppstod under sletting av notatet.");
     }
   }, []);
 

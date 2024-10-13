@@ -22,8 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
-import { AccountOwner } from "@/lib/internal-api/types";
-
+import { AccountOwner, WorkspaceData } from "@/lib/internal-api/types";
 
 export function AccountOwnerCombobox({
   companyId,
@@ -47,7 +46,22 @@ export function AccountOwnerCombobox({
       setIsLoading(true);
       getWorkspaceUsers().then((response) => {
         if (response) {
-          setAccountOwners(response);
+          const validOwners: AccountOwner[] = response
+            .filter(
+              (
+                user
+              ): user is WorkspaceData & { clerk_id: string; email: string } =>
+                user.clerk_id !== undefined && user.email !== undefined
+            )
+            .map((user) => ({
+              id: user.id,
+              email: user.email,
+              username: user.username ?? null,
+              first_name: user.first_name ?? null,
+              last_name: user.last_name ?? null,
+              clerk_id: user.clerk_id,
+            }));
+          setAccountOwners(validOwners);
         }
         setIsLoading(false);
       });
@@ -67,14 +81,14 @@ export function AccountOwnerCombobox({
       if (updatedCompany) {
         onOwnerAdded(owner);
         toast.success(
-          `${owner.first_name || owner.email} added as account owner`
+          `${owner.first_name || owner.email} lagt til som ansvarlig`
         );
       } else {
-        toast.error("Failed to update account owner");
+        toast.error("Kunne ikke oppdatere kontoansvarlig");
       }
     } catch (error) {
       console.error("Error updating account owner:", error);
-      toast.error("An error occurred while updating account owner");
+      toast.error("En feil oppstod under oppdatering av kontoansvarlig");
     }
   };
 
@@ -136,14 +150,14 @@ function OwnerList({
 }) {
   return (
     <Command>
-      <CommandInput placeholder="Search account owners..." />
+      <CommandInput placeholder="Søk etter personer..." />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>Ingen resultater funnet.</CommandEmpty>
         <CommandGroup>
           {isLoading ? (
             <CommandItem>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading...
+              Laster...
             </CommandItem>
           ) : (
             accountOwners.map((owner) => (

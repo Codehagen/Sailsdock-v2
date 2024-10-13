@@ -19,7 +19,6 @@ import useMediaQuery from "@/lib/hooks/use-media-query";
 import { MinimalTiptapEditor } from "@/components/notes/minimal-tiptap/minimal-tiptap";
 import { Content } from "@tiptap/react";
 import { createNotesCompany } from "@/actions/company/create-notes-companies";
-import { deleteNotesCompany } from "@/actions/company/delete-notes-companies";
 import { toast } from "sonner";
 
 const MemoizedMinimalTiptapEditor = React.memo(MinimalTiptapEditor);
@@ -107,6 +106,7 @@ export function AddNoteSheet({
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
+      if (isSaving) return; // Prevent multiple submissions
       setIsSaving(true);
       try {
         if (noteToEdit) {
@@ -114,7 +114,6 @@ export function AddNoteSheet({
             title: noteTitle,
             content: noteContent,
           });
-          toast.success("Note updated successfully");
         } else {
           const newNote = await createNotesCompany({
             title: noteTitle,
@@ -123,40 +122,41 @@ export function AddNoteSheet({
           });
           if (newNote) {
             onNoteAdded({ title: noteTitle, content: noteContent });
-            toast.success("Note added successfully");
           }
         }
         setNoteTitle("");
         setNoteContent("");
         setOpen(false);
       } catch (error) {
-        toast.error("Failed to save note. Please try again.");
+        toast.error("Kunne ikke lagre notat. Vennligst prøv igjen.");
       } finally {
         setIsSaving(false);
       }
     },
-    [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit, companyId]
+    [
+      noteTitle,
+      noteContent,
+      onNoteAdded,
+      onNoteEdited,
+      noteToEdit,
+      companyId,
+      isSaving,
+    ]
   );
 
   const handleDelete = useCallback(async () => {
-    if (noteToEdit) {
+    if (noteToEdit && !isDeleting) {
       setIsDeleting(true);
       try {
-        const deleted = await deleteNotesCompany(noteToEdit.uuid);
-        if (deleted) {
-          onNoteDeleted(noteToEdit.uuid);
-          setOpen(false);
-          toast.success("Note deleted successfully");
-        } else {
-          toast.error("Failed to delete note. Please try again.");
-        }
+        await onNoteDeleted(noteToEdit.uuid);
+        setOpen(false);
       } catch (error) {
-        toast.error("An error occurred while deleting the note.");
+        toast.error("En feil oppstod under sletting av notatet.");
       } finally {
         setIsDeleting(false);
       }
     }
-  }, [noteToEdit, onNoteDeleted]);
+  }, [noteToEdit, onNoteDeleted, isDeleting]);
 
   const handleNoteContentChange = useCallback((newContent: Content) => {
     setNoteContent(newContent);

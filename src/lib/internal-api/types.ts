@@ -112,14 +112,7 @@ export interface CompanyData {
   labels_details: any[]; // You might want to define a more specific type if needed
   opportunities: any[]; // You might want to define a more specific type if needed
   people: any[]; // You might want to define a more specific type if needed
-  account_owners: Array<{
-    id: number;
-    clerk_id: string;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-  }>;
+  account_owners: AccountOwner[] | number[];
   timeline: Array<{
     id: number;
     class_type: string;
@@ -193,9 +186,9 @@ export interface AccountOwner {
   id: number;
   clerk_id: string;
   email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
+  username: string | null;
+  first_name: string | null;
+  last_name: string | null;
 }
 
 export interface WorkspaceData {
