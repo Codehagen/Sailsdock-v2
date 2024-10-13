@@ -128,13 +128,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedOrgNumber(updatedCompany.orgnr);
-        toast.success("Organization number updated successfully");
+        toast.success("Organisasjonsnummer oppdatert");
       } else {
-        toast.error("Failed to update organization number");
+        toast.error("Kunne ikke oppdatere organisasjonsnummer");
       }
     } catch (error) {
       console.error("Error updating organization number:", error);
-      toast.error("An error occurred while updating organization number");
+      toast.error("En feil oppstod under oppdatering av organisasjonsnummer");
     }
     setIsOrgNumberPopoverOpen(false);
   };
@@ -160,13 +160,13 @@ export function CompanyUserDetails({
           address_zip: updatedCompany.address_zip,
           address_city: updatedCompany.address_city,
         }));
-        toast.success("Address updated successfully");
+        toast.success("Adresse oppdatert");
       } else {
-        toast.error("Failed to update address");
+        toast.error("Kunne ikke oppdatere adresse");
       }
     } catch (error) {
       console.error("Error updating address:", error);
-      toast.error("An error occurred while updating address");
+      toast.error("En feil oppstod under oppdatering av adresse");
     }
 
     setIsAddressPopoverOpen(false);
@@ -185,13 +185,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedArr(updatedCompany.arr.toString());
-        toast.success("ARR updated successfully");
+        toast.success("ARR oppdatert");
       } else {
-        toast.error("Failed to update ARR");
+        toast.error("Kunne ikke oppdatere ARR");
       }
     } catch (error) {
       console.error("Error updating ARR:", error);
-      toast.error("An error occurred while updating ARR");
+      toast.error("En feil oppstod under oppdatering av ARR");
     }
     setIsArrPopoverOpen(false);
   };
@@ -208,13 +208,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedEmployees(updatedCompany.num_employees.toString());
-        toast.success("Number of employees updated successfully");
+        toast.success("Antall ansatte oppdatert");
       } else {
-        toast.error("Failed to update number of employees");
+        toast.error("Kunne ikke oppdatere antall ansatte");
       }
     } catch (error) {
       console.error("Error updating number of employees:", error);
-      toast.error("An error occurred while updating number of employees");
+      toast.error("En feil oppstod under oppdatering av antall ansatte");
     }
     setIsEmployeesPopoverOpen(false);
   };
@@ -231,13 +231,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedCompanyName(updatedCompany.name);
-        toast.success("Company name updated successfully");
+        toast.success("Firmanavn oppdatert");
       } else {
-        toast.error("Failed to update company name");
+        toast.error("Kunne ikke oppdatere firmanavn");
       }
     } catch (error) {
       console.error("Error updating company name:", error);
-      toast.error("An error occurred while updating company name");
+      toast.error("En feil oppstod under oppdatering av firmanavn");
     }
     setIsCompanyNamePopoverOpen(false);
   };
@@ -254,13 +254,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedUrl(updatedCompany.url);
-        toast.success("URL updated successfully");
+        toast.success("Nettadresse oppdatert");
       } else {
-        toast.error("Failed to update URL");
+        toast.error("Kunne ikke oppdatere nettadresse");
       }
     } catch (error) {
       console.error("Error updating URL:", error);
-      toast.error("An error occurred while updating URL");
+      toast.error("En feil oppstod under oppdatering av nettadresse");
     }
     setIsUrlPopoverOpen(false);
   };
@@ -277,13 +277,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedLinkedIn(updatedCompany.some_linked);
-        toast.success("LinkedIn URL updated successfully");
+        toast.success("LinkedIn-adresse oppdatert");
       } else {
-        toast.error("Failed to update LinkedIn URL");
+        toast.error("Kunne ikke oppdatere LinkedIn-adresse");
       }
     } catch (error) {
       console.error("Error updating LinkedIn URL:", error);
-      toast.error("An error occurred while updating LinkedIn URL");
+      toast.error("En feil oppstod under oppdatering av LinkedIn-adresse");
     }
     setIsLinkedInPopoverOpen(false);
   };
@@ -300,13 +300,13 @@ export function CompanyUserDetails({
       });
       if (updatedCompany) {
         setEditedTwitter(updatedCompany.some_twitter);
-        toast.success("Twitter URL updated successfully");
+        toast.success("Twitter-adresse oppdatert");
       } else {
-        toast.error("Failed to update Twitter URL");
+        toast.error("Kunne ikke oppdatere Twitter-adresse");
       }
     } catch (error) {
       console.error("Error updating Twitter URL:", error);
-      toast.error("An error occurred while updating Twitter URL");
+      toast.error("En feil oppstod under oppdatering av Twitter-adresse");
     }
     setIsTwitterPopoverOpen(false);
   };
@@ -334,13 +334,13 @@ export function CompanyUserDetails({
         setAccountOwners((prevOwners) =>
           prevOwners.filter((owner) => owner.id !== ownerId)
         );
-        toast.success("Account owner removed successfully");
+        toast.success("Kontoansvarlig fjernet");
       } else {
-        toast.error("Failed to remove account owner");
+        toast.error("Kunne ikke fjerne kontoansvarlig");
       }
     } catch (error) {
       console.error("Error removing account owner:", error);
-      toast.error("An error occurred while removing account owner");
+      toast.error("En feil oppstod under fjerning av kontoansvarlig");
     }
   };
 
@@ -902,7 +902,7 @@ export function CompanyUserDetails({
                         onClick={() => handleRemoveAccountOwner(owner.id)}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Remove
+                        Fjern
                       </Button>
                     </PopoverContent>
                   </Popover>
