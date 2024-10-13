@@ -16,6 +16,7 @@ import {
   Check,
   X,
   Pen,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -48,6 +49,7 @@ import countries from "@/lib/countries";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
 import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
+import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -325,6 +327,23 @@ export function CompanyUserDetails({
       }
       return [...prevOwners, newOwner];
     });
+  };
+
+  const handleRemoveAccountOwner = async (ownerId: number) => {
+    try {
+      const success = await removeAccountOwner(companyDetails.uuid, ownerId);
+      if (success) {
+        setAccountOwners((prevOwners) =>
+          prevOwners.filter((owner) => owner.id !== ownerId)
+        );
+        toast.success("Account owner removed successfully");
+      } else {
+        toast.error("Failed to remove account owner");
+      }
+    } catch (error) {
+      console.error("Error removing account owner:", error);
+      toast.error("An error occurred while removing account owner");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -832,27 +851,47 @@ export function CompanyUserDetails({
                 currentAccountOwners={accountOwners.map((owner) => owner.id)}
               />
             </div>
-            {accountOwners.map((owner, index) => (
-              <Link
-                key={owner.id}
-                href={`/people/${owner.clerk_id}`}
-                className="inline-block"
-              >
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                      "text-xs font-medium"
-                    )}
-                  >
-                    {owner.first_name?.charAt(0) || owner.email.charAt(0)}
+            {accountOwners.map((owner) => (
+              <div key={owner.id} className="flex items-center gap-2">
+                <Link href={`/people/${owner.clerk_id}`} className="flex-grow">
+                  <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {owner.first_name?.charAt(0) || owner.email.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {`${owner.first_name || ""} ${owner.last_name || ""}`}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {`${owner.first_name || ""} ${owner.last_name || ""}`}
-                  </span>
-                </div>
-              </Link>
+                </Link>
+                <Separator orientation="vertical" className="h-6" />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0 hover:bg-transparent"
+                    >
+                      <Pen className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-2">
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveAccountOwner(owner.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remove
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              </div>
             ))}
           </div>
           <Separator className="my-4" />
