@@ -35,17 +35,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import countries from "@/lib/countries";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
 import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
@@ -77,13 +69,19 @@ export function CompanyUserDetails({
 }: {
   companyDetails: CompanyData;
 }) {
+  const [companyDetailsState, setCompanyDetailsState] =
+    useState(companyDetails);
   const [editedCompanyName, setEditedCompanyName] = useState(
     companyDetails.name
   );
-  const [editedOrgNumber, setEditedOrgNumber] = useState(companyDetails.orgnr);
-  const [editedArr, setEditedArr] = useState(companyDetails.arr.toString());
+  const [editedOrgNumber, setEditedOrgNumber] = useState(
+    companyDetails.orgnr || ""
+  );
+  const [editedArr, setEditedArr] = useState(
+    companyDetails.arr ? companyDetails.arr.toString() : ""
+  );
   const [editedEmployees, setEditedEmployees] = useState(
-    companyDetails.num_employees.toString()
+    companyDetails.num_employees ? companyDetails.num_employees.toString() : ""
   );
   const [isUrlPopoverOpen, setIsUrlPopoverOpen] = useState(false);
   const [editedUrl, setEditedUrl] = useState(companyDetails.url);
@@ -104,7 +102,7 @@ export function CompanyUserDetails({
     useState(false);
 
   const [accountOwners, setAccountOwners] = useState<AccountOwner[]>(
-    companyDetails.account_owners || []
+    (companyDetails.account_owners as AccountOwner[]) || []
   );
 
   const {
@@ -116,10 +114,10 @@ export function CompanyUserDetails({
   } = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address1: companyDetails.address_street,
-      address2: "", // Assuming there's no address2 in the companyDetails
-      postcode: companyDetails.address_zip,
-      city: companyDetails.address_city,
+      address1: companyDetails.address_street || "",
+      address2: "",
+      postcode: companyDetails.address_zip || "",
+      city: companyDetails.address_city || "",
     },
   });
 
@@ -156,7 +154,7 @@ export function CompanyUserDetails({
 
       if (updatedCompany) {
         // Update local state with the new address details
-        setCompanyDetails((prevDetails) => ({
+        setCompanyDetailsState((prevDetails) => ({
           ...prevDetails,
           address_street: updatedCompany.address_street,
           address_zip: updatedCompany.address_zip,
@@ -593,7 +591,9 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {editedOrgNumber}
+                          {editedOrgNumber
+                            ? editedOrgNumber
+                            : "Legg til Org.nr"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -602,6 +602,7 @@ export function CompanyUserDetails({
                         <Input
                           value={editedOrgNumber}
                           onChange={(e) => setEditedOrgNumber(e.target.value)}
+                          placeholder="Skriv inn Org.nr"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -631,7 +632,11 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground truncate max-w-[150px]">
-                          {`${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`}
+                          {companyDetails.address_street &&
+                          companyDetails.address_zip &&
+                          companyDetails.address_city
+                            ? `${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`
+                            : "Legg til adresse"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -726,7 +731,11 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {parseFloat(editedArr).toLocaleString("no-NO")} NOK
+                          {editedArr
+                            ? `${parseFloat(editedArr).toLocaleString(
+                                "no-NO"
+                              )} NOK`
+                            : "Legg til ARR"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -738,6 +747,7 @@ export function CompanyUserDetails({
                             value={editedArr}
                             onChange={(e) => setEditedArr(e.target.value)}
                             className="pr-12"
+                            placeholder="Skriv inn ARR"
                           />
                           <span className="ml-[-40px] text-sm text-muted-foreground">
                             NOK
@@ -771,9 +781,11 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {parseInt(editedEmployees, 10).toLocaleString(
-                            "no-NO"
-                          )}
+                          {editedEmployees
+                            ? parseInt(editedEmployees, 10).toLocaleString(
+                                "no-NO"
+                              )
+                            : "Legg til antall ansatte"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -783,6 +795,7 @@ export function CompanyUserDetails({
                           type="number"
                           value={editedEmployees}
                           onChange={(e) => setEditedEmployees(e.target.value)}
+                          placeholder="Skriv inn antall ansatte"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -853,8 +866,11 @@ export function CompanyUserDetails({
             </div>
             {accountOwners.map((owner) => (
               <div key={owner.id} className="flex items-center gap-2">
-                <Link href={`/people/${owner.clerk_id}`} className="flex-grow">
-                  <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/people/${owner.clerk_id}`}
+                    className="flex items-center gap-2 flex-grow"
+                  >
                     <div
                       className={cn(
                         "flex items-center justify-center",
@@ -867,30 +883,30 @@ export function CompanyUserDetails({
                     <span className="text-sm font-medium text-muted-foreground">
                       {`${owner.first_name || ""} ${owner.last_name || ""}`}
                     </span>
-                  </div>
-                </Link>
-                <Separator orientation="vertical" className="h-6" />
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0 hover:bg-transparent"
-                    >
-                      <Pen className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-2">
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleRemoveAccountOwner(owner.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Remove
-                    </Button>
-                  </PopoverContent>
-                </Popover>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveAccountOwner(owner.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </div>
             ))}
           </div>
