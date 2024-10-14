@@ -7,6 +7,7 @@ import {
   DealData,
   CompanyData,
   NoteData,
+  OpportunityData,
 } from "./types";
 
 class ApiClient {
@@ -166,6 +167,77 @@ class ApiClient {
         this.request<NoteData>("patch", `notes/${noteId}/`, noteData),
       delete: (noteId: string) => 
         this.request<NoteData>("delete", `notes/${noteId}/`),
+    },
+  };
+
+  // Add this new section for opportunities
+  opportunities = {
+    getAll: (workspaceId: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/opportunities`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<OpportunityData[]>("get", url);
+    },
+    get: (opportunityId: string) =>
+      this.request<OpportunityData>("get", `/opportunities/${opportunityId}`),
+    create: (workspaceId: string, opportunityData: Partial<OpportunityData>) =>
+      this.request<OpportunityData>("post", `/opportunities/`, opportunityData),
+    update: (
+      opportunityId: string,
+      opportunityData: Partial<OpportunityData>
+    ) =>
+      this.request<OpportunityData>(
+        "patch",
+        `/opportunities/${opportunityId}/`,
+        opportunityData
+      ),
+    delete: (opportunityId: string) =>
+      this.request<OpportunityData>(
+        "delete",
+        `/opportunities/${opportunityId}`
+      ),
+    getDetails: (opportunityId: string) =>
+      this.request<OpportunityData>(
+        "get",
+        `/opportunities/${opportunityId}/details`
+      ),
+
+    // You can add a notes section for opportunities if needed, similar to the company notes
+    notes: {
+      getAll: (opportunityId: string, pageSize?: number, page?: number) => {
+        let url = `opportunities/${opportunityId}/notes`;
+        if (pageSize !== undefined && page !== undefined) {
+          url += `?page_size=${pageSize}&page=${page}`;
+        }
+        return this.request<NoteData[]>("get", url);
+      },
+      get: (opportunityId: string, noteId: string) =>
+        this.request<NoteData>(
+          "get",
+          `opportunities/${opportunityId}/notes/${noteId}/`
+        ),
+      create: (opportunityId: string, noteData: Partial<NoteData>) =>
+        this.request<NoteData>(
+          "post",
+          `opportunities/${opportunityId}/notes/`,
+          noteData
+        ),
+      update: (
+        opportunityId: string,
+        noteId: string,
+        noteData: Partial<NoteData>
+      ) =>
+        this.request<NoteData>(
+          "patch",
+          `opportunities/${opportunityId}/notes/${noteId}/`,
+          noteData
+        ),
+      delete: (opportunityId: string, noteId: string) =>
+        this.request<NoteData>(
+          "delete",
+          `opportunities/${opportunityId}/notes/${noteId}/`
+        ),
     },
   };
 }

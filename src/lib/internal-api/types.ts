@@ -211,3 +211,17 @@ export interface NoteData {
   updatedAt: string;
   createdBy: string;
 }
+
+export interface OpportunityData {
+  id: string;
+  name: string;
+  description?: string;
+  value?: number;
+  stage?: string;
+  probability?: number;
+  expectedCloseDate?: string;
+  companyId?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Add any other fields specific to opportunities
+}
