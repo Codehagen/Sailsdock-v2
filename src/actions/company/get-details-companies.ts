@@ -15,7 +15,7 @@ export async function getCompanyDetails(
   }
 
   try {
-    const response = await apiClient.company.get(companyId);
+    const response = await apiClient.company.getDetails(companyId);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

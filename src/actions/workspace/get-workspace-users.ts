@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/internal-api/api-client";
 import { WorkspaceData } from "@/lib/internal-api/types";
 import { getCurrentUser } from "@/actions/user/get-user-data";
 
-export async function getCompanies(): Promise<WorkspaceData[] | null> {
+export async function getWorkspaceUsers(): Promise<WorkspaceData[] | null> {
   try {
     const currentUser = await getCurrentUser();
 
@@ -16,16 +16,17 @@ export async function getCompanies(): Promise<WorkspaceData[] | null> {
     }
 
     const workspaceId = currentUser.company_details.uuid;
-    const response = await apiClient.workspaces.get(workspaceId);
+    const response = await apiClient.workspaces.getUsers(workspaceId);
+    console.log("API response:", response);
 
-    if (response.success && response.data.length > 0) {
+    if (response.success && response.data) {
       return response.data;
     } else {
-      console.error("Workspace not found:", response.status);
+      console.error("Failed to fetch workspace users:", response.status);
       return null;
     }
   } catch (error: any) {
-    console.error("Error in getWorkspace:", error.message);
+    console.error("Error in getWorkspaceUsers:", error.message);
     return null;
   }
 }

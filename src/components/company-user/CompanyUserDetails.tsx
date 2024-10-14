@@ -15,6 +15,8 @@ import {
   Twitter,
   Check,
   X,
+  Pen,
+  Trash2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -33,37 +35,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
-import countries from "@/lib/countries";
-
-interface OwnerInfo {
-  name: string;
-  orgNumber: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-  address: string;
-  arr: string;
-  createdBy: string;
-  website: string;
-  employees: string;
-  linkedin: string;
-  lastUpdated: string;
-  twitter: string;
-  addedDate: string;
-  accountOwners: Array<{ name: string; uuid: string }>;
-  opportunities: Array<{ name: string; uuid: string }>;
-  people: Array<{ name: string; uuid: string }>;
-}
+import { updateCompany } from "@/actions/company/update-companies";
+import { toast } from "sonner";
+import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
+import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -82,7 +60,6 @@ const addressSchema = z.object({
   address2: z.string().optional(),
   postcode: z.string().min(4, "Postnummer må være minst 4 siffer"),
   city: z.string().min(1, "By er påkrevd"),
-  country: z.string().min(1, "Land er påkrevd"),
 });
 
 type AddressFormData = z.infer<typeof addressSchema>;
@@ -90,54 +67,43 @@ type AddressFormData = z.infer<typeof addressSchema>;
 export function CompanyUserDetails({
   companyDetails,
 }: {
-  companyDetails: { name: string };
+  companyDetails: CompanyData;
 }) {
-  const [ownerInfo, setOwnerInfo] = useState<OwnerInfo>({
-    name: "Propdock AS",
-    orgNumber: "912345678",
-    contactPerson: "Christer Hagen",
-    email: "christer@propdock.no",
-    phone: "+47 123 45 678",
-    address: "Storgata 1, 0123 Oslo",
-    arr: "1 000 000 NOK",
-    createdBy: "John Doe",
-    website: "https://propdock.no",
-    employees: "50",
-    linkedin: "https://linkedin.com/company/propdock",
-    lastUpdated: "2023-04-15",
-    twitter: "https://twitter.com/propdock",
-    addedDate: "2023-05-15T10:30:00Z",
-    accountOwners: [
-      { name: "Christer Hagen", uuid: "123e4567-e89b-12d3-a456-426614174000" },
-    ],
-    opportunities: [
-      { name: "Mulighet 1", uuid: "123e4567-e89b-12d3-a456-426614174001" },
-      { name: "Mulighet 2", uuid: "123e4567-e89b-12d3-a456-426614174002" },
-    ],
-    people: [
-      { name: "Christer Hagen", uuid: "123e4567-e89b-12d3-a456-426614174003" },
-      { name: "John Doe", uuid: "123e4567-e89b-12d3-a456-426614174004" },
-      { name: "Jane Doe", uuid: "123e4567-e89b-12d3-a456-426614174005" },
-    ],
-  });
+  const [companyDetailsState, setCompanyDetailsState] =
+    useState(companyDetails);
+  const [editedCompanyName, setEditedCompanyName] = useState(
+    companyDetails.name
+  );
+  const [editedOrgNumber, setEditedOrgNumber] = useState(
+    companyDetails.orgnr || ""
+  );
+  const [editedArr, setEditedArr] = useState(
+    companyDetails.arr ? companyDetails.arr.toString() : ""
+  );
+  const [editedEmployees, setEditedEmployees] = useState(
+    companyDetails.num_employees ? companyDetails.num_employees.toString() : ""
+  );
+  const [isUrlPopoverOpen, setIsUrlPopoverOpen] = useState(false);
+  const [editedUrl, setEditedUrl] = useState(companyDetails.url);
+  const [editedLinkedIn, setEditedLinkedIn] = useState(
+    companyDetails.some_linked
+  );
+  const [editedTwitter, setEditedTwitter] = useState(
+    companyDetails.some_twitter
+  );
+  const [isLinkedInPopoverOpen, setIsLinkedInPopoverOpen] = useState(false);
+  const [isTwitterPopoverOpen, setIsTwitterPopoverOpen] = useState(false);
 
   const [isOrgNumberPopoverOpen, setIsOrgNumberPopoverOpen] = useState(false);
-  const [editedOrgNumber, setEditedOrgNumber] = useState(ownerInfo.orgNumber);
-
-  const handleUpdateOrgNumber = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      orgNumber: editedOrgNumber,
-    }));
-    setIsOrgNumberPopoverOpen(false);
-  };
-
-  const handleCancelOrgNumberEdit = () => {
-    setEditedOrgNumber(ownerInfo.orgNumber);
-    setIsOrgNumberPopoverOpen(false);
-  };
-
   const [isAddressPopoverOpen, setIsAddressPopoverOpen] = useState(false);
+  const [isArrPopoverOpen, setIsArrPopoverOpen] = useState(false);
+  const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
+  const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
+    useState(false);
+
+  const [accountOwners, setAccountOwners] = useState<AccountOwner[]>(
+    (companyDetails.account_owners as AccountOwner[]) || []
+  );
 
   const {
     register,
@@ -148,24 +114,61 @@ export function CompanyUserDetails({
   } = useForm<AddressFormData>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
-      address1: "",
+      address1: companyDetails.address_street || "",
       address2: "",
-      postcode: "",
-      city: "",
-      country: "",
+      postcode: companyDetails.address_zip || "",
+      city: companyDetails.address_city || "",
     },
   });
 
-  const handleUpdateAddress = (data: AddressFormData) => {
-    const selectedCountry = countries.find(
-      (country) => country.code === data.country
-    );
-    const countryName = selectedCountry ? selectedCountry.name : data.country;
+  const handleUpdateOrgNumber = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        orgnr: editedOrgNumber,
+      });
+      if (updatedCompany) {
+        setEditedOrgNumber(updatedCompany.orgnr);
+        toast.success("Organisasjonsnummer oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere organisasjonsnummer");
+      }
+    } catch (error) {
+      console.error("Error updating organization number:", error);
+      toast.error("En feil oppstod under oppdatering av organisasjonsnummer");
+    }
+    setIsOrgNumberPopoverOpen(false);
+  };
 
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      address: `${data.address1}, ${data.postcode} ${data.city}, ${countryName}`,
-    }));
+  const handleCancelOrgNumberEdit = () => {
+    setEditedOrgNumber(companyDetails.orgnr);
+    setIsOrgNumberPopoverOpen(false);
+  };
+
+  const handleUpdateAddress = async (data: AddressFormData) => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        address_street: data.address1,
+        address_zip: data.postcode,
+        address_city: data.city,
+      });
+
+      if (updatedCompany) {
+        // Update local state with the new address details
+        setCompanyDetailsState((prevDetails) => ({
+          ...prevDetails,
+          address_street: updatedCompany.address_street,
+          address_zip: updatedCompany.address_zip,
+          address_city: updatedCompany.address_city,
+        }));
+        toast.success("Adresse oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere adresse");
+      }
+    } catch (error) {
+      console.error("Error updating address:", error);
+      toast.error("En feil oppstod under oppdatering av adresse");
+    }
+
     setIsAddressPopoverOpen(false);
     reset();
   };
@@ -175,53 +178,170 @@ export function CompanyUserDetails({
     setIsAddressPopoverOpen(false);
   };
 
-  const [isArrPopoverOpen, setIsArrPopoverOpen] = useState(false);
-  const [editedArr, setEditedArr] = useState(ownerInfo.arr);
-
-  const handleUpdateArr = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      arr: editedArr,
-    }));
+  const handleUpdateArr = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        arr: parseFloat(editedArr),
+      });
+      if (updatedCompany) {
+        setEditedArr(updatedCompany.arr.toString());
+        toast.success("ARR oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere ARR");
+      }
+    } catch (error) {
+      console.error("Error updating ARR:", error);
+      toast.error("En feil oppstod under oppdatering av ARR");
+    }
     setIsArrPopoverOpen(false);
   };
 
   const handleCancelArrEdit = () => {
-    setEditedArr(ownerInfo.arr);
+    setEditedArr(companyDetails.arr.toString());
     setIsArrPopoverOpen(false);
   };
 
-  const [isEmployeesPopoverOpen, setIsEmployeesPopoverOpen] = useState(false);
-  const [editedEmployees, setEditedEmployees] = useState(ownerInfo.employees);
-
-  const handleUpdateEmployees = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      employees: editedEmployees,
-    }));
+  const handleUpdateEmployees = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        num_employees: parseInt(editedEmployees, 10),
+      });
+      if (updatedCompany) {
+        setEditedEmployees(updatedCompany.num_employees.toString());
+        toast.success("Antall ansatte oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere antall ansatte");
+      }
+    } catch (error) {
+      console.error("Error updating number of employees:", error);
+      toast.error("En feil oppstod under oppdatering av antall ansatte");
+    }
     setIsEmployeesPopoverOpen(false);
   };
 
   const handleCancelEmployeesEdit = () => {
-    setEditedEmployees(ownerInfo.employees);
+    setEditedEmployees(companyDetails.num_employees.toString());
     setIsEmployeesPopoverOpen(false);
   };
 
-  const [isCompanyNamePopoverOpen, setIsCompanyNamePopoverOpen] =
-    useState(false);
-  const [editedCompanyName, setEditedCompanyName] = useState(ownerInfo.name);
-
-  const handleUpdateCompanyName = () => {
-    setOwnerInfo((prevInfo) => ({
-      ...prevInfo,
-      name: editedCompanyName,
-    }));
+  const handleUpdateCompanyName = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        name: editedCompanyName,
+      });
+      if (updatedCompany) {
+        setEditedCompanyName(updatedCompany.name);
+        toast.success("Firmanavn oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere firmanavn");
+      }
+    } catch (error) {
+      console.error("Error updating company name:", error);
+      toast.error("En feil oppstod under oppdatering av firmanavn");
+    }
     setIsCompanyNamePopoverOpen(false);
   };
 
   const handleCancelCompanyNameEdit = () => {
-    setEditedCompanyName(ownerInfo.name);
+    setEditedCompanyName(companyDetails.name);
     setIsCompanyNamePopoverOpen(false);
+  };
+
+  const handleUpdateUrl = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        url: editedUrl,
+      });
+      if (updatedCompany) {
+        setEditedUrl(updatedCompany.url);
+        toast.success("Nettadresse oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere nettadresse");
+      }
+    } catch (error) {
+      console.error("Error updating URL:", error);
+      toast.error("En feil oppstod under oppdatering av nettadresse");
+    }
+    setIsUrlPopoverOpen(false);
+  };
+
+  const handleCancelUrlEdit = () => {
+    setEditedUrl(companyDetails.url);
+    setIsUrlPopoverOpen(false);
+  };
+
+  const handleUpdateLinkedIn = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        some_linked: editedLinkedIn,
+      });
+      if (updatedCompany) {
+        setEditedLinkedIn(updatedCompany.some_linked);
+        toast.success("LinkedIn-adresse oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere LinkedIn-adresse");
+      }
+    } catch (error) {
+      console.error("Error updating LinkedIn URL:", error);
+      toast.error("En feil oppstod under oppdatering av LinkedIn-adresse");
+    }
+    setIsLinkedInPopoverOpen(false);
+  };
+
+  const handleCancelLinkedInEdit = () => {
+    setEditedLinkedIn(companyDetails.some_linked);
+    setIsLinkedInPopoverOpen(false);
+  };
+
+  const handleUpdateTwitter = async () => {
+    try {
+      const updatedCompany = await updateCompany(companyDetails.uuid, {
+        some_twitter: editedTwitter,
+      });
+      if (updatedCompany) {
+        setEditedTwitter(updatedCompany.some_twitter);
+        toast.success("Twitter-adresse oppdatert");
+      } else {
+        toast.error("Kunne ikke oppdatere Twitter-adresse");
+      }
+    } catch (error) {
+      console.error("Error updating Twitter URL:", error);
+      toast.error("En feil oppstod under oppdatering av Twitter-adresse");
+    }
+    setIsTwitterPopoverOpen(false);
+  };
+
+  const handleCancelTwitterEdit = () => {
+    setEditedTwitter(companyDetails.some_twitter);
+    setIsTwitterPopoverOpen(false);
+  };
+
+  const handleOwnerAdded = (newOwner: AccountOwner) => {
+    setAccountOwners((prevOwners) => {
+      // Check if the owner already exists
+      const ownerExists = prevOwners.some((owner) => owner.id === newOwner.id);
+      if (ownerExists) {
+        return prevOwners; // Don't add duplicate owners
+      }
+      return [...prevOwners, newOwner];
+    });
+  };
+
+  const handleRemoveAccountOwner = async (ownerId: number) => {
+    try {
+      const success = await removeAccountOwner(companyDetails.uuid, ownerId);
+      if (success) {
+        setAccountOwners((prevOwners) =>
+          prevOwners.filter((owner) => owner.id !== ownerId)
+        );
+        toast.success("Kontoansvarlig fjernet");
+      } else {
+        toast.error("Kunne ikke fjerne kontoansvarlig");
+      }
+    } catch (error) {
+      console.error("Error removing account owner:", error);
+      toast.error("En feil oppstod under fjerning av kontoansvarlig");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -234,63 +354,71 @@ export function CompanyUserDetails({
     return formatDistanceToNow(date, { addSuffix: true, locale: nb });
   };
 
-  const addedTimeAgo = getTimeAgo(ownerInfo.addedDate);
+  const addedTimeAgo = getTimeAgo(companyDetails.date_created);
 
   const infoItems: InfoItem[] = [
     {
       icon: Building,
       label: "Org.nr",
-      value: ownerInfo.orgNumber,
+      value: companyDetails.orgnr,
       editable: true,
     },
     {
       icon: MapPin,
       label: "Adresse",
-      value: ownerInfo.address,
+      value: `${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`,
       editable: true,
     },
     {
       icon: DollarSign,
       label: "ARR",
-      value: ownerInfo.arr,
+      value: `${companyDetails.arr} NOK`,
       editable: true,
     },
-    { icon: Calendar, label: "Opprettet av", value: ownerInfo.createdBy },
+    {
+      icon: Calendar,
+      label: "Opprettet",
+      value: formatDate(companyDetails.date_created),
+      displayValue: getTimeAgo(companyDetails.date_created),
+    },
     {
       icon: Globe,
       label: "Nettside",
-      value: ownerInfo.website,
+      value: editedUrl,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.website),
+      displayValue: editedUrl ? extractDomain(editedUrl) : "Tom",
+      editable: true,
     },
     {
       icon: Users,
       label: "Ansatte",
-      value: ownerInfo.employees,
+      value: companyDetails.num_employees.toString(),
       editable: true,
     },
     {
       icon: Linkedin,
       label: "LinkedIn",
-      value: ownerInfo.linkedin,
+      value: editedLinkedIn,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.linkedin),
+      displayValue: editedLinkedIn ? extractDomain(editedLinkedIn) : "Tom",
+      editable: true,
     },
     {
       icon: Clock,
-      label: "Sist oppdatert",
-      value: ownerInfo.lastUpdated,
-      displayValue: getTimeAgo(ownerInfo.lastUpdated),
+      label: "Sist kontaktet",
+      value: companyDetails.last_contacted,
+      displayValue: getTimeAgo(companyDetails.last_contacted),
     },
     {
       icon: Twitter,
       label: "Twitter",
-      value: ownerInfo.twitter,
+      value: editedTwitter,
       isLink: true,
       isBadge: true,
-      displayValue: extractDomain(ownerInfo.twitter),
+      displayValue: editedTwitter ? extractDomain(editedTwitter) : "Tom",
+      editable: true,
     },
   ];
 
@@ -299,9 +427,12 @@ export function CompanyUserDetails({
       <CardHeader>
         <CardTitle className="flex items-center gap-4">
           <Avatar className="h-12 w-12">
-            <AvatarImage src="/path-to-company-logo.png" alt={ownerInfo.name} />
+            <AvatarImage
+              src="/path-to-company-logo.png"
+              alt={companyDetails.name}
+            />
             <AvatarFallback>
-              {ownerInfo.name.slice(0, 2).toUpperCase()}
+              {companyDetails.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -311,7 +442,7 @@ export function CompanyUserDetails({
             >
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="p-0 h-auto font-normal">
-                  <h3 className="text-lg font-semibold">{ownerInfo.name}</h3>
+                  <h3 className="text-lg font-semibold">{editedCompanyName}</h3>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -351,7 +482,104 @@ export function CompanyUserDetails({
               <span className="text-sm text-muted-foreground font-medium min-w-[100px]">
                 {item.label}:
               </span>
-              {item.editable ? (
+              {item.editable &&
+              (item.label === "Nettside" ||
+                item.label === "LinkedIn" ||
+                item.label === "Twitter") ? (
+                <Badge
+                  variant="secondary"
+                  className="font-normal flex items-center"
+                >
+                  {item.value ? (
+                    <a
+                      href={item.value}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm hover:underline text-muted-foreground"
+                    >
+                      {item.displayValue}
+                    </a>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Tom</span>
+                  )}
+                  <Separator orientation="vertical" className="mx-2 h-4" />
+                  <Popover
+                    open={
+                      item.label === "Nettside"
+                        ? isUrlPopoverOpen
+                        : item.label === "LinkedIn"
+                        ? isLinkedInPopoverOpen
+                        : isTwitterPopoverOpen
+                    }
+                    onOpenChange={
+                      item.label === "Nettside"
+                        ? setIsUrlPopoverOpen
+                        : item.label === "LinkedIn"
+                        ? setIsLinkedInPopoverOpen
+                        : setIsTwitterPopoverOpen
+                    }
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                      >
+                        <Pen className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <Input
+                          value={
+                            item.label === "Nettside"
+                              ? editedUrl
+                              : item.label === "LinkedIn"
+                              ? editedLinkedIn
+                              : editedTwitter
+                          }
+                          onChange={(e) =>
+                            item.label === "Nettside"
+                              ? setEditedUrl(e.target.value)
+                              : item.label === "LinkedIn"
+                              ? setEditedLinkedIn(e.target.value)
+                              : setEditedTwitter(e.target.value)
+                          }
+                        />
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={
+                              item.label === "Nettside"
+                                ? handleCancelUrlEdit
+                                : item.label === "LinkedIn"
+                                ? handleCancelLinkedInEdit
+                                : handleCancelTwitterEdit
+                            }
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Avbryt
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={
+                              item.label === "Nettside"
+                                ? handleUpdateUrl
+                                : item.label === "LinkedIn"
+                                ? handleUpdateLinkedIn
+                                : handleUpdateTwitter
+                            }
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Bekreft
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Badge>
+              ) : item.editable ? (
                 item.label === "Org.nr" ? (
                   <Popover
                     open={isOrgNumberPopoverOpen}
@@ -363,7 +591,9 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {editedOrgNumber
+                            ? editedOrgNumber
+                            : "Legg til Org.nr"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -372,6 +602,7 @@ export function CompanyUserDetails({
                         <Input
                           value={editedOrgNumber}
                           onChange={(e) => setEditedOrgNumber(e.target.value)}
+                          placeholder="Skriv inn Org.nr"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -400,8 +631,12 @@ export function CompanyUserDetails({
                         variant="ghost"
                         className="p-0 h-auto font-normal"
                       >
-                        <span className="text-sm text-muted-foreground">
-                          {item.value}
+                        <span className="text-sm text-muted-foreground truncate max-w-[150px]">
+                          {companyDetails.address_street &&
+                          companyDetails.address_zip &&
+                          companyDetails.address_city
+                            ? `${companyDetails.address_street}, ${companyDetails.address_zip} ${companyDetails.address_city}`
+                            : "Legg til adresse"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -467,38 +702,6 @@ export function CompanyUserDetails({
                             )}
                           </div>
                         </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor="country">Land</Label>
-                          <Controller
-                            name="country"
-                            control={control}
-                            render={({ field }) => (
-                              <Select
-                                onValueChange={field.onChange}
-                                value={field.value}
-                              >
-                                <SelectTrigger id="country">
-                                  <SelectValue placeholder="Velg land" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {countries.map((country) => (
-                                    <SelectItem
-                                      key={country.code}
-                                      value={country.code}
-                                    >
-                                      {country.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          />
-                          {errors.country && (
-                            <p className="text-sm text-red-500">
-                              {errors.country.message}
-                            </p>
-                          )}
-                        </div>
                         <div className="flex justify-end space-x-2">
                           <Button
                             type="button"
@@ -528,16 +731,28 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {editedArr
+                            ? `${parseFloat(editedArr).toLocaleString(
+                                "no-NO"
+                              )} NOK`
+                            : "Legg til ARR"}
                         </span>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-80">
                       <div className="space-y-2">
-                        <Input
-                          value={editedArr}
-                          onChange={(e) => setEditedArr(e.target.value)}
-                        />
+                        <div className="flex items-center">
+                          <Input
+                            type="number"
+                            value={editedArr}
+                            onChange={(e) => setEditedArr(e.target.value)}
+                            className="pr-12"
+                            placeholder="Skriv inn ARR"
+                          />
+                          <span className="ml-[-40px] text-sm text-muted-foreground">
+                            NOK
+                          </span>
+                        </div>
                         <div className="flex justify-end space-x-2">
                           <Button
                             size="sm"
@@ -566,7 +781,11 @@ export function CompanyUserDetails({
                         className="p-0 h-auto font-normal"
                       >
                         <span className="text-sm text-muted-foreground">
-                          {item.value}
+                          {editedEmployees
+                            ? parseInt(editedEmployees, 10).toLocaleString(
+                                "no-NO"
+                              )
+                            : "Legg til antall ansatte"}
                         </span>
                       </Button>
                     </PopoverTrigger>
@@ -576,6 +795,7 @@ export function CompanyUserDetails({
                           type="number"
                           value={editedEmployees}
                           onChange={(e) => setEditedEmployees(e.target.value)}
+                          placeholder="Skriv inn antall ansatte"
                         />
                         <div className="flex justify-end space-x-2">
                           <Button
@@ -636,42 +856,69 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Account Owner ({ownerInfo.accountOwners.length})
+                Ansvarlig ({accountOwners.length})
               </h4>
-              <AccountOwnerCombobox />
+              <AccountOwnerCombobox
+                companyId={companyDetails.uuid}
+                onOwnerAdded={handleOwnerAdded}
+                currentAccountOwners={accountOwners.map((owner) => owner.id)}
+              />
             </div>
-            {ownerInfo.accountOwners.map((owner, index) => (
-              <Link
-                key={index}
-                href={`/people/${owner.uuid}`}
-                className="inline-block"
-              >
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                      "text-xs font-medium"
-                    )}
+            {accountOwners.map((owner) => (
+              <div key={owner.id} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/people/${owner.clerk_id}`}
+                    className="flex items-center gap-2 flex-grow"
                   >
-                    {owner.name.charAt(0)}
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {owner.name}
-                  </span>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {owner.first_name?.charAt(0) || owner.email.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {`${owner.first_name || ""} ${owner.last_name || ""}`}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveAccountOwner(owner.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           <Separator className="my-4" />
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Muligheter ({ownerInfo.opportunities.length})
+                Muligheter ({companyDetails.opportunities.length})
               </h4>
               <OpportunityCombobox />
             </div>
-            {ownerInfo.opportunities.map((opportunity, index) => (
+            {companyDetails.opportunities.map((opportunity, index) => (
               <Link
                 key={index}
                 href={`/opportunity/${opportunity.uuid}`}
@@ -698,11 +945,11 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Personer ({ownerInfo.people.length})
+                Personer ({companyDetails.people.length})
               </h4>
               <PersonCombobox />
             </div>
-            {ownerInfo.people.map((person, index) => (
+            {companyDetails.people.map((person, index) => (
               <Link
                 key={index}
                 href={`/people/${person.uuid}`}
