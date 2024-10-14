@@ -123,7 +123,7 @@ export function CompanyTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell className="p-0.5 px-2 border w-min" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
