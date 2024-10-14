@@ -1,10 +1,10 @@
+import Link from "next/link";
 import { DashboardShell } from "@/components/shell/shell";
 import { DashboardHeader } from "@/components/shell/header";
 import { AddCompanySheet } from "@/components/company/AddCompanySheet";
-import { getCompanies } from "@/actions/company/get-companies";
-import { CompanyTable } from "@/components/company/company-table/data-table";
-import { columns } from "@/components/company/company-table/columns";
 import { getOpportunities } from "@/actions/opportunity/get-opportunities";
+import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+import { OpportunityData } from "@/lib/internal-api/types";
 
 export default async function OpportunityPage() {
   const { data: opportunities, totalCount } = await getOpportunities(10, 1);
@@ -16,7 +16,11 @@ export default async function OpportunityPage() {
         <AddCompanySheet />
       </DashboardHeader>
 
-      <p>Ingen muligheter funnet.</p>
+      {opportunities && opportunities.length > 0 ? (
+        <KanbanBoard opportunities={opportunities as OpportunityData[]} />
+      ) : (
+        <p className="text-center py-4">Ingen muligheter funnet.</p>
+      )}
     </DashboardShell>
   );
 }

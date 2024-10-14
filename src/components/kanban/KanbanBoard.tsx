@@ -29,198 +29,53 @@ const DynamicDragOverlay = dynamic(
   { ssr: false }
 );
 
+interface OpportunityData {
+  id: number;
+  uuid: string;
+  name: string;
+  status: string;
+  stage: string;
+  value: number;
+  est_completion: string;
+  user_details: {
+    first_name: string;
+    last_name: string;
+  };
+  // Add other fields as needed
+}
+
+interface KanbanBoardProps {
+  opportunities: OpportunityData[];
+}
+
 const defaultCols = [
-  {
-    id: "todo" as const,
-    title: "Todo",
-  },
-  {
-    id: "in-progress" as const,
-    title: "In progress",
-  },
-  {
-    id: "done" as const,
-    title: "Done",
-  },
-] satisfies Column[];
+  { id: "todo", title: "Todo" },
+  { id: "in-progress", title: "In progress" },
+  { id: "done", title: "Done" },
+] as const;
 
 export type ColumnId = (typeof defaultCols)[number]["id"];
 
-const initialTasks: Task[] = [
-  {
-    id: "task1",
-    columnId: "done",
-    title: "Avtale navn",
-    status: "Done",
-    dueDate: "2024-05-15",
-    assignee: {
-      name: "Christer",
-    },
-    arr: "100 000 NOK",
-    company: "Propdock AS",
-    pointOfContact: "John Doe",
-  },
-  {
-    id: "task2",
-    columnId: "done",
-    title: "Samle krav fra interessenter",
-    status: "Done",
-    dueDate: "2024-06-01",
-    assignee: {
-      name: "Vegard",
-    },
-    arr: "250 000 NOK",
-    company: "TechCorp Inc.",
-    pointOfContact: "Jane Smith",
-  },
-  {
-    id: "task3",
-    columnId: "done",
-    title: "Lage trådskisser og mockups",
-    status: "Done",
-    dueDate: "2024-06-15",
-    assignee: {
-      name: "Steffen",
-    },
-    arr: "150 000 NOK",
-    company: "DesignPro Ltd.",
-    pointOfContact: "Alice Johnson",
-  },
-  {
-    id: "task4",
-    columnId: "in-progress",
-    title: "Utvikle hjemmeside layout",
-    status: "In progress",
-    dueDate: "2024-07-01",
-    assignee: {
-      name: "Christer",
-    },
-    arr: "200 000 NOK",
-    company: "WebDev Solutions",
-    pointOfContact: "Bob Williams",
-  },
-  {
-    id: "task5",
-    columnId: "in-progress",
-    title: "Designe fargepalett og typografi",
-    status: "In progress",
-    dueDate: "2024-07-15",
-    assignee: {
-      name: "Vegard",
-    },
-    arr: "120 000 NOK",
-    company: "CreativeDesigns Co.",
-    pointOfContact: "Emma Brown",
-  },
-  {
-    id: "task6",
-    columnId: "todo",
-    title: "Implementere brukerautentisering",
-    status: "Todo",
-    dueDate: "2024-08-01",
-    assignee: {
-      name: "Steffen",
-    },
-    arr: "300 000 NOK",
-    company: "SecureTech Systems",
-    pointOfContact: "David Lee",
-  },
-  {
-    id: "task7",
-    columnId: "todo",
-    title: "Bygge kontakt oss side",
-    status: "Todo",
-    dueDate: "2024-08-15",
-    assignee: {
-      name: "Christer",
-    },
-    arr: "80 000 NOK",
-    company: "ContactPro Services",
-    pointOfContact: "Sarah Davis",
-  },
-  {
-    id: "task8",
-    columnId: "todo",
-    title: "Lage produktkatalog",
-    status: "Todo",
-    dueDate: "2024-09-01",
-    assignee: {
-      name: "Vegard",
-    },
-    arr: "180 000 NOK",
-    company: "CatalogMasters Inc.",
-    pointOfContact: "Michael Wilson",
-  },
-  {
-    id: "task9",
-    columnId: "todo",
-    title: "Utvikle om oss side",
-    status: "Todo",
-    dueDate: "2024-09-15",
-    assignee: {
-      name: "Steffen",
-    },
-    arr: "90 000 NOK",
-    company: "AboutUs Experts",
-    pointOfContact: "Emily Taylor",
-  },
-  {
-    id: "task10",
-    columnId: "todo",
-    title: "Optimalisere nettsted for mobile enheter",
-    status: "Todo",
-    dueDate: "2024-10-01",
-    assignee: {
-      name: "Christer",
-    },
-    arr: "220 000 NOK",
-    company: "MobileOptimize Co.",
-    pointOfContact: "Daniel Brown",
-  },
-  {
-    id: "task11",
-    columnId: "todo",
-    title: "Integrere betalingsløsning",
-    status: "Todo",
-    dueDate: "2024-10-15",
-    assignee: {
-      name: "Vegard",
-    },
-    arr: "350 000 NOK",
-    company: "PaymentTech Solutions",
-    pointOfContact: "Olivia Martinez",
-  },
-  {
-    id: "task12",
-    columnId: "todo",
-    title: "Utføre testing og feilretting",
-    status: "Todo",
-    dueDate: "2024-11-01",
-    assignee: {
-      name: "Steffen",
-    },
-    arr: "280 000 NOK",
-    company: "QualityAssure Ltd.",
-    pointOfContact: "James Anderson",
-  },
-  {
-    id: "task13",
-    columnId: "todo",
-    title: "Lansere nettsted og distribuere til server",
-    status: "Todo",
-    dueDate: "2024-11-08",
-    assignee: {
-      name: "Christer",
-    },
-    arr: "400 000 NOK",
-    company: "LaunchPad Enterprises",
-    pointOfContact: "Sophia Garcia",
-  },
-];
-export function KanbanBoard() {
+export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   const [columns, setColumns] = useState<Column[]>(defaultCols);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
+
+  const initialTasks: Task[] = useMemo(() => {
+    return opportunities.map((opp) => ({
+      id: opp.uuid,
+      columnId: getColumnIdFromStage(opp.stage),
+      title: opp.name,
+      status: opp.status,
+      dueDate: opp.est_completion,
+      assignee: {
+        name: `${opp.user_details.first_name} ${opp.user_details.last_name}`,
+      },
+      arr: `${opp.value} NOK`,
+      company: "", // Add company name if available in the opportunity data
+      pointOfContact: "", // Add point of contact if available in the opportunity data
+    }));
+  }, [opportunities]);
 
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
@@ -517,6 +372,17 @@ export function KanbanBoard() {
         }
         return tasks;
       });
+    }
+  }
+
+  function getColumnIdFromStage(stage: string): ColumnId {
+    switch (stage.toLowerCase()) {
+      case "sendt tilbud":
+        return "todo";
+      case "følge opp":
+        return "in-progress";
+      default:
+        return "todo";
     }
   }
 }
