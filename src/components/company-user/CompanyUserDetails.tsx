@@ -938,9 +938,9 @@ export function CompanyUserDetails({
                 Muligheter ({opportunities.length})
               </h4>
               <OpportunityCombobox
-                companyId={companyDetails.uuid}
+                companyId={companyDetails.id}
                 onOpportunityAdded={handleOpportunityAdded}
-                currentOpportunities={opportunities.map((opp) => opp.uuid)}
+                currentOpportunities={opportunities.map((opp) => opp.id)}
               />
             </div>
             {opportunities.map((opportunity) => (

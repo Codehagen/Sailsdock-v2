@@ -23,15 +23,16 @@ import { getOpportunities } from "@/actions/opportunity/get-opportunities";
 import { toast } from "sonner";
 import { OpportunityData } from "@/lib/internal-api/types";
 import { AddOpportunitySheet } from "@/components/company-user/AddOpportunitySheet";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 export function OpportunityCombobox({
   companyId,
   onOpportunityAdded,
   currentOpportunities,
 }: {
-  companyId: string;
+  companyId: number;
   onOpportunityAdded: (opportunity: OpportunityData) => void;
-  currentOpportunities: string[];
+  currentOpportunities: number[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [isAddSheetOpen, setIsAddSheetOpen] = React.useState(false);
@@ -59,8 +60,15 @@ export function OpportunityCombobox({
     setSelectedOpportunity(opportunity);
     setOpen(false);
     try {
-      onOpportunityAdded(opportunity);
-      toast.success(`${opportunity.name} lagt til som mulighet`);
+      const updatedOpportunity = await updateOpportunity(opportunity.uuid, {
+        companies: [...currentOpportunities, companyId],
+      });
+      if (updatedOpportunity) {
+        onOpportunityAdded(updatedOpportunity);
+        toast.success(`${opportunity.name} lagt til som mulighet`);
+      } else {
+        throw new Error("Failed to update opportunity");
+      }
     } catch (error) {
       console.error("Error adding opportunity:", error);
       toast.error("En feil oppstod under tillegging av mulighet");
@@ -158,7 +166,7 @@ function OpportunityList({
           ) : (
             opportunities.map((opportunity) => (
               <CommandItem
-                key={opportunity.uuid}
+                key={opportunity.id}
                 value={opportunity.name}
                 onSelect={() => handleSelectOpportunity(opportunity)}
               >

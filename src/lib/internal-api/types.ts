@@ -245,6 +245,6 @@ export interface OpportunityData {
   company_details: CompanyData;
   workspace: any | null; // You might want to define a more specific type if needed
   people: any[]; // You might want to define a more specific type if needed
-  companies: any[]; // You might want to define a more specific type if needed
+  companies: number[]; // Changed from any[] to number[]
   account_owners: any[]; // You might want to define a more specific type if needed
 }

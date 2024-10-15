@@ -5,8 +5,8 @@ import { OpportunityData } from "@/lib/internal-api/types";
 import { auth } from "@clerk/nextjs/server";
 
 export async function updateOpportunity(
-  opportunityId: string,
-  opportunityData: Partial<OpportunityData>
+  opportunityUuid: string,
+  opportunityData: { companies: number[] }
 ): Promise<OpportunityData | null> {
   const { userId } = auth();
 
@@ -16,19 +16,34 @@ export async function updateOpportunity(
   }
 
   try {
-    const response = await apiClient.opportunities.update(
-      opportunityId,
+    console.log(
+      `Sending update request for opportunity ${opportunityUuid}:`,
       opportunityData
     );
+
+    const response = await apiClient.opportunities.update(
+      opportunityUuid,
+      opportunityData
+    );
+
+    console.log("Update opportunity response:", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
     } else {
-      console.error("Failed to update opportunity:", response.status);
+      console.error(
+        "Failed to update opportunity:",
+        response.status,
+        response.data
+      );
       return null;
     }
   } catch (error: any) {
-    console.error("Error in updateOpportunity:", error.message);
+    console.error(
+      "Error in updateOpportunity:",
+      error.message,
+      error.response?.data
+    );
     return null;
   }
 }

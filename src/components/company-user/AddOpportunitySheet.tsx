@@ -35,7 +35,7 @@ const defaultValues: OpportunityFormData = {
 };
 
 interface AddOpportunitySheetProps {
-  companyId: string;
+  companyId: number;
   onOpportunityAdded: (opportunity: OpportunityData) => void;
 }
 
