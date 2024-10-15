@@ -40,7 +40,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
-import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
+import {
+  AccountOwner,
+  CompanyData,
+  OpportunityData,
+} from "@/lib/internal-api/types";
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 
 interface InfoItem {
@@ -103,6 +107,10 @@ export function CompanyUserDetails({
 
   const [accountOwners, setAccountOwners] = useState<AccountOwner[]>(
     (companyDetails.account_owners as AccountOwner[]) || []
+  );
+
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(
+    companyDetails.opportunities || []
   );
 
   const {
@@ -342,6 +350,19 @@ export function CompanyUserDetails({
       console.error("Error removing account owner:", error);
       toast.error("En feil oppstod under fjerning av kontoansvarlig");
     }
+  };
+
+  const handleOpportunityAdded = (newOpportunity: OpportunityData) => {
+    setOpportunities((prevOpportunities) => {
+      // Check if the opportunity already exists
+      const opportunityExists = prevOpportunities.some(
+        (opportunity) => opportunity.uuid === newOpportunity.uuid
+      );
+      if (opportunityExists) {
+        return prevOpportunities; // Don't add duplicate opportunities
+      }
+      return [...prevOpportunities, newOpportunity];
+    });
   };
 
   const formatDate = (dateString: string) => {
@@ -914,13 +935,17 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Muligheter ({companyDetails.opportunities.length})
+                Muligheter ({opportunities.length})
               </h4>
-              <OpportunityCombobox />
+              <OpportunityCombobox
+                companyId={companyDetails.uuid}
+                onOpportunityAdded={handleOpportunityAdded}
+                currentOpportunities={opportunities.map((opp) => opp.uuid)}
+              />
             </div>
-            {companyDetails.opportunities.map((opportunity, index) => (
+            {opportunities.map((opportunity) => (
               <Link
-                key={index}
+                key={opportunity.uuid}
                 href={`/opportunity/${opportunity.uuid}`}
                 className="inline-block"
               >
