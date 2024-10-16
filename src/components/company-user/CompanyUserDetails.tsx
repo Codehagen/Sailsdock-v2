@@ -17,6 +17,7 @@ import {
   X,
   Pen,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -113,6 +114,11 @@ export function CompanyUserDetails({
   const [opportunities, setOpportunities] = useState<OpportunityData[]>(
     companyDetails.opportunities || []
   );
+
+  const [removingOwnerId, setRemovingOwnerId] = useState<number | null>(null);
+  const [removingOpportunityId, setRemovingOpportunityId] = useState<
+    number | null
+  >(null);
 
   const {
     register,
@@ -337,6 +343,7 @@ export function CompanyUserDetails({
   };
 
   const handleRemoveAccountOwner = async (ownerId: number) => {
+    setRemovingOwnerId(ownerId);
     try {
       const success = await removeAccountOwner(companyDetails.uuid, ownerId);
       if (success) {
@@ -350,6 +357,8 @@ export function CompanyUserDetails({
     } catch (error) {
       console.error("Error removing account owner:", error);
       toast.error("En feil oppstod under fjerning av kontoansvarlig");
+    } finally {
+      setRemovingOwnerId(null);
     }
   };
 
@@ -367,6 +376,7 @@ export function CompanyUserDetails({
   };
 
   const handleRemoveOpportunity = async (opportunityId: number) => {
+    setRemovingOpportunityId(opportunityId);
     try {
       const opportunityToRemove = opportunities.find(
         (opp) => opp.id === opportunityId
@@ -375,17 +385,14 @@ export function CompanyUserDetails({
         throw new Error("Opportunity not found");
       }
 
-      // Check if companies exists and is an array
-      const currentCompanies = Array.isArray(opportunityToRemove.companies) 
-        ? opportunityToRemove.companies 
+      const currentCompanies = Array.isArray(opportunityToRemove.companies)
+        ? opportunityToRemove.companies
         : [];
 
       const updatedOpportunity = await updateOpportunity(
         opportunityToRemove.uuid,
         {
-          companies: currentCompanies.filter(
-            (id) => id !== companyDetails.id
-          ),
+          companies: currentCompanies.filter((id) => id !== companyDetails.id),
         }
       );
 
@@ -400,6 +407,8 @@ export function CompanyUserDetails({
     } catch (error) {
       console.error("Error removing opportunity:", error);
       toast.error("En feil oppstod under fjerning av mulighet");
+    } finally {
+      setRemovingOpportunityId(null);
     }
   };
 
@@ -959,8 +968,13 @@ export function CompanyUserDetails({
                         variant="destructive"
                         size="sm"
                         onClick={() => handleRemoveAccountOwner(owner.id)}
+                        disabled={removingOwnerId === owner.id}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        {removingOwnerId === owner.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
                         Fjern
                       </Button>
                     </PopoverContent>
@@ -1017,8 +1031,13 @@ export function CompanyUserDetails({
                         variant="destructive"
                         size="sm"
                         onClick={() => handleRemoveOpportunity(opportunity.id)}
+                        disabled={removingOpportunityId === opportunity.id}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        {removingOpportunityId === opportunity.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
                         Fjern
                       </Button>
                     </PopoverContent>
