@@ -24,6 +24,7 @@ export interface UserData {
   company: number;
   company_details: {
     uuid: string;
+    id: string;
     name: string;
     orgnr: string;
   };

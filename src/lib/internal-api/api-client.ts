@@ -181,7 +181,7 @@ class ApiClient {
     },
     get: (opportunityId: string) =>
       this.request<OpportunityData>("get", `/opportunities/${opportunityId}`),
-    create: (workspaceId: string, opportunityData: Partial<OpportunityData>) =>
+    create: (opportunityData: Partial<OpportunityData>) =>
       this.request<OpportunityData>("post", `/opportunities/`, opportunityData),
     update: (
       opportunityId: string,

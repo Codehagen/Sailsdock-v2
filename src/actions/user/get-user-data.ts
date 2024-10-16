@@ -15,6 +15,7 @@ export async function getCurrentUser(): Promise<UserData | null> {
 
   try {
     const response = await apiClient.users.get(userId);
+    console.log("Response:", response);
 
     if (response.success && response.data.length > 0) {
       console.log("User found in database");
