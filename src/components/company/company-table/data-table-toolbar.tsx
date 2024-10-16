@@ -10,6 +10,13 @@ import { DataTableViewOptions } from "@/components/company/company-table/data-ta
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { companyTypes, companyStatuses, companyPriorities } from "./data";
 
+const arrRanges = [
+  { label: "< 100k", value: "0-100000" },
+  { label: "100k - 500k", value: "100000-500000" },
+  { label: "500k - 1M", value: "500000-1000000" },
+  { label: "> 1M", value: "1000000-" },
+];
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
@@ -49,6 +56,13 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("priority")}
             title="Prioritet"
             options={companyPriorities}
+          />
+        )}
+        {table.getColumn("arr") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("arr")}
+            title="ARR"
+            options={arrRanges}
           />
         )}
         {isFiltered && (

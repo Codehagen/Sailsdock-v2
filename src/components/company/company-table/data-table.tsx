@@ -35,6 +35,12 @@ interface DataTableProps<TData, TValue> {
   initialTotalCount: number;
 }
 
+const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
+  const arr = row.getValue(columnId);
+  const [min, max] = filterValue.split("-").map(Number);
+  return arr >= min && (max ? arr <= max : true);
+};
+
 export function CompanyTable<TData, TValue>({
   columns,
   initialData,
@@ -71,6 +77,9 @@ export function CompanyTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
+    filterFns: {
+      arrRange: arrRangeFilter,
+    },
   });
 
   React.useEffect(() => {
@@ -123,7 +132,10 @@ export function CompanyTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="p-0.5 px-2 border w-min" key={cell.id}>
+                    <TableCell
+                      className="p-0.5 px-2 border w-min"
+                      key={cell.id}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

@@ -10,5 +10,6 @@ export interface Company {
   address_street: string;
   address_zip: string;
   address_city: string;
+  arr: number; // Add this line
   // ... other fields
 }

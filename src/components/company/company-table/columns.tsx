@@ -3,11 +3,11 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { Company } from "./types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
+import { nFormatter } from "@/lib/utils";
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -40,37 +40,42 @@ export const columns: ColumnDef<Company>[] = [
     ),
   },
   {
-    accessorKey: "type",
+    accessorKey: "url",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
+      <DataTableColumnHeader column={column} title="URL" />
     ),
     cell: ({ row }) => (
       <div className="text-sm text-muted-foreground">
-        <Badge>{row.getValue("type")}</Badge>
+        <Link
+          href={row.getValue("url")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          {row.getValue("url")}
+        </Link>
       </div>
     ),
   },
   {
-    accessorKey: "status",
+    accessorKey: "num_employees",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Personer" />
     ),
     cell: ({ row }) => (
       <div className="text-sm text-muted-foreground">
-        <Badge variant="outline">{row.getValue("status") || "Ikke satt"}</Badge>
+        {row.getValue("num_employees") || "N/A"}
       </div>
     ),
   },
   {
-    accessorKey: "priority",
+    accessorKey: "user_name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Prioritet" />
+      <DataTableColumnHeader column={column} title="Laget av" />
     ),
     cell: ({ row }) => (
       <div className="text-sm text-muted-foreground">
-        <Badge variant="secondary">
-          {row.getValue("priority") || "Ikke satt"}
-        </Badge>
+        {row.getValue("user_name")}
       </div>
     ),
   },
@@ -84,6 +89,21 @@ export const columns: ColumnDef<Company>[] = [
       return (
         <div className="text-sm text-muted-foreground">
           {formatDistanceToNow(date, { addSuffix: true, locale: nb })}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "arr",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="ARR" />
+    ),
+    cell: ({ row }) => {
+      const arr = parseFloat(row.getValue("arr"));
+      const formatted = nFormatter(arr, { digits: 1 });
+      return (
+        <div className="text-sm text-muted-foreground text-right">
+          {formatted}
         </div>
       );
     },
