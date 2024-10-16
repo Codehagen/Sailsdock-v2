@@ -28,6 +28,12 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { getCompanies } from "@/actions/company/get-companies";
+import { subDays, subMonths, subYears, parseISO } from "date-fns";
+import {
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+} from "date-fns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -39,6 +45,35 @@ const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
   const arr = row.getValue(columnId);
   const [min, max] = filterValue.split("-").map(Number);
   return arr >= min && (max ? arr <= max : true);
+};
+
+const lastContactedFilter = (
+  row: any,
+  columnId: string,
+  filterValue: string
+) => {
+  const lastContactedDate = parseISO(row.getValue(columnId));
+  const now = new Date();
+  const daysDiff = differenceInDays(now, lastContactedDate);
+  const monthsDiff = differenceInMonths(now, lastContactedDate);
+  const yearsDiff = differenceInYears(now, lastContactedDate);
+
+  switch (filterValue) {
+    case "last-week":
+      return daysDiff < 7;
+    case "last-month":
+      return daysDiff < 30;
+    case "last-3-months":
+      return monthsDiff < 3;
+    case "last-6-months":
+      return monthsDiff < 6;
+    case "last-year":
+      return yearsDiff < 1;
+    case "more-than-year":
+      return yearsDiff >= 1;
+    default:
+      return true;
+  }
 };
 
 export function CompanyTable<TData, TValue>({
@@ -79,6 +114,7 @@ export function CompanyTable<TData, TValue>({
     pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
     filterFns: {
       arrRange: arrRangeFilter,
+      lastContactedRange: lastContactedFilter,
     },
   });
 
