@@ -116,6 +116,21 @@ export function CompanyTable<TData, TValue>({
       arrRange: arrRangeFilter,
       lastContactedRange: lastContactedFilter,
     },
+    meta: {
+      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex]!,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+    },
   });
 
   React.useEffect(() => {

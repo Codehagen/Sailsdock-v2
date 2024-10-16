@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
@@ -9,6 +10,16 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
 import { nFormatter, extractDomain } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, X, Pen } from "lucide-react";
+import { updateCompany } from "@/actions/company/update-companies";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -59,9 +70,36 @@ export const columns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="URL" />
     ),
-    cell: ({ row }) => {
-      const url = row.getValue("url") as string;
+    cell: ({ row, table }) => {
+      const [url, setUrl] = useState(row.getValue("url") as string);
+      const [isEditing, setIsEditing] = useState(false);
+      const [editedUrl, setEditedUrl] = useState(url);
+
+      const handleUpdateUrl = async () => {
+        try {
+          const updatedCompany = await updateCompany(row.original.uuid, {
+            url: editedUrl,
+          });
+          if (updatedCompany) {
+            setUrl(updatedCompany.url);
+            toast.success("URL oppdatert");
+            table.options.meta?.updateData(
+              row.index,
+              "url",
+              updatedCompany.url
+            );
+          } else {
+            toast.error("Kunne ikke oppdatere URL");
+          }
+        } catch (error) {
+          console.error("Error updating URL:", error);
+          toast.error("En feil oppstod under oppdatering av URL");
+        }
+        setIsEditing(false);
+      };
+
       const domain = url ? extractDomain(url) : "Tom";
+
       return (
         <div className="text-sm text-muted-foreground">
           {url ? (
@@ -76,7 +114,39 @@ export const columns: ColumnDef<Company>[] = [
               </Link>
             </Badge>
           ) : (
-            <span>Tom</span>
+            <Popover open={isEditing} onOpenChange={setIsEditing}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-8 p-0 font-normal">
+                  <span className="text-sm text-muted-foreground">Tom</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-2">
+                  <Input
+                    value={editedUrl}
+                    onChange={(e) => setEditedUrl(e.target.value)}
+                    placeholder="Skriv inn URL"
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditedUrl(url);
+                        setIsEditing(false);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Avbryt
+                    </Button>
+                    <Button size="sm" onClick={handleUpdateUrl}>
+                      <Check className="h-4 w-4 mr-1" />
+                      Bekreft
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       );
