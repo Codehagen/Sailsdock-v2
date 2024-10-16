@@ -24,6 +24,7 @@ export interface UserData {
   company: number;
   company_details: {
     uuid: string;
+    id: string;
     name: string;
     orgnr: string;
   };
@@ -210,4 +211,41 @@ export interface NoteData {
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+}
+
+export interface OpportunityData {
+  id: number;
+  uuid: string;
+  name: string;
+  description: string;
+  status: string;
+  stage: string;
+  value: number;
+  est_completion: string | null;
+  date_completed: string | null;
+  is_closed: boolean;
+  is_won: boolean;
+  step_1: boolean;
+  step_2: boolean;
+  step_3: boolean;
+  step_4: boolean;
+  step_5: boolean;
+  special_tasks: string | null;
+  date_created: string;
+  last_updated: string | null;
+  user: number;
+  company: number;
+  user_details: {
+    id: number;
+    clerk_id: string;
+    email: string;
+    username: string | null;
+    first_name: string;
+    last_name: string;
+  };
+  company_details: CompanyData;
+  workspace: any | null; // You might want to define a more specific type if needed
+  people: any[]; // You might want to define a more specific type if needed
+  companies: number[]; // Changed from any[] to number[]
+  account_owners: any[]; // You might want to define a more specific type if needed
 }

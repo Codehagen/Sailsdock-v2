@@ -17,6 +17,7 @@ import {
   X,
   Pen,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
@@ -40,8 +41,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { updateCompany } from "@/actions/company/update-companies";
 import { toast } from "sonner";
-import { AccountOwner, CompanyData } from "@/lib/internal-api/types";
+import {
+  AccountOwner,
+  CompanyData,
+  OpportunityData,
+} from "@/lib/internal-api/types";
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -104,6 +110,15 @@ export function CompanyUserDetails({
   const [accountOwners, setAccountOwners] = useState<AccountOwner[]>(
     (companyDetails.account_owners as AccountOwner[]) || []
   );
+
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(
+    companyDetails.opportunities || []
+  );
+
+  const [removingOwnerId, setRemovingOwnerId] = useState<number | null>(null);
+  const [removingOpportunityId, setRemovingOpportunityId] = useState<
+    number | null
+  >(null);
 
   const {
     register,
@@ -328,6 +343,7 @@ export function CompanyUserDetails({
   };
 
   const handleRemoveAccountOwner = async (ownerId: number) => {
+    setRemovingOwnerId(ownerId);
     try {
       const success = await removeAccountOwner(companyDetails.uuid, ownerId);
       if (success) {
@@ -341,6 +357,58 @@ export function CompanyUserDetails({
     } catch (error) {
       console.error("Error removing account owner:", error);
       toast.error("En feil oppstod under fjerning av kontoansvarlig");
+    } finally {
+      setRemovingOwnerId(null);
+    }
+  };
+
+  const handleOpportunityAdded = (newOpportunity: OpportunityData) => {
+    setOpportunities((prevOpportunities) => {
+      // Check if the opportunity already exists
+      const opportunityExists = prevOpportunities.some(
+        (opportunity) => opportunity.uuid === newOpportunity.uuid
+      );
+      if (opportunityExists) {
+        return prevOpportunities; // Don't add duplicate opportunities
+      }
+      return [...prevOpportunities, newOpportunity];
+    });
+  };
+
+  const handleRemoveOpportunity = async (opportunityId: number) => {
+    setRemovingOpportunityId(opportunityId);
+    try {
+      const opportunityToRemove = opportunities.find(
+        (opp) => opp.id === opportunityId
+      );
+      if (!opportunityToRemove) {
+        throw new Error("Opportunity not found");
+      }
+
+      const currentCompanies = Array.isArray(opportunityToRemove.companies)
+        ? opportunityToRemove.companies
+        : [];
+
+      const updatedOpportunity = await updateOpportunity(
+        opportunityToRemove.uuid,
+        {
+          companies: currentCompanies.filter((id) => id !== companyDetails.id),
+        }
+      );
+
+      if (updatedOpportunity) {
+        setOpportunities((prevOpportunities) =>
+          prevOpportunities.filter((opp) => opp.id !== opportunityId)
+        );
+        toast.success(`${opportunityToRemove.name} fjernet fra muligheter`);
+      } else {
+        throw new Error("Failed to update opportunity");
+      }
+    } catch (error) {
+      console.error("Error removing opportunity:", error);
+      toast.error("En feil oppstod under fjerning av mulighet");
+    } finally {
+      setRemovingOpportunityId(null);
     }
   };
 
@@ -900,8 +968,13 @@ export function CompanyUserDetails({
                         variant="destructive"
                         size="sm"
                         onClick={() => handleRemoveAccountOwner(owner.id)}
+                        disabled={removingOwnerId === owner.id}
                       >
-                        <Trash2 className="h-4 w-4 mr-2" />
+                        {removingOwnerId === owner.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
                         Fjern
                       </Button>
                     </PopoverContent>
@@ -914,31 +987,63 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Muligheter ({companyDetails.opportunities.length})
+                Muligheter ({opportunities.length})
               </h4>
-              <OpportunityCombobox />
+              <OpportunityCombobox
+                companyId={companyDetails.id}
+                onOpportunityAdded={handleOpportunityAdded}
+                currentOpportunities={opportunities.map((opp) => opp.id)}
+              />
             </div>
-            {companyDetails.opportunities.map((opportunity, index) => (
-              <Link
-                key={index}
-                href={`/opportunity/${opportunity.uuid}`}
-                className="inline-block"
-              >
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                      "text-xs font-medium"
-                    )}
+            {opportunities.map((opportunity) => (
+              <div key={opportunity.uuid} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/opportunity/${opportunity.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
                   >
-                    {opportunity.name.charAt(0)}
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {opportunity.name}
-                  </span>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {opportunity.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {opportunity.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveOpportunity(opportunity.id)}
+                        disabled={removingOpportunityId === opportunity.id}
+                      >
+                        {removingOpportunityId === opportunity.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           <Separator className="my-4" />

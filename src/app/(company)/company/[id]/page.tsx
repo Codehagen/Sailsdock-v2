@@ -24,7 +24,6 @@ export default async function CompanyUserPage({
 }) {
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
-  console.log(companyDetails);
 
   if (!companyDetails) {
     return (
@@ -77,7 +76,7 @@ export default async function CompanyUserPage({
             </TabsContent>
             <TabsContent value="notes">
               <NotesContent
-                notes={companyDetails.notes}
+                notes={companyDetails.notes as any}
                 companyId={companyDetails.id}
               />
             </TabsContent>
