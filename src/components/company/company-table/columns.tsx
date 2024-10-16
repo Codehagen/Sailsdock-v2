@@ -200,11 +200,79 @@ export const columns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ansatte" />
     ),
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue("num_employees") || "N/A"}
-      </div>
-    ),
+    cell: ({ row, table }) => {
+      const [isEditing, setIsEditing] = useState(false);
+      const [editedEmployees, setEditedEmployees] = useState(
+        row.getValue("num_employees")?.toString() || ""
+      );
+
+      const handleUpdateEmployees = async () => {
+        try {
+          const updatedCompany = await updateCompany(row.original.uuid, {
+            num_employees: parseInt(editedEmployees, 10),
+          });
+          if (updatedCompany) {
+            table.options.meta?.updateData(
+              row.index,
+              "num_employees",
+              updatedCompany.num_employees
+            );
+            toast.success("Antall ansatte oppdatert");
+          } else {
+            toast.error("Kunne ikke oppdatere antall ansatte");
+          }
+        } catch (error) {
+          console.error("Error updating number of employees:", error);
+          toast.error("En feil oppstod under oppdatering av antall ansatte");
+        }
+        setIsEditing(false);
+      };
+
+      const employeeCount = row.getValue("num_employees");
+
+      return (
+        <div className="text-sm text-muted-foreground">
+          {employeeCount ? (
+            <span>{employeeCount.toString()}</span>
+          ) : (
+            <Popover open={isEditing} onOpenChange={setIsEditing}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-8 p-0 font-normal">
+                  <span className="text-sm text-muted-foreground">Tom</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-2">
+                  <Input
+                    type="number"
+                    value={editedEmployees}
+                    onChange={(e) => setEditedEmployees(e.target.value)}
+                    placeholder="Skriv inn antall ansatte"
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditedEmployees("");
+                        setIsEditing(false);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Avbryt
+                    </Button>
+                    <Button size="sm" onClick={handleUpdateEmployees}>
+                      <Check className="h-4 w-4 mr-1" />
+                      Bekreft
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "user_name",
@@ -236,12 +304,77 @@ export const columns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ARR" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const [isEditing, setIsEditing] = useState(false);
+      const [editedArr, setEditedArr] = useState(
+        row.getValue("arr")?.toString() || ""
+      );
+
+      const handleUpdateArr = async () => {
+        try {
+          const updatedCompany = await updateCompany(row.original.uuid, {
+            arr: parseFloat(editedArr),
+          });
+          if (updatedCompany) {
+            table.options.meta?.updateData(
+              row.index,
+              "arr",
+              updatedCompany.arr
+            );
+            toast.success("ARR oppdatert");
+          } else {
+            toast.error("Kunne ikke oppdatere ARR");
+          }
+        } catch (error) {
+          console.error("Error updating ARR:", error);
+          toast.error("En feil oppstod under oppdatering av ARR");
+        }
+        setIsEditing(false);
+      };
+
       const arr = parseFloat(row.getValue("arr"));
-      const formatted = nFormatter(arr, { digits: 1 });
+      const formatted = arr ? nFormatter(arr, { digits: 1 }) : null;
+
       return (
         <div className="text-sm text-muted-foreground text-right">
-          {formatted}
+          {formatted ? (
+            <span>{formatted}</span>
+          ) : (
+            <Popover open={isEditing} onOpenChange={setIsEditing}>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" className="h-8 p-0 font-normal">
+                  <span className="text-sm text-muted-foreground">Tom</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-2">
+                  <Input
+                    type="number"
+                    value={editedArr}
+                    onChange={(e) => setEditedArr(e.target.value)}
+                    placeholder="Skriv inn ARR"
+                  />
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditedArr("");
+                        setIsEditing(false);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-1" />
+                      Avbryt
+                    </Button>
+                    <Button size="sm" onClick={handleUpdateArr}>
+                      <Check className="h-4 w-4 mr-1" />
+                      Bekreft
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       );
     },

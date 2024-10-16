@@ -7,7 +7,6 @@ import { columns } from "@/components/company/company-table/columns";
 
 export default async function CompanyPage() {
   const { data: companies, totalCount } = await getCompanies(10, 1);
-  console.log(companies);
 
   return (
     <DashboardShell>
