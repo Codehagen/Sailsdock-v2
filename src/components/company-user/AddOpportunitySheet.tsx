@@ -62,7 +62,7 @@ export function AddOpportunitySheet({
     try {
       const result = await createOpportunity({
         ...values,
-        company: companyId, // Send companyId as a single value
+        company: companyId,
       });
       if (result) {
         toast.success("Mulighet opprettet", {
