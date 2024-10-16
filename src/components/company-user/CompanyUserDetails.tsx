@@ -46,6 +46,7 @@ import {
   OpportunityData,
 } from "@/lib/internal-api/types";
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -363,6 +364,43 @@ export function CompanyUserDetails({
       }
       return [...prevOpportunities, newOpportunity];
     });
+  };
+
+  const handleRemoveOpportunity = async (opportunityId: number) => {
+    try {
+      const opportunityToRemove = opportunities.find(
+        (opp) => opp.id === opportunityId
+      );
+      if (!opportunityToRemove) {
+        throw new Error("Opportunity not found");
+      }
+
+      // Check if companies exists and is an array
+      const currentCompanies = Array.isArray(opportunityToRemove.companies) 
+        ? opportunityToRemove.companies 
+        : [];
+
+      const updatedOpportunity = await updateOpportunity(
+        opportunityToRemove.uuid,
+        {
+          companies: currentCompanies.filter(
+            (id) => id !== companyDetails.id
+          ),
+        }
+      );
+
+      if (updatedOpportunity) {
+        setOpportunities((prevOpportunities) =>
+          prevOpportunities.filter((opp) => opp.id !== opportunityId)
+        );
+        toast.success(`${opportunityToRemove.name} fjernet fra muligheter`);
+      } else {
+        throw new Error("Failed to update opportunity");
+      }
+    } catch (error) {
+      console.error("Error removing opportunity:", error);
+      toast.error("En feil oppstod under fjerning av mulighet");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -944,26 +982,49 @@ export function CompanyUserDetails({
               />
             </div>
             {opportunities.map((opportunity) => (
-              <Link
-                key={opportunity.uuid}
-                href={`/opportunity/${opportunity.uuid}`}
-                className="inline-block"
-              >
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                      "text-xs font-medium"
-                    )}
+              <div key={opportunity.uuid} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/opportunity/${opportunity.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
                   >
-                    {opportunity.name.charAt(0)}
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {opportunity.name}
-                  </span>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {opportunity.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {opportunity.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveOpportunity(opportunity.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
           <Separator className="my-4" />
