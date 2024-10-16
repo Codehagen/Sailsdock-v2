@@ -163,10 +163,10 @@ export const timeAgo = (
 
 export function extractDomain(url: string): string {
   try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.hostname.replace(/^www\./, "");
+    const domain = new URL(url).hostname;
+    return domain.startsWith("www.") ? domain.slice(4) : domain;
   } catch {
-    return url; // Return the original string if it's not a valid URL
+    return url;
   }
 }
 

@@ -7,7 +7,8 @@ import Link from "next/link";
 import { Company } from "./types";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
-import { nFormatter } from "@/lib/utils";
+import { nFormatter, extractDomain } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -33,29 +34,53 @@ export const columns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Org.nr" />
     ),
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.getValue("orgnr")}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const orgnr = row.getValue("orgnr") as string;
+      return (
+        <div className="text-sm text-muted-foreground">
+          {orgnr ? (
+            <Link
+              href={`https://www.proff.no/bransjesøk?q=${orgnr}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:underline"
+            >
+              {orgnr}
+            </Link>
+          ) : (
+            "N/A"
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "url",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="URL" />
     ),
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        <Link
-          href={row.getValue("url")}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:underline"
-        >
-          {row.getValue("url")}
-        </Link>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const url = row.getValue("url") as string;
+      const domain = url ? extractDomain(url) : "Tom";
+      return (
+        <div className="text-sm text-muted-foreground">
+          {url ? (
+            <Badge variant="secondary" className="font-normal">
+              <Link
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm hover:underline text-muted-foreground"
+              >
+                {domain}
+              </Link>
+            </Badge>
+          ) : (
+            <span>Tom</span>
+          )}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "num_employees",
