@@ -163,9 +163,18 @@ export const timeAgo = (
 
 export function extractDomain(url: string): string {
   try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.hostname.replace(/^www\./, '');
+    const domain = new URL(url).hostname;
+    return domain.startsWith("www.") ? domain.slice(4) : domain;
   } catch {
-    return url; // Return the original string if it's not a valid URL
+    return url;
   }
+}
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat("nb-NO", {
+    style: "currency",
+    currency: "NOK",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
 }

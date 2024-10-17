@@ -9,20 +9,23 @@ export default async function CompanyPage() {
   const { data: companies, totalCount } = await getCompanies(10, 1);
 
   return (
-    <DashboardShell>
+    <DashboardShell className="">
+      {/* <DashboardShell className="h-[calc(100vh-64px)] grid-rows-[auto,1fr]"> */}
       <DashboardHeader heading="Bedrifter" text="Dine bedrifter">
         <AddCompanySheet />
       </DashboardHeader>
 
-      {companies ? (
-        <CompanyTable
-          columns={columns}
-          initialData={companies}
-          initialTotalCount={totalCount}
-        />
-      ) : (
-        <p>Ingen selskaper funnet.</p>
-      )}
+      <div className="overflow-hidden">
+        {companies ? (
+          <CompanyTable
+            columns={columns}
+            initialData={companies}
+            initialTotalCount={totalCount}
+          />
+        ) : (
+          <p>Ingen selskaper funnet.</p>
+        )}
+      </div>
     </DashboardShell>
   );
 }

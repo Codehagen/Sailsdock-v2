@@ -28,12 +28,55 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { getCompanies } from "@/actions/company/get-companies";
+import { subDays, subMonths, subYears, parseISO } from "date-fns";
+import {
+  differenceInDays,
+  differenceInMonths,
+  differenceInYears,
+} from "date-fns";
+
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   initialData: TData[];
   initialTotalCount: number;
 }
+
+const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
+  const arr = row.getValue(columnId);
+  const [min, max] = filterValue.split("-").map(Number);
+  return arr >= min && (max ? arr <= max : true);
+};
+
+const lastContactedFilter = (
+  row: any,
+  columnId: string,
+  filterValue: string
+) => {
+  const lastContactedDate = parseISO(row.getValue(columnId));
+  const now = new Date();
+  const daysDiff = differenceInDays(now, lastContactedDate);
+  const monthsDiff = differenceInMonths(now, lastContactedDate);
+  const yearsDiff = differenceInYears(now, lastContactedDate);
+
+  switch (filterValue) {
+    case "last-week":
+      return daysDiff < 7;
+    case "last-month":
+      return daysDiff < 30;
+    case "last-3-months":
+      return monthsDiff < 3;
+    case "last-6-months":
+      return monthsDiff < 6;
+    case "last-year":
+      return yearsDiff < 1;
+    case "more-than-year":
+      return yearsDiff >= 1;
+    default:
+      return true;
+  }
+};
 
 export function CompanyTable<TData, TValue>({
   columns,
@@ -71,6 +114,25 @@ export function CompanyTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
+    filterFns: {
+      arrRange: arrRangeFilter,
+      lastContactedRange: lastContactedFilter,
+    },
+    meta: {
+      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex]!,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+    },
   });
 
   React.useEffect(() => {
@@ -93,25 +155,23 @@ export function CompanyTable<TData, TValue>({
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <DataTableToolbar table={table} />
-      <div className="rounded-md border">
+      <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -123,7 +183,10 @@ export function CompanyTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell className="p-0.5 px-2 border w-min" key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className="p-0.5 px-2 border w-min"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -144,7 +207,8 @@ export function CompanyTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       <DataTablePagination table={table} />
     </div>
   );

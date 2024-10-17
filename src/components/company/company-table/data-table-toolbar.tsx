@@ -10,6 +10,13 @@ import { DataTableViewOptions } from "@/components/company/company-table/data-ta
 import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 import { companyTypes, companyStatuses, companyPriorities } from "./data";
 
+const arrRanges = [
+  { label: "< 100k", value: "0-100000" },
+  { label: "100k - 500k", value: "100000-500000" },
+  { label: "500k - 1M", value: "500000-1000000" },
+  { label: "> 1M", value: "1000000-" },
+];
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
 }
@@ -20,8 +27,8 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-1 items-center space-x-2 flex-wrap">
         <Input
           placeholder="Filtrer selskaper..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -49,6 +56,13 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("priority")}
             title="Prioritet"
             options={companyPriorities}
+          />
+        )}
+        {table.getColumn("arr") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("arr")}
+            title="ARR"
+            options={arrRanges}
           />
         )}
         {isFiltered && (
