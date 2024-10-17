@@ -9,7 +9,8 @@ export default async function CompanyPage() {
   const { data: companies, totalCount } = await getCompanies(10, 1);
 
   return (
-    <DashboardShell className="h-[calc(100vh-64px)] grid-rows-[auto,1fr]">
+    <DashboardShell className="">
+      {/* <DashboardShell className="h-[calc(100vh-64px)] grid-rows-[auto,1fr]"> */}
       <DashboardHeader heading="Bedrifter" text="Dine bedrifter">
         <AddCompanySheet />
       </DashboardHeader>
