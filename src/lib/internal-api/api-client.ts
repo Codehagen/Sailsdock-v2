@@ -8,6 +8,7 @@ import {
   CompanyData,
   NoteData,
   OpportunityData,
+  PersonData,
 } from "./types";
 
 class ApiClient {
@@ -239,6 +240,27 @@ class ApiClient {
           `opportunities/${opportunityId}/notes/${noteId}/`
         ),
     },
+  };
+
+  // Add this new section for people
+  people = {
+    getAll: (workspaceId: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/people`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<PersonData[]>("get", url);
+    },
+    get: (personId: string) =>
+      this.request<PersonData>("get", `/people/${personId}`),
+    create: (personData: Partial<PersonData>) =>
+      this.request<PersonData>("post", `/people/`, personData),
+    update: (personId: string, personData: Partial<PersonData>) =>
+      this.request<PersonData>("patch", `/people/${personId}/`, personData),
+    delete: (personId: string) =>
+      this.request<PersonData>("delete", `/people/${personId}`),
+    getDetails: (personId: string) =>
+      this.request<PersonData>("get", `/people/${personId}/details`),
   };
 }
 
