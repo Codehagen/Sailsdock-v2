@@ -35,6 +35,8 @@ import {
   differenceInYears,
 } from "date-fns";
 
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   initialData: TData[];
@@ -153,25 +155,23 @@ export function CompanyTable<TData, TValue>({
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <DataTableToolbar table={table} />
-      <div className="rounded-md border">
+      <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -184,8 +184,8 @@ export function CompanyTable<TData, TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
-                      className="p-0.5 px-2 border w-min"
                       key={cell.id}
+                      className="p-0.5 px-2 border w-min"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -207,7 +207,8 @@ export function CompanyTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
       <DataTablePagination table={table} />
     </div>
   );

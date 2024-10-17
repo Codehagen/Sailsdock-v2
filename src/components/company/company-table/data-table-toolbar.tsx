@@ -27,8 +27,8 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center space-x-2">
+    <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-1 items-center space-x-2 flex-wrap">
         <Input
           placeholder="Filtrer selskaper..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
