@@ -252,7 +252,7 @@ class ApiClient {
       return this.request<PersonData[]>("get", url);
     },
     get: (personId: string) =>
-      this.request<PersonData>("get", `/people/${personId}`),
+      this.request<PersonData>("get", `/people/${personId}/`),
     create: (personData: Partial<PersonData>) =>
       this.request<PersonData>("post", `/people/`, personData),
     update: (personId: string, personData: Partial<PersonData>) =>

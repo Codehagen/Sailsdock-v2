@@ -16,28 +16,68 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { Separator } from "@/components/ui/separator";
+import { getPeople } from "@/actions/people/get-people";
+import { toast } from "sonner";
+import { PersonData } from "@/lib/internal-api/types";
+import { updatePerson } from "@/actions/people/update-people";
 
-type Person = {
-  uuid: string;
-  name: string;
-};
-
-const people: Person[] = [
-  { uuid: "1", name: "Christer Hagen" },
-  { uuid: "2", name: "John Doe" },
-  { uuid: "3", name: "Jane Doe" },
-  // Add more people as needed
-];
-
-export function PersonCombobox() {
+export function PersonCombobox({
+  companyId,
+  onPersonAdded,
+  currentPersons,
+}: {
+  companyId: number;
+  onPersonAdded: (person: PersonData) => void;
+  currentPersons: number[];
+}) {
   const [open, setOpen] = React.useState(false);
   const { isDesktop } = useMediaQuery();
-  const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(
+  const [selectedPerson, setSelectedPerson] = React.useState<PersonData | null>(
     null
   );
+  const [people, setPeople] = React.useState<PersonData[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (open && people.length === 0) {
+      setIsLoading(true);
+      getPeople().then((response) => {
+        if (response.data) {
+          setPeople(response.data);
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [open, people.length]);
+
+  const handleSelectPerson = async (person: PersonData) => {
+    setSelectedPerson(person);
+    setOpen(false);
+    try {
+      const updatedPerson = await updatePerson(person.uuid, {
+        companies: [...currentPersons, companyId],
+      });
+      if (updatedPerson) {
+        onPersonAdded(updatedPerson);
+        toast.success(`${person.name} lagt til som person`);
+      } else {
+        throw new Error("Failed to update person");
+      }
+    } catch (error) {
+      console.error("Error adding person:", error);
+      toast.error("En feil oppstod under tillegging av person");
+    }
+  };
+
+  const handleAddNewPerson = () => {
+    setOpen(false);
+    // TODO: Implement AddPersonSheet component and use it here
+    // setIsAddSheetOpen(true);
+    toast.info("Funksjonalitet for å legge til ny person kommer snart");
+  };
 
   if (isDesktop) {
     return (
@@ -48,7 +88,14 @@ export function PersonCombobox() {
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0">
-          <PersonList setOpen={setOpen} setSelectedPerson={setSelectedPerson} />
+          <PersonList
+            setOpen={setOpen}
+            setSelectedPerson={setSelectedPerson}
+            people={people}
+            isLoading={isLoading}
+            handleSelectPerson={handleSelectPerson}
+            handleAddNewPerson={handleAddNewPerson}
+          />
         </PopoverContent>
       </Popover>
     );
@@ -63,7 +110,14 @@ export function PersonCombobox() {
       </DrawerTrigger>
       <DrawerContent>
         <div className="mt-4 border-t">
-          <PersonList setOpen={setOpen} setSelectedPerson={setSelectedPerson} />
+          <PersonList
+            setOpen={setOpen}
+            setSelectedPerson={setSelectedPerson}
+            people={people}
+            isLoading={isLoading}
+            handleSelectPerson={handleSelectPerson}
+            handleAddNewPerson={handleAddNewPerson}
+          />
         </div>
       </DrawerContent>
     </Drawer>
@@ -73,41 +127,54 @@ export function PersonCombobox() {
 function PersonList({
   setOpen,
   setSelectedPerson,
+  people,
+  isLoading,
+  handleSelectPerson,
+  handleAddNewPerson,
 }: {
   setOpen: (open: boolean) => void;
-  setSelectedPerson: (person: Person | null) => void;
+  setSelectedPerson: (person: PersonData | null) => void;
+  people: PersonData[];
+  isLoading: boolean;
+  handleSelectPerson: (person: PersonData) => void;
+  handleAddNewPerson: () => void;
 }) {
+  const [inputValue, setInputValue] = React.useState("");
+
   return (
     <Command>
-      <CommandInput placeholder="Search people..." />
+      <CommandInput
+        placeholder="Søk etter personer..."
+        value={inputValue}
+        onValueChange={setInputValue}
+      />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>Ingen resultater funnet.</CommandEmpty>
         <CommandGroup>
-          {people.map((person) => (
-            <CommandItem
-              key={person.uuid}
-              value={person.name}
-              onSelect={() => {
-                setSelectedPerson(person);
-                setOpen(false);
-              }}
-            >
-              <div className="flex items-center">
-                <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-2">
-                  {person.name.charAt(0)}
-                </div>
-                {person.name}
-              </div>
+          {isLoading ? (
+            <CommandItem>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Laster...
             </CommandItem>
-          ))}
+          ) : (
+            people.map((person) => (
+              <CommandItem
+                key={person.id}
+                value={person.name}
+                onSelect={() => handleSelectPerson(person)}
+              >
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-2">
+                    {person.name.charAt(0).toUpperCase()}
+                  </div>
+                  {person.name}
+                </div>
+              </CommandItem>
+            ))
+          )}
         </CommandGroup>
         <Separator className="my-2" />
-        <CommandItem
-          onSelect={() => {
-            // Handle adding a new person
-            setOpen(false);
-          }}
-        >
+        <CommandItem onSelect={handleAddNewPerson}>
           <div className="flex items-center">
             <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center mr-2">
               <Plus className="h-4 w-4" />
