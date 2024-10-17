@@ -249,3 +249,12 @@ export interface OpportunityData {
   companies: number[]; // Changed from any[] to number[]
   account_owners: any[]; // You might want to define a more specific type if needed
 }
+
+export interface PersonData {
+  id: number;
+  uuid: string;
+  name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+}
