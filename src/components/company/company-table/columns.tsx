@@ -279,11 +279,16 @@ export const columns: ColumnDef<Company>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Laget av" />
     ),
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.original.user.first_name} {row.original.user.last_name}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const user = row.original.user;
+      return (
+        <div className="text-sm text-muted-foreground">
+          {user
+            ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
+            : "N/A"}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "last_contacted",
