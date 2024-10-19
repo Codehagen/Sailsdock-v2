@@ -38,7 +38,7 @@ import { Icons } from "@/components/icons";
 const data = {
   user: {
     name: "Christer Hagen",
-    email: "christer@propx.no",
+    email: "christer@sailsdock.no",
     avatar: "/avatars/john-doe.jpg",
   },
   navMain: [
@@ -119,23 +119,18 @@ const data = {
           url: "/kanban",
           icon: ArrowRight,
         },
-        {
-          title: "Settings",
-          url: "/settings",
-          icon: Settings2,
-        },
       ],
     },
   ],
   navSecondary: [
     {
       title: "Support",
-      url: "#",
+      url: "/help",
       icon: LifeBuoy,
     },
     {
-      title: "Feedback",
-      url: "#",
+      title: "Tilbakemelding",
+      url: "/help",
       icon: Send,
     },
   ],
