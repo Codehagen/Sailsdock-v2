@@ -20,7 +20,7 @@ export async function getCurrentUser(): Promise<UserData | null> {
     // Log the full response, regardless of success or failure
     console.log("Full get user response:", JSON.stringify(response, null, 2));
 
-    if (response.success && response.data.length > 0) 
+    if (response.success && response.data.length > 0) {
       console.log("User found in database");
       return response.data[0];
     }
