@@ -71,12 +71,12 @@ const data = {
           icon: Users,
           items: [
             {
-              title: "All Personer",
-              url: "/people",
+              title: "Test Person",
+              url: "/people/82be121f-b56c-46db-abb3-bccc5c7c0267",
               icon: UsersRound,
             },
             {
-              title: "Add Person",
+              title: "Placeholder",
               url: "/people/add",
               icon: UserPlus,
             },
@@ -88,12 +88,12 @@ const data = {
           icon: Building,
           items: [
             {
-              title: "All Bedrifter",
-              url: "/company",
+              title: "Test Bedrift",
+              url: "/company/82be121f-b56c-46db-abb3-bccc5c7c0267",
               icon: Building2,
             },
             {
-              title: "Add Bedrift",
+              title: "Placeholder",
               url: "/company/add",
               icon: Building2,
             },
