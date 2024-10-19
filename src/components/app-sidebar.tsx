@@ -18,6 +18,7 @@ import {
   UsersRound,
   Building2,
   Star,
+  Command,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -170,9 +171,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/" className="flex items-center space-x-2">
-                {/* <Icons.logo className="w-auto h-[40px]" /> */}
-                <span className="font-bold text-xl">Sailsdock</span>
+              <Link href="/">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                  <Icons.logo className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Sailsdock</span>
+                  <span className="truncate text-xs">Kjeldsberg</span>
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
