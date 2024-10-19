@@ -40,7 +40,16 @@ export async function getCurrentUser(): Promise<UserData | null> {
       return null;
     }
   } catch (error: any) {
-    console.error("Error in getCurrentUser:", error.message);
+    console.error("Error in getCurrentUser:", error);
+    if (error.response) {
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
+      console.error("Response headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("Request:", error.request);
+    } else {
+      console.error("Error message:", error.message);
+    }
     return null;
   }
 }
