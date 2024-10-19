@@ -503,14 +503,19 @@ export function CompanyUserDetails({
               {companyDetails.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div>
+          <div className="flex-grow min-w-0">
             <Popover
               open={isCompanyNamePopoverOpen}
               onOpenChange={setIsCompanyNamePopoverOpen}
             >
               <PopoverTrigger asChild>
-                <Button variant="ghost" className="p-0 h-auto font-normal">
-                  <h3 className="text-lg font-semibold">{editedCompanyName}</h3>
+                <Button
+                  variant="ghost"
+                  className="p-0 h-auto font-normal w-full text-left"
+                >
+                  <h3 className="text-lg font-semibold truncate">
+                    {editedCompanyName}
+                  </h3>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">

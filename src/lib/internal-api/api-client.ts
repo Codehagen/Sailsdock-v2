@@ -8,6 +8,7 @@ import {
   CompanyData,
   NoteData,
   OpportunityData,
+  SidebarViewData, // Add this new type
 } from "./types";
 
 class ApiClient {
@@ -239,6 +240,11 @@ class ApiClient {
           `opportunities/${opportunityId}/notes/${noteId}/`
         ),
     },
+  };
+
+  sidebarViews = {
+    getAll: (userId: string) =>
+      this.request<SidebarViewData[]>("get", `users/${userId}/views/`),
   };
 }
 

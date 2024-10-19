@@ -249,3 +249,14 @@ export interface OpportunityData {
   companies: number[]; // Changed from any[] to number[]
   account_owners: any[]; // You might want to define a more specific type if needed
 }
+
+export interface SidebarViewData {
+  name: string;
+  description: string;
+  icon: string;
+  parent_element: number;
+  url: string;
+  sorting: number;
+  fields: null | any; // You may want to define a more specific type for fields if needed
+  user: number;
+}

@@ -4,9 +4,12 @@ import { AddCompanySheet } from "@/components/company/AddCompanySheet";
 import { getCompanies } from "@/actions/company/get-companies";
 import { CompanyTable } from "@/components/company/company-table/data-table";
 import { columns } from "@/components/company/company-table/columns";
+import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
 
 export default async function CompanyPage() {
   const { data: companies, totalCount } = await getCompanies(10, 1);
+  const sidebarData = await getSidebarData();
+  console.log("Sidebar data:", sidebarData);
 
   return (
     <DashboardShell className="">
