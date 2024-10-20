@@ -15,6 +15,8 @@ export async function getCurrentUser(): Promise<UserData | null> {
 
   try {
     console.log("Attempting to get user with ID:", userId);
+    console.log("Clerk user details:", JSON.stringify(clerkUser, null, 2));
+
     const response = await apiClient.users.get(userId);
 
     // Log the full response, regardless of success or failure

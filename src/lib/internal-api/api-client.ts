@@ -31,13 +31,25 @@ class ApiClient {
       if (!userId) {
         throw new Error("Unauthorized");
       }
+      console.log("Request config:", JSON.stringify(config, null, 2));
       return config;
     });
 
     this.axiosInstance.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        console.log("Response data:", JSON.stringify(response.data, null, 2));
+        return response;
+      },
       (error) => {
         console.error("API request failed:", error);
+        if (error.response) {
+          console.error("Response status:", error.response.status);
+          console.error(
+            "Response data:",
+            JSON.stringify(error.response.data, null, 2)
+          );
+          console.error("Response headers:", error.response.headers);
+        }
         return Promise.reject(error);
       }
     );
@@ -49,11 +61,18 @@ class ApiClient {
     data?: Record<string, unknown>
   ): Promise<ApiResponse<T>> {
     try {
+      console.log(`Making ${method.toUpperCase()} request to ${url}`);
+      if (data) {
+        console.log("Request data:", JSON.stringify(data, null, 2));
+      }
+
       const response: AxiosResponse = await this.axiosInstance({
         method,
         url,
         data,
       });
+
+      console.log("Full response:", JSON.stringify(response, null, 2));
 
       const isPaginated = response.data.results !== undefined;
       const dataArray = isPaginated ? response.data.results : response.data;
@@ -81,16 +100,12 @@ class ApiClient {
             url: axiosError.config?.url,
             data: axiosError.config?.data,
           },
-          data:
-            axiosError.response?.data &&
-            typeof axiosError.response.data === "object"
-              ? JSON.stringify(axiosError.response.data).slice(0, 100)
-              : "Response data not available or not in expected format",
+          data: axiosError.response?.data,
         };
 
         console.error(
           `API client error for ${method.toUpperCase()} ${url}:`,
-          errorInfo
+          JSON.stringify(errorInfo, null, 2)
         );
 
         return {
