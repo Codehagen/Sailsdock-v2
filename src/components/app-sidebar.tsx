@@ -36,6 +36,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
+import { FeedbackDialog } from "@/components/feedback-dialog";
 
 const data = {
   user: {
@@ -166,6 +167,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     })),
   }));
 
+  // Update the navSecondary items to include the FeedbackDialog
+  const navSecondaryWithFeedback = data.navSecondary.map(item => {
+    if (item.title === "Tilbakemelding") {
+      return {
+        ...item,
+        component: (
+          <FeedbackDialog>
+            <SidebarMenuButton>
+              <Send className="mr-2 h-4 w-4" />
+              <span>{item.title}</span>
+            </SidebarMenuButton>
+          </FeedbackDialog>
+        ),
+      };
+    }
+    return item;
+  });
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -187,7 +206,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={updatedNavMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavSecondary items={navSecondaryWithFeedback} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
