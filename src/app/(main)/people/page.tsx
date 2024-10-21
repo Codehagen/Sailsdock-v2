@@ -1,7 +1,5 @@
 import { getCurrentUser } from "@/actions/user/get-user-data";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
-import { DashboardShell } from "@/components/shell/shell";
-import { DashboardHeader } from "@/components/shell/header";
 import { Button } from "@/components/ui/button";
 
 export default async function PeoplePage() {
@@ -13,11 +11,14 @@ export default async function PeoplePage() {
   }
 
   return (
-    <DashboardShell>
-      <DashboardHeader
-        heading={"Personer"}
-        text="Dine personer"
-      ></DashboardHeader>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-2xl font-bold tracking-tight">Personer</h2>
+        <div className="hidden items-center space-x-2 md:flex">
+          <Button>Legg til person</Button>
+        </div>
+      </div>
+
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="user" />
         <EmptyPlaceholder.Title>Legg til person</EmptyPlaceholder.Title>
@@ -27,6 +28,6 @@ export default async function PeoplePage() {
         </EmptyPlaceholder.Description>
         <Button className="mt-4">Legg til person</Button>
       </EmptyPlaceholder>
-    </DashboardShell>
+    </div>
   );
 }

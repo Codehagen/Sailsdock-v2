@@ -113,22 +113,8 @@ export default function SettingsDashboard({ user }: { user: UserType }) {
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <main className="flex min-h-screen flex-1 flex-col gap-4 bg-muted/40 p-4 md:gap-8 md:p-10">
-        <div className="mx-auto w-full max-w-6xl">
-          <nav className="flex items-center text-sm font-medium text-muted-foreground">
-            <a href="#" className="hover:text-foreground">
-              Innstillinger
-            </a>
-            <ChevronRight className="mx-2 h-4 w-4" />
-            <span className="text-foreground">
-              {
-                navItems
-                  .flatMap((category) => category.items)
-                  .find((item) => item.id === activeTab)?.label
-              }
-            </span>
-          </nav>
-        </div>
+      <main className="flex min-h-screen flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
+        <div className="mx-auto w-full max-w-6xl"></div>
         <div className="mx-auto grid w-full max-w-6xl items-start gap-6 md:grid-cols-[250px_1fr] lg:grid-cols-[300px_1fr]">
           <nav className="flex flex-col space-y-6">
             {navItems.map((category) => (
