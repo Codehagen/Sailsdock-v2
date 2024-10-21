@@ -51,6 +51,23 @@ export function PeopleTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
+  const updateData = React.useCallback(
+    (rowIndex: number, columnId: string, value: unknown) => {
+      setData((old) =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            return {
+              ...old[rowIndex]!,
+              [columnId]: value,
+            };
+          }
+          return row;
+        })
+      );
+    },
+    []
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -72,6 +89,9 @@ export function PeopleTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
+    meta: {
+      updateData,
+    },
   });
 
   React.useEffect(() => {
