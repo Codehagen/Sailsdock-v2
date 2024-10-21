@@ -1,23 +1,12 @@
-import { getCurrentUser } from "@/actions/user/get-user-data";
+import { Suspense } from "react";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { AddPersonSheet } from "@/components/people/AddPersonSheet";
 import { PeopleTable } from "@/components/people/people-table/data-table";
 import { columns } from "@/components/people/people-table/columns";
+import { PeopleTableSkeleton } from "@/components/people/people-table-skeleton";
 
-export default async function PeoplePage({
-  searchParams,
-}: {
-  searchParams: { page?: string };
-}) {
-  const page = Number(searchParams.page) || 1;
-  const pageSize = 10;
-
-  const {
-    data: people,
-    totalCount,
-  } = await getAllPeople(pageSize, page);
-
+export default async function PeoplePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between space-y-2">
@@ -27,23 +16,37 @@ export default async function PeoplePage({
         </div>
       </div>
 
-      {people && people.length > 0 ? (
-        <PeopleTable
-          columns={columns}
-          initialData={people}
-          initialTotalCount={totalCount}
-        />
-      ) : (
-        <EmptyPlaceholder>
-          <EmptyPlaceholder.Icon name="user" />
-          <EmptyPlaceholder.Title>Legg til person</EmptyPlaceholder.Title>
-          <EmptyPlaceholder.Description>
-            Du har ikke lagt til noen personer. Legg til en person for å komme i
-            gang.
-          </EmptyPlaceholder.Description>
-          <AddPersonSheet />
-        </EmptyPlaceholder>
-      )}
+      <div className="overflow-hidden">
+        <Suspense fallback={<PeopleTableSkeleton />}>
+          <PeopleTableWrapper />
+        </Suspense>
+      </div>
     </div>
   );
+}
+
+async function PeopleTableWrapper() {
+  const { data: people, totalCount } = await getAllPeople(10, 1);
+
+  if (people && people.length > 0) {
+    return (
+      <PeopleTable
+        columns={columns}
+        initialData={people}
+        initialTotalCount={totalCount}
+      />
+    );
+  } else {
+    return (
+      <EmptyPlaceholder>
+        <EmptyPlaceholder.Icon name="user" />
+        <EmptyPlaceholder.Title>Ingen personer funnet</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Description>
+          Du har ikke lagt til noen personer ennå. Legg til en person for å
+          komme i gang.
+        </EmptyPlaceholder.Description>
+        <AddPersonSheet />
+      </EmptyPlaceholder>
+    );
+  }
 }
