@@ -19,6 +19,7 @@ import {
   Building2,
   Star,
   Command,
+  Settings,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -115,11 +116,6 @@ const data = {
           url: "/notes",
           icon: BookOpen,
         },
-        {
-          title: "Kanban",
-          url: "/kanban",
-          icon: ArrowRight,
-        },
       ],
     },
   ],
@@ -133,6 +129,11 @@ const data = {
       title: "Tilbakemelding",
       url: "/help",
       icon: Send,
+    },
+    {
+      title: "Innstillinger",
+      url: "/settings",
+      icon: Settings,
     },
   ],
 };

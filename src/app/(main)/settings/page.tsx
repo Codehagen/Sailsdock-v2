@@ -8,14 +8,15 @@ export default async function SettingsPage() {
   const userData = await getCurrentUser();
 
   if (!userData) {
-    // Handle the case where no user is found
     return (
       <DashboardShell>
         <DashboardHeader
           heading="Innstillinger"
           text="Administrer dine innstillinger"
         />
-        <div>No user data available. Please log in.</div>
+        <div className="overflow-hidden">
+          <p>No user data available. Please log in.</p>
+        </div>
       </DashboardShell>
     );
   }
@@ -28,7 +29,9 @@ export default async function SettingsPage() {
         heading="Innstillinger"
         text="Administrer dine innstillinger"
       />
-      <SettingsDashboard user={user} />
+      <div className="overflow-hidden">
+        <SettingsDashboard user={user} />
+      </div>
     </DashboardShell>
   );
 }
