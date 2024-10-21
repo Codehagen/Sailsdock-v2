@@ -2,10 +2,9 @@ export interface ApiResponse<T> {
   success: boolean;
   status: number;
   data: T[];
-  pagination?: {
-    next: string | null;
-    prev: string | null;
-  };
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
 }
 
 export interface UserData {
@@ -259,4 +258,24 @@ export interface SidebarViewData {
   sorting: number;
   fields: null | any; // You may want to define a more specific type for fields if needed
   user: number;
+}
+
+export interface PersonData {
+  id: number;
+  uuid: string;
+  date_created: string;
+  last_modified: string;
+  name: string;
+  title: string;
+  phone: string;
+  email: string;
+  department: string;
+  address_street: string;
+  address_zip: string;
+  address_city: string;
+  pref_com: string;
+  url: string;
+  user: number;
+  workspace: number;
+  company: number;
 }
