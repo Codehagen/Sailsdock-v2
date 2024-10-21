@@ -185,7 +185,7 @@ export function CompanyTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="p-0.5 px-2 border w-min"
+                      className="p-0.5 px-2 border w-min max-w-[300px]"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

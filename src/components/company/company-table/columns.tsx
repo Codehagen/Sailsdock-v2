@@ -153,33 +153,31 @@ export const columns: ColumnDef<Company>[] = [
     cell: ({ row }) => {
       const accountOwners = row.original.account_owners || []
       return (
-        <div className="max-w-[200px] overflow-x-auto">
-          <div className="flex gap-1 py-1">
-            {accountOwners.map((owner) => (
-              <Link
-                key={owner.id}
-                href={`/people/${owner.clerk_id}`}
-                className="inline-block">
-                <Badge
-                  variant="secondary"
-                  className="font-normal whitespace-nowrap">
-                  <div className="flex items-center gap-1">
-                    <div
-                      className={cn(
-                        "flex items-center justify-center",
-                        "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
-                        "text-[10px] font-medium"
-                      )}>
-                      {owner.first_name?.charAt(0) || owner.email.charAt(0)}
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {`${owner.first_name || ""} ${owner.last_name || ""}`}
-                    </span>
+        <div className="flex gap-1 w-full overflow-auto py-1" style={{ scrollbarWidth: "thin" }}>
+          {accountOwners.map((owner) => (
+            <Link
+              key={owner.id}
+              href={`/people/${owner.clerk_id}`}
+              className="inline-block">
+              <Badge
+                variant="secondary"
+                className="font-normal whitespace-nowrap">
+                <div className="flex items-center gap-1">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
+                      "text-[10px] font-medium"
+                    )}>
+                    {owner.first_name?.charAt(0) || owner.email.charAt(0)}
                   </div>
-                </Badge>
-              </Link>
-            ))}
-          </div>
+                  <span className="text-xs text-muted-foreground">
+                    {`${owner.first_name || ""} ${owner.last_name || ""}`}
+                  </span>
+                </div>
+              </Badge>
+            </Link>
+          ))}
         </div>
       )
     },
