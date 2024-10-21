@@ -1,8 +1,9 @@
 import { getCurrentUser } from "@/actions/user/get-user-data";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
-import { Pagination } from "@/components/ui/pagination";
 import { AddPersonSheet } from "@/components/people/AddPersonSheet";
+import { PeopleTable } from "@/components/people/people-table/data-table";
+import { columns } from "@/components/people/people-table/columns";
 
 export default async function PeoplePage({
   searchParams,
@@ -10,15 +11,12 @@ export default async function PeoplePage({
   searchParams: { page?: string };
 }) {
   const page = Number(searchParams.page) || 1;
-  const pageSize = 10; // You can adjust this or make it dynamic
+  const pageSize = 10;
 
   const {
     data: people,
     totalCount,
-    totalPages,
   } = await getAllPeople(pageSize, page);
-  console.log("People data:", people);
-
 
   return (
     <div className="space-y-4">
@@ -30,19 +28,11 @@ export default async function PeoplePage({
       </div>
 
       {people && people.length > 0 ? (
-        <>
-          <ul className="space-y-4">
-            {people.map((person) => (
-              <li key={person.uuid} className="border p-4 rounded-md">
-                <h3 className="text-lg font-semibold">{person.name}</h3>
-                <p>{person.title}</p>
-                <p>Email: {person.email}</p>
-                <p>Phone: {person.phone}</p>
-              </li>
-            ))}
-          </ul>
-          <Pagination page={page} totalPages={totalPages} />
-        </>
+        <PeopleTable
+          columns={columns}
+          initialData={people}
+          initialTotalCount={totalCount}
+        />
       ) : (
         <EmptyPlaceholder>
           <EmptyPlaceholder.Icon name="user" />
