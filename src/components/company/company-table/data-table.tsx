@@ -156,7 +156,7 @@ export function CompanyTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar data={data} table={table} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
