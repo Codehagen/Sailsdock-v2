@@ -19,8 +19,8 @@ export default clerkMiddleware(
     if (!isPublicRoute(req)) {
       auth().protect();
     }
-  },
-  { debug: true } // Set debug mode to true
+  }
+  //   { debug: process.env.NODE_ENV === "development" }
 );
 
 export const config = {
