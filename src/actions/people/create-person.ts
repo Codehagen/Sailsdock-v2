@@ -17,18 +17,23 @@ export async function createPerson(
 
   try {
     const currentUser = await getCurrentUser();
-    if (!currentUser || !currentUser.company_details?.uuid) {
-      console.error("No associated company found for the user");
+    if (!currentUser) {
+      console.error("No current user found");
       return null;
     }
 
-    const companyId = currentUser.company_details.uuid;
+    // Use workspace instead of company
     const dataToSend = {
       ...personData,
-      company: currentUser.company,
+      user: currentUser.id,
+      workspace: currentUser.company, // Assuming 'company' field in UserData represents the workspace ID
     };
+    console.log("Data to send:", dataToSend);
 
     const response = await apiClient.people.create(dataToSend);
+
+    // Log the entire response
+    console.log("API response:", JSON.stringify(response, null, 2));
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

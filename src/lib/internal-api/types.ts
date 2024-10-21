@@ -276,6 +276,6 @@ export interface PersonData {
   pref_com: string;
   url: string;
   user: number;
-  workspace: number;
-  company: number;
+  workspace: number; // Changed from 'company' to 'workspace'
+  company: number | null; // Make this optional or nullable if it's not always required
 }
