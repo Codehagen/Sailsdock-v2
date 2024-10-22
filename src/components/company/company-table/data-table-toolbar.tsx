@@ -11,6 +11,7 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { companyTypes, companyStatuses, companyPriorities } from "./data"
 import { set } from "date-fns"
 import { RotateCwSquare } from "lucide-react"
+import DataTableEmployeeFilter from "./employee-filter"
 
 const arrRanges = [
   { label: "< 100k", value: "0-100000" },
@@ -32,18 +33,24 @@ export function DataTableToolbar<TData>({
   const filteredRows = data.filter((row) => row.account_owners.length)
   // Unique list of account_owners (personer)
   const owners = filteredRows
-  .flatMap((row) => row.account_owners)
-  .reduce((uniqueOwners, owner: any) => {
-    const ownerName = `${owner?.first_name ?? ""} ${owner?.last_name ?? ""}`.trim();
-    const ownerValue = ownerName.toLowerCase();
+    .flatMap((row) => row.account_owners)
+    .reduce((uniqueOwners, owner: any) => {
+      const ownerName = `${owner?.first_name ?? ""} ${
+        owner?.last_name ?? ""
+      }`.trim()
+      const ownerValue = ownerName.toLowerCase()
 
-    // Check if owner already exists
-    if (!uniqueOwners.some((o: any) => o.value === ownerValue)) {
-      uniqueOwners.push({ value: ownerValue, label: ownerName, icon: undefined });
-    }
-    
-    return uniqueOwners;
-  }, [] as { value: string; label: string; icon: undefined }[]);
+      // Check if owner already exists
+      if (!uniqueOwners.some((o: any) => o.value === ownerValue)) {
+        uniqueOwners.push({
+          value: ownerValue,
+          label: ownerName,
+          icon: undefined,
+        })
+      }
+
+      return uniqueOwners
+    }, [] as { value: string; label: string; icon: undefined }[])
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
@@ -56,18 +63,11 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-     {/*    {table.getColumn("type") && (
+        {/*         {table.getColumn("type") && (
           <DataTableFacetedFilter
             column={table.getColumn("type")}
             title="Type"
             options={companyTypes}
-          />
-        )}
-        {table.getColumn("status") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("status")}
-            title="Status"
-            options={companyStatuses}
           />
         )} */}
         {table.getColumn("account_owners") && (
@@ -77,6 +77,16 @@ export function DataTableToolbar<TData>({
             options={owners}
           />
         )}
+        {table.getColumn("num_employees") && (
+          <DataTableEmployeeFilter column={table.getColumn("num_employees")} />
+        )}
+        {/*         {table.getColumn("num_employees") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("num_employees")}
+            title="Ansatte"
+            options={companyStatuses}
+          />
+        )} */}
         {table.getColumn("arr") && (
           <DataTableFacetedFilter
             column={table.getColumn("arr")}

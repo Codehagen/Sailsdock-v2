@@ -153,7 +153,9 @@ export const columns: ColumnDef<Company>[] = [
     cell: ({ row }) => {
       const accountOwners = row.original.account_owners || []
       return (
-        <div className="flex gap-1 w-full overflow-auto py-1" style={{ scrollbarWidth: "thin" }}>
+        <div
+          className="flex gap-1 w-full overflow-auto py-1"
+          style={{ scrollbarWidth: "thin" }}>
           {accountOwners.map((owner) => (
             <Link
               key={owner.id}
@@ -274,6 +276,7 @@ export const columns: ColumnDef<Company>[] = [
         </div>
       )
     },
+    filterFn: "inNumberRange"
   },
   {
     accessorKey: "user_name",

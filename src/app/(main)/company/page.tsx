@@ -18,7 +18,7 @@ export default async function CompanyPage() {
         <AddCompanySheet />
       </DashboardHeader>
 
-      <div className="overflow-hidden">
+      <div className="overflow-hidden p-1">
         {companies ? (
           <CompanyTable
             columns={columns}
