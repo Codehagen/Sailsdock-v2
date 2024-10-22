@@ -30,9 +30,12 @@ export const columns: ColumnDef<Person>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium text-muted-foreground">
+          <Link
+            href={`/people/${row.original.uuid}`}
+            className="max-w-[500px] truncate font-medium hover:underline"
+          >
             {row.getValue("name")}
-          </span>
+          </Link>
         </div>
       );
     },

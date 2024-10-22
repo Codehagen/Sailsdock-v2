@@ -32,7 +32,7 @@ async function CompanyTableWrapper() {
     return (
       <CompanyTable
         columns={columns}
-        initialData={companies}
+        initialData={companies as any}
         initialTotalCount={totalCount}
       />
     );

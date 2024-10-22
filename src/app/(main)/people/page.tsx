@@ -32,7 +32,7 @@ async function PeopleTableWrapper() {
     return (
       <PeopleTable
         columns={columns}
-        initialData={people}
+        initialData={people as any}
         initialTotalCount={totalCount}
       />
     );

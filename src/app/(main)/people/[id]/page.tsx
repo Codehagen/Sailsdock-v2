@@ -1,5 +1,5 @@
 import { DashboardShell } from "@/components/shell/shell";
-import { getPersonDetails } from "@/actions/people/get-person";
+import { getPersonDetails } from "@/actions/people/get-person-details";
 import { PersonUserDetails } from "@/components/people-user/PersonUserDetails";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
