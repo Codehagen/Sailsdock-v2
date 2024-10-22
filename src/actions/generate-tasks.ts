@@ -12,6 +12,7 @@ const TaskSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
+  tag: z.enum(["email", "meeting", "call", "other"]),
 });
 
 const TasksResponseSchema = z.object({
@@ -27,7 +28,7 @@ export async function generateTasks(prompt: string, jsonInput: string) {
       messages: [
         {
           role: "system",
-          content: `${prompt} Svar alltid på norsk.`,
+          content: `${prompt} Svar alltid på norsk. Tagg hver oppgave med en av følgende: email, meeting, call, eller other.`,
         },
         {
           role: "user",
@@ -43,6 +44,49 @@ export async function generateTasks(prompt: string, jsonInput: string) {
     return tasksResponse?.tasks;
   } catch (error) {
     console.error("Error generating tasks:", error);
-    throw new Error("Failed to generate tasks");
+    throw new Error(
+      `Failed to generate tasks: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+  }
+}
+
+export async function generateContent(
+  task: z.infer<typeof TaskSchema>,
+  jsonInput: string
+) {
+  try {
+    const parsedJson = JSON.parse(jsonInput);
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Du er en assistent som hjelper med å generere innhold basert på oppgaver. Svar alltid på norsk.",
+        },
+        {
+          role: "user",
+          content: `Generer innhold for følgende oppgave: ${JSON.stringify(
+            task
+          )}. Bruk denne konteksten: ${JSON.stringify(parsedJson)}`,
+        },
+      ],
+    });
+
+    const generatedContent = completion.choices[0].message.content;
+    if (!generatedContent) {
+      throw new Error("No content generated");
+    }
+    return generatedContent;
+  } catch (error) {
+    console.error("Error generating content:", error);
+    throw new Error(
+      `Failed to generate content: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
   }
 }
