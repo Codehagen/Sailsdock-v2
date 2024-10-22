@@ -1,14 +1,14 @@
 "use server";
 
 import { apiClient } from "@/lib/internal-api/api-client";
-import { CompanyData } from "@/lib/internal-api/types";
+import { PersonData } from "@/lib/internal-api/types";
 import { getCurrentUser } from "@/actions/user/get-user-data";
 
-export async function getCompanies(
+export async function getAllPeople(
   pageSize: number = 10,
   page: number = 1
 ): Promise<{
-  data: CompanyData[] | null;
+  data: PersonData[] | null;
   totalCount: number;
   totalPages: number;
 }> {
@@ -23,7 +23,7 @@ export async function getCompanies(
     }
 
     const companyId = currentUser.company_details.uuid;
-    const response = await apiClient.company.getAll(companyId, pageSize, page);
+    const response = await apiClient.people.getAll(companyId, pageSize, page);
 
     if (response.success && Array.isArray(response.data)) {
       const totalCount = response.count || 0;
@@ -34,11 +34,11 @@ export async function getCompanies(
         totalPages,
       };
     } else {
-      console.error("Companies not found:", response.status);
+      console.error("People not found:", response.status);
       return { data: null, totalCount: 0, totalPages: 0 };
     }
   } catch (error: any) {
-    console.error("Error in getCompanies:", error.message);
+    console.error("Error in getAllPeople:", error.message);
     return { data: null, totalCount: 0, totalPages: 0 };
   }
 }

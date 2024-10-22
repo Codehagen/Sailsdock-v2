@@ -1,5 +1,6 @@
-import * as React from "react"
-import { type LucideIcon } from "lucide-react"
+import * as React from "react";
+import Link from "next/link";
+import { type LucideIcon } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -7,34 +8,34 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
-export function NavSecondary({
-  items,
-  ...props
-}: {
-  items: {
-    title: string
-    url: string
-    icon: LucideIcon
-  }[]
-} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+interface NavSecondaryProps extends React.ComponentProps<typeof SidebarMenu> {
+  items: Array<{
+    title: string;
+    url?: string;
+    icon: React.ElementType;
+    component?: React.ReactNode;
+  }>;
+}
+
+export function NavSecondary({ items, ...props }: NavSecondaryProps) {
   return (
-    <SidebarGroup {...props}>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
-  )
+    <SidebarMenu {...props}>
+      {items.map((item, index) => (
+        <SidebarMenuItem key={index}>
+          {item.component ? (
+            item.component
+          ) : (
+            <SidebarMenuButton asChild>
+              <Link href={item.url || "#"}>
+                {item.icon && <item.icon className="mr-2 h-4 w-4" />}
+                <span>{item.title}</span>
+              </Link>
+            </SidebarMenuButton>
+          )}
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
 }

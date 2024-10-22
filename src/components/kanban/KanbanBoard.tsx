@@ -33,31 +33,32 @@ interface OpportunityData {
   id: number;
   uuid: string;
   name: string;
-  status: string;
-  stage: string;
-  value: number;
-  est_completion: string;
-  user_details: {
+  status?: string;
+  stage?: string;
+  value?: number;
+  est_completion?: string | null;
+  user_details?: {
     first_name: string;
     last_name: string;
   };
-  // Add other fields as needed
 }
 
 interface KanbanBoardProps {
   opportunities: OpportunityData[];
 }
 
-const defaultCols = [
+// Update the defaultCols declaration
+const defaultCols: Column[] = [
   { id: "todo", title: "Todo" },
   { id: "in-progress", title: "In progress" },
   { id: "done", title: "Done" },
-] as const;
+];
 
-export type ColumnId = (typeof defaultCols)[number]["id"];
+export type ColumnId = "todo" | "in-progress" | "done";
 
 export function KanbanBoard({ opportunities }: KanbanBoardProps) {
-  const [columns, setColumns] = useState<Column[]>(defaultCols);
+  // Update the initial state of columns
+  const [columns, setColumns] = useState<Column[]>(() => [...defaultCols]);
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -66,12 +67,14 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
       id: opp.uuid,
       columnId: getColumnIdFromStage(opp.stage),
       title: opp.name,
-      status: opp.status,
-      dueDate: opp.est_completion,
+      status: opp.status || "Unknown",
+      dueDate: opp.est_completion || "",
       assignee: {
-        name: `${opp.user_details.first_name} ${opp.user_details.last_name}`,
+        name: opp.user_details
+          ? `${opp.user_details.first_name} ${opp.user_details.last_name}`
+          : "Unassigned",
       },
-      arr: `${opp.value} NOK`,
+      arr: opp.value ? `${opp.value} NOK` : "N/A",
       company: "", // Add company name if available in the opportunity data
       pointOfContact: "", // Add point of contact if available in the opportunity data
     }));
@@ -375,12 +378,16 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
     }
   }
 
-  function getColumnIdFromStage(stage: string): ColumnId {
+  function getColumnIdFromStage(stage?: string): ColumnId {
+    if (!stage) return "todo"; // Default to "todo" if stage is undefined
+
     switch (stage.toLowerCase()) {
       case "sendt tilbud":
         return "todo";
       case "følge opp":
         return "in-progress";
+      case "vunnet":
+        return "done";
       default:
         return "todo";
     }

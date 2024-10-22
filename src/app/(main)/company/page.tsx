@@ -1,34 +1,52 @@
-import { DashboardShell } from "@/components/shell/shell";
-import { DashboardHeader } from "@/components/shell/header";
-import { AddCompanySheet } from "@/components/company/AddCompanySheet";
+import { Suspense } from "react";
 import { getCompanies } from "@/actions/company/get-companies";
 import { CompanyTable } from "@/components/company/company-table/data-table";
 import { columns } from "@/components/company/company-table/columns";
-import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
+import { AddCompanySheet } from "@/components/company/AddCompanySheet";
+import { EmptyPlaceholder } from "@/components/empty-placeholder";
+import { CompanyTableSkeleton } from "@/components/company/company-table-skeleton";
 
 export default async function CompanyPage() {
-  const { data: companies, totalCount }: any = await getCompanies(10, 1);
-  const sidebarData = await getSidebarData();
-  console.log("Sidebar data:", sidebarData);
-
   return (
-    <DashboardShell className="">
-      {/* <DashboardShell className="h-[calc(100vh-64px)] grid-rows-[auto,1fr]"> */}
-      <DashboardHeader heading="Bedrifter" text="Dine bedrifter">
-        <AddCompanySheet />
-      </DashboardHeader>
-
-      <div className="overflow-hidden p-1">
-        {companies ? (
-          <CompanyTable
-            columns={columns}
-            initialData={companies}
-            initialTotalCount={totalCount}
-          />
-        ) : (
-          <p>Ingen selskaper funnet.</p>
-        )}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-2xl font-bold tracking-tight">Bedrifter</h2>
+        <div className="hidden items-center space-x-2 md:flex">
+          <AddCompanySheet />
+        </div>
       </div>
-    </DashboardShell>
+
+      <div className="overflow-hidden">
+        <Suspense fallback={<CompanyTableSkeleton />}>
+          <CompanyTableWrapper />
+        </Suspense>
+      </div>
+    </div>
   );
+}
+
+async function CompanyTableWrapper() {
+  const { data: companies, totalCount } = await getCompanies(10, 1);
+
+  if (companies && companies.length > 0) {
+    return (
+      <CompanyTable
+        columns={columns}
+        initialData={companies as any}
+        initialTotalCount={totalCount}
+      />
+    );
+  } else {
+    return (
+      <EmptyPlaceholder>
+        <EmptyPlaceholder.Icon name="building" />
+        <EmptyPlaceholder.Title>Ingen bedrifter funnet</EmptyPlaceholder.Title>
+        <EmptyPlaceholder.Description>
+          Du har ikke lagt til noen bedrifter ennå. Legg til en bedrift for å
+          komme i gang.
+        </EmptyPlaceholder.Description>
+        <AddCompanySheet />
+      </EmptyPlaceholder>
+    );
+  }
 }
