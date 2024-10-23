@@ -263,19 +263,28 @@ export interface SidebarViewData {
 export interface PersonData {
   id: number;
   uuid: string;
+  name: string;
+  title?: string;
+  phone?: string;
+  email?: string;
   date_created: string;
   last_modified: string;
+  company: CompanyData | null;
+  opportunities: OpportunityData[];
+  // Add these new properties
+}
+
+// Make sure you have CompanyData and OpportunityData interfaces defined as well
+export interface CompanyData {
+  id: number;
+  uuid: string;
   name: string;
-  title: string;
-  phone: string;
-  email: string;
-  department: string;
-  address_street: string;
-  address_zip: string;
-  address_city: string;
-  pref_com: string;
-  url: string;
-  user: number;
-  workspace: number; // Changed from 'company' to 'workspace'
-  company: number | null; // Make this optional or nullable if it's not always required
+  // ... other company properties
+}
+
+export interface OpportunityData {
+  id: number;
+  uuid: string;
+  name: string;
+  // ... other opportunity properties
 }

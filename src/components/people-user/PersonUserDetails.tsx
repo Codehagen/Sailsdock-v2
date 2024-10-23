@@ -8,16 +8,17 @@ import {
   Phone,
   Mail,
   Building,
-  MapPin,
-  Globe,
   Calendar,
   Clock,
+  Briefcase,
+  Target,
+  Users,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
-import { cn, extractDomain } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,10 +27,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, X } from "lucide-react";
+import { Check, X, Trash2, Loader2 } from "lucide-react";
 import { updatePerson } from "@/actions/people/update-person";
 import { toast } from "sonner";
-import { PersonData } from "@/lib/internal-api/types";
+import {
+  PersonData,
+  CompanyData,
+  OpportunityData,
+} from "@/lib/internal-api/types";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -57,21 +62,78 @@ export function PersonUserDetails({
   const [isPhonePopoverOpen, setIsPhonePopoverOpen] = useState(false);
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
+  // New state for company, opportunities, and other people
+  const [company, setCompany] = useState<CompanyData | null>(personDetails.company || null);
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(personDetails.opportunities || []);
+  const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
+
   const handleUpdateField = async (field: string, value: string) => {
     try {
-      const updatedPerson = await updatePerson(personDetails.uuid, {
-        [field]: value,
-      });
+      const updateData = { [field]: value };
+
+      const updatedPerson = await updatePerson(personDetails.uuid, updateData);
+
       if (updatedPerson) {
-        toast.success(`${field} oppdatert`);
+        let successMessage = "";
+        switch (field) {
+          case "name":
+            successMessage = "Navn er oppdatert";
+            break;
+          case "title":
+            successMessage = "Tittel er oppdatert";
+            break;
+          case "email":
+            successMessage = "E-postadresse er oppdatert";
+            break;
+          case "phone":
+            successMessage = "Telefonnummer er oppdatert";
+            break;
+          default:
+            successMessage = `${field} er oppdatert`;
+        }
+        toast.success(successMessage);
         return true;
       } else {
-        toast.error(`Kunne ikke oppdatere ${field}`);
+        let errorMessage = "";
+        switch (field) {
+          case "name":
+            errorMessage = "Kunne ikke oppdatere navn";
+            break;
+          case "title":
+            errorMessage = "Kunne ikke oppdatere tittel";
+            break;
+          case "email":
+            errorMessage = "Kunne ikke oppdatere e-postadresse";
+            break;
+          case "phone":
+            errorMessage = "Kunne ikke oppdatere telefonnummer";
+            break;
+          default:
+            errorMessage = `Kunne ikke oppdatere ${field}`;
+        }
+        toast.error(errorMessage);
         return false;
       }
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
-      toast.error(`En feil oppstod under oppdatering av ${field}`);
+      let errorMessage = "";
+      switch (field) {
+        case "name":
+          errorMessage = "En feil oppstod under oppdatering av navn";
+          break;
+        case "title":
+          errorMessage = "En feil oppstod under oppdatering av tittel";
+          break;
+        case "email":
+          errorMessage = "En feil oppstod under oppdatering av e-postadresse";
+          break;
+        case "phone":
+          errorMessage = "En feil oppstod under oppdatering av telefonnummer";
+          break;
+        default:
+          errorMessage = `En feil oppstod under oppdatering av ${field}`;
+      }
+      toast.error(errorMessage);
       return false;
     }
   };
@@ -102,41 +164,16 @@ export function PersonUserDetails({
       editable: true,
     },
     {
-      icon: Phone,
-      label: "Telefon",
-      value: editedPhone,
-      editable: true,
-    },
-    {
       icon: Mail,
       label: "E-post",
       value: editedEmail,
       editable: true,
     },
     {
-      icon: Building,
-      label: "Selskap",
-      value: personDetails.company?.name || "Ikke tilknyttet",
-      isLink: !!personDetails.company,
-      linkPrefix: "/company/",
-    },
-    {
-      icon: MapPin,
-      label: "Adresse",
-      value:
-        `${personDetails.address_street || ""}, ${
-          personDetails.address_zip || ""
-        } ${personDetails.address_city || ""}`.trim() || "Ikke angitt",
-    },
-    {
-      icon: Globe,
-      label: "Nettside",
-      value: personDetails.url || "Ikke angitt",
-      isLink: !!personDetails.url,
-      isBadge: true,
-      displayValue: personDetails.url
-        ? extractDomain(personDetails.url)
-        : "Ikke angitt",
+      icon: Phone,
+      label: "Telefon",
+      value: editedPhone,
+      editable: true,
     },
     {
       icon: Calendar,
@@ -166,55 +203,7 @@ export function PersonUserDetails({
             </AvatarFallback>
           </Avatar>
           <div className="flex-grow min-w-0">
-            <Popover
-              open={isNamePopoverOpen}
-              onOpenChange={setIsNamePopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto font-normal w-full text-left"
-                >
-                  <h3 className="text-lg font-semibold truncate">
-                    {editedName}
-                  </h3>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-2">
-                  <Input
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setEditedName(personDetails.name);
-                        setIsNamePopoverOpen(false);
-                      }}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Avbryt
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={async () => {
-                        const success = await handleUpdateField(
-                          "name",
-                          editedName
-                        );
-                        if (success) setIsNamePopoverOpen(false);
-                      }}
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      Bekreft
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <h3 className="text-lg font-semibold truncate">{editedName}</h3>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>
@@ -251,7 +240,10 @@ export function PersonUserDetails({
                   }
                 >
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" className="p-0 h-auto font-normal">
+                    <Button
+                      variant="ghost"
+                      className="p-0 h-auto font-normal text-left"
+                    >
                       <span className="text-sm text-muted-foreground">
                         {item.value || "Ikke angitt"}
                       </span>
@@ -307,7 +299,14 @@ export function PersonUserDetails({
                         <Button
                           size="sm"
                           onClick={async () => {
-                            const field = item.label.toLowerCase();
+                            const field =
+                              item.label === "Navn"
+                                ? "name"
+                                : item.label === "Tittel"
+                                ? "title"
+                                : item.label === "Telefon"
+                                ? "phone"
+                                : "email";
                             const value =
                               item.label === "Navn"
                                 ? editedName
@@ -338,30 +337,6 @@ export function PersonUserDetails({
                     </div>
                   </PopoverContent>
                 </Popover>
-              ) : item.isLink ? (
-                item.isBadge ? (
-                  <Badge variant="secondary" className="font-normal">
-                    <a
-                      href={item.value}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm hover:underline text-muted-foreground"
-                    >
-                      {item.displayValue || item.value}
-                    </a>
-                  </Badge>
-                ) : (
-                  <Link
-                    href={
-                      item.linkPrefix
-                        ? `${item.linkPrefix}${item.value}`
-                        : item.value
-                    }
-                    className="text-sm text-muted-foreground hover:underline"
-                  >
-                    {item.displayValue || item.value}
-                  </Link>
-                )
               ) : (
                 <span className="text-sm text-muted-foreground">
                   {item.displayValue || item.value}
@@ -369,6 +344,172 @@ export function PersonUserDetails({
               )}
             </div>
           ))}
+
+          <Separator className="my-4" />
+
+          {/* Company Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Selskap
+              </h4>
+              {/* Add a company selector component here if needed */}
+            </div>
+            {company ? (
+              <div className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/company/${company.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {company.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {company.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          // Add logic to remove company association
+                          setCompany(null);
+                          toast.success("Selskapstilknytning fjernet");
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Ingen tilknyttet selskap
+              </span>
+            )}
+          </div>
+
+          <Separator className="my-4" />
+
+          {/* Opportunities Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Muligheter ({opportunities.length})
+              </h4>
+              {/* Add an opportunity selector component here if needed */}
+            </div>
+            {opportunities.map((opportunity) => (
+              <div key={opportunity.uuid} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/opportunity/${opportunity.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {opportunity.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {opportunity.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          // Add logic to remove opportunity
+                          setOpportunities(
+                            opportunities.filter(
+                              (opp) => opp.uuid !== opportunity.uuid
+                            )
+                          );
+                          toast.success(
+                            `${opportunity.name} fjernet fra muligheter`
+                          );
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Separator className="my-4" />
+
+          {/* Other People Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Personer ({otherPeople.length})
+              </h4>
+              {/* Add a person selector component here if needed */}
+            </div>
+            {otherPeople.map((person) => (
+              <Link
+                key={person.uuid}
+                href={`/people/${person.uuid}`}
+                className="inline-block"
+              >
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                      "text-xs font-medium"
+                    )}
+                  >
+                    {person.name.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {person.name}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>

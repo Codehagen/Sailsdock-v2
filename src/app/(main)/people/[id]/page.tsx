@@ -24,6 +24,7 @@ export default async function PersonUserPage({
 }) {
   const personId = params.id;
   const personDetails = await getPersonDetails(personId);
+  console.log(personDetails);
 
   if (!personDetails) {
     return (
