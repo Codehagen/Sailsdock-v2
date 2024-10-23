@@ -3,7 +3,17 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Phone, Mail, Building, Calendar, Clock } from "lucide-react";
+import {
+  User,
+  Phone,
+  Mail,
+  Building,
+  Calendar,
+  Clock,
+  Briefcase,
+  Target,
+  Users,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -17,10 +27,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, X } from "lucide-react";
+import { Check, X, Trash2, Loader2 } from "lucide-react";
 import { updatePerson } from "@/actions/people/update-person";
 import { toast } from "sonner";
-import { PersonData } from "@/lib/internal-api/types";
+import {
+  PersonData,
+  CompanyData,
+  OpportunityData,
+} from "@/lib/internal-api/types";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -47,6 +61,11 @@ export function PersonUserDetails({
   const [isTitlePopoverOpen, setIsTitlePopoverOpen] = useState(false);
   const [isPhonePopoverOpen, setIsPhonePopoverOpen] = useState(false);
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
+
+  // New state for company, opportunities, and other people
+  const [company, setCompany] = useState<CompanyData | null>(personDetails.company || null);
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(personDetails.opportunities || []);
+  const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
 
   const handleUpdateField = async (field: string, value: string) => {
     try {
@@ -325,6 +344,172 @@ export function PersonUserDetails({
               )}
             </div>
           ))}
+
+          <Separator className="my-4" />
+
+          {/* Company Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Selskap
+              </h4>
+              {/* Add a company selector component here if needed */}
+            </div>
+            {company ? (
+              <div className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/company/${company.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {company.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {company.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          // Add logic to remove company association
+                          setCompany(null);
+                          toast.success("Selskapstilknytning fjernet");
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Ingen tilknyttet selskap
+              </span>
+            )}
+          </div>
+
+          <Separator className="my-4" />
+
+          {/* Opportunities Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Muligheter ({opportunities.length})
+              </h4>
+              {/* Add an opportunity selector component here if needed */}
+            </div>
+            {opportunities.map((opportunity) => (
+              <div key={opportunity.uuid} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/opportunity/${opportunity.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
+                  >
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {opportunity.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {opportunity.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                          // Add logic to remove opportunity
+                          setOpportunities(
+                            opportunities.filter(
+                              (opp) => opp.uuid !== opportunity.uuid
+                            )
+                          );
+                          toast.success(
+                            `${opportunity.name} fjernet fra muligheter`
+                          );
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Separator className="my-4" />
+
+          {/* Other People Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h4 className="text-sm font-medium text-muted-foreground">
+                Personer ({otherPeople.length})
+              </h4>
+              {/* Add a person selector component here if needed */}
+            </div>
+            {otherPeople.map((person) => (
+              <Link
+                key={person.uuid}
+                href={`/people/${person.uuid}`}
+                className="inline-block"
+              >
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                      "text-xs font-medium"
+                    )}
+                  >
+                    {person.name.charAt(0)}
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {person.name}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
