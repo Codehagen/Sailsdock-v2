@@ -20,6 +20,18 @@ import {
   Star,
   Command,
   Settings,
+  Bot,
+  Frame,
+  PieChart,
+  Map,
+  MoreHorizontal,
+  Folder,
+  Share,
+  Trash2,
+  MessageSquare,
+  Sparkles,
+  Brain,
+  Zap,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -33,10 +45,20 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenuAction,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const data = {
   user: {
@@ -137,6 +159,23 @@ const data = {
       icon: Settings,
     },
   ],
+  aiProjects: [
+    {
+      name: "AI Assistants",
+      url: "/generator",
+      icon: Sparkles,
+    },
+    {
+      name: "Chat",
+      url: "/ai/chat",
+      icon: MessageSquare,
+    },
+    // {
+    //   name: "AI Models",
+    //   url: "/ai/models",
+    //   icon: Brain,
+    // },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -168,7 +207,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }));
 
   // Update the navSecondary items to include the FeedbackDialog
-  const navSecondaryWithFeedback = data.navSecondary.map(item => {
+  const navSecondaryWithFeedback = data.navSecondary.map((item) => {
     if (item.title === "Tilbakemelding") {
       return {
         ...item,
@@ -206,6 +245,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain groups={updatedNavMain} />
+
+        {/* Update the AI Projects section */}
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+          <SidebarGroupLabel>AI Projects</SidebarGroupLabel>
+          <SidebarMenu>
+            {data.aiProjects.map((item) => (
+              <SidebarMenuItem key={item.name}>
+                <SidebarMenuButton asChild>
+                  <Link href={item.url}>
+                    <item.icon className="mr-2 h-4 w-4" />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+
         <NavSecondary items={navSecondaryWithFeedback} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
