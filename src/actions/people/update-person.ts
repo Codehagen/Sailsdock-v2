@@ -17,6 +17,7 @@ export async function updatePerson(
 
   try {
     const response = await apiClient.people.update(personId, personData);
+    console.log("updatePerson response", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

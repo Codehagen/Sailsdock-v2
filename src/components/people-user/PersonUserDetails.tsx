@@ -3,21 +3,12 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  User,
-  Phone,
-  Mail,
-  Building,
-  MapPin,
-  Globe,
-  Calendar,
-  Clock,
-} from "lucide-react";
+import { User, Phone, Mail, Building, Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { nb } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
-import { cn, extractDomain } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,19 +50,71 @@ export function PersonUserDetails({
 
   const handleUpdateField = async (field: string, value: string) => {
     try {
-      const updatedPerson = await updatePerson(personDetails.uuid, {
-        [field]: value,
-      });
+      const updateData = { [field]: value };
+
+      const updatedPerson = await updatePerson(personDetails.uuid, updateData);
+
       if (updatedPerson) {
-        toast.success(`${field} oppdatert`);
+        let successMessage = "";
+        switch (field) {
+          case "name":
+            successMessage = "Navn er oppdatert";
+            break;
+          case "title":
+            successMessage = "Tittel er oppdatert";
+            break;
+          case "email":
+            successMessage = "E-postadresse er oppdatert";
+            break;
+          case "phone":
+            successMessage = "Telefonnummer er oppdatert";
+            break;
+          default:
+            successMessage = `${field} er oppdatert`;
+        }
+        toast.success(successMessage);
         return true;
       } else {
-        toast.error(`Kunne ikke oppdatere ${field}`);
+        let errorMessage = "";
+        switch (field) {
+          case "name":
+            errorMessage = "Kunne ikke oppdatere navn";
+            break;
+          case "title":
+            errorMessage = "Kunne ikke oppdatere tittel";
+            break;
+          case "email":
+            errorMessage = "Kunne ikke oppdatere e-postadresse";
+            break;
+          case "phone":
+            errorMessage = "Kunne ikke oppdatere telefonnummer";
+            break;
+          default:
+            errorMessage = `Kunne ikke oppdatere ${field}`;
+        }
+        toast.error(errorMessage);
         return false;
       }
     } catch (error) {
       console.error(`Error updating ${field}:`, error);
-      toast.error(`En feil oppstod under oppdatering av ${field}`);
+      let errorMessage = "";
+      switch (field) {
+        case "name":
+          errorMessage = "En feil oppstod under oppdatering av navn";
+          break;
+        case "title":
+          errorMessage = "En feil oppstod under oppdatering av tittel";
+          break;
+        case "email":
+          errorMessage = "En feil oppstod under oppdatering av e-postadresse";
+          break;
+        case "phone":
+          errorMessage = "En feil oppstod under oppdatering av telefonnummer";
+          break;
+        default:
+          errorMessage = `En feil oppstod under oppdatering av ${field}`;
+      }
+      toast.error(errorMessage);
       return false;
     }
   };
@@ -102,41 +145,16 @@ export function PersonUserDetails({
       editable: true,
     },
     {
-      icon: Phone,
-      label: "Telefon",
-      value: editedPhone,
-      editable: true,
-    },
-    {
       icon: Mail,
       label: "E-post",
       value: editedEmail,
       editable: true,
     },
     {
-      icon: Building,
-      label: "Selskap",
-      value: personDetails.company?.name || "Ikke tilknyttet",
-      isLink: !!personDetails.company,
-      linkPrefix: "/company/",
-    },
-    {
-      icon: MapPin,
-      label: "Adresse",
-      value:
-        `${personDetails.address_street || ""}, ${
-          personDetails.address_zip || ""
-        } ${personDetails.address_city || ""}`.trim() || "Ikke angitt",
-    },
-    {
-      icon: Globe,
-      label: "Nettside",
-      value: personDetails.url || "Ikke angitt",
-      isLink: !!personDetails.url,
-      isBadge: true,
-      displayValue: personDetails.url
-        ? extractDomain(personDetails.url)
-        : "Ikke angitt",
+      icon: Phone,
+      label: "Telefon",
+      value: editedPhone,
+      editable: true,
     },
     {
       icon: Calendar,
@@ -166,55 +184,7 @@ export function PersonUserDetails({
             </AvatarFallback>
           </Avatar>
           <div className="flex-grow min-w-0">
-            <Popover
-              open={isNamePopoverOpen}
-              onOpenChange={setIsNamePopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto font-normal w-full text-left"
-                >
-                  <h3 className="text-lg font-semibold truncate">
-                    {editedName}
-                  </h3>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-2">
-                  <Input
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setEditedName(personDetails.name);
-                        setIsNamePopoverOpen(false);
-                      }}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Avbryt
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={async () => {
-                        const success = await handleUpdateField(
-                          "name",
-                          editedName
-                        );
-                        if (success) setIsNamePopoverOpen(false);
-                      }}
-                    >
-                      <Check className="h-4 w-4 mr-1" />
-                      Bekreft
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+            <h3 className="text-lg font-semibold truncate">{editedName}</h3>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>
@@ -251,7 +221,10 @@ export function PersonUserDetails({
                   }
                 >
                   <PopoverTrigger asChild>
-                    <Button variant="ghost" className="p-0 h-auto font-normal">
+                    <Button
+                      variant="ghost"
+                      className="p-0 h-auto font-normal text-left"
+                    >
                       <span className="text-sm text-muted-foreground">
                         {item.value || "Ikke angitt"}
                       </span>
@@ -307,7 +280,14 @@ export function PersonUserDetails({
                         <Button
                           size="sm"
                           onClick={async () => {
-                            const field = item.label.toLowerCase();
+                            const field =
+                              item.label === "Navn"
+                                ? "name"
+                                : item.label === "Tittel"
+                                ? "title"
+                                : item.label === "Telefon"
+                                ? "phone"
+                                : "email";
                             const value =
                               item.label === "Navn"
                                 ? editedName
@@ -338,30 +318,6 @@ export function PersonUserDetails({
                     </div>
                   </PopoverContent>
                 </Popover>
-              ) : item.isLink ? (
-                item.isBadge ? (
-                  <Badge variant="secondary" className="font-normal">
-                    <a
-                      href={item.value}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm hover:underline text-muted-foreground"
-                    >
-                      {item.displayValue || item.value}
-                    </a>
-                  </Badge>
-                ) : (
-                  <Link
-                    href={
-                      item.linkPrefix
-                        ? `${item.linkPrefix}${item.value}`
-                        : item.value
-                    }
-                    className="text-sm text-muted-foreground hover:underline"
-                  >
-                    {item.displayValue || item.value}
-                  </Link>
-                )
               ) : (
                 <span className="text-sm text-muted-foreground">
                   {item.displayValue || item.value}
