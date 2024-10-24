@@ -3,6 +3,7 @@ import { getUserTasks } from "@/actions/tasks/get-user-tasks";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AddTaskSheet } from "@/components/tasks/AddTaskSheet";
+import Link from "next/link";
 
 export default async function TasksPage() {
   return (
@@ -33,7 +34,11 @@ async function TasksWrapper() {
           {tasks.map((task) => (
             <Card key={task.id}>
               <CardHeader>
-                <CardTitle>{task.title}</CardTitle>
+                <Link href={`/tasks/${task.uuid}`}>
+                  <CardTitle className="hover:underline cursor-pointer">
+                    {task.title}
+                  </CardTitle>
+                </Link>
               </CardHeader>
               <CardContent>
                 <p>Status: {task.status}</p>
