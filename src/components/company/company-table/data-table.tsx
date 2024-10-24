@@ -78,6 +78,22 @@ const lastContactedFilter = (
   }
 };
 
+export function filterOwners(row: any, columnId: string, filterValue: string[]) {
+  const owners = row.original.account_owners
+    ? row.original.account_owners.map((owner: any) =>
+        `${owner?.first_name ?? ""} ${owner?.last_name ?? ""}`.trim()
+      )
+    : []
+
+  // If owners is empty, return false
+  if (owners.length === 0) return false
+
+  // Check if any owner matches any of the filter values
+  return owners.some((owner: any) =>
+    filterValue.some((filter: string) => owner.toLowerCase() === filter)
+  )
+}
+
 export function CompanyTable<TData, TValue>({
   columns,
   initialData,

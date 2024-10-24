@@ -30,6 +30,7 @@ export function DataTableToolbar<TData>({
   data,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+  // Remove all rows with empty "people" col
   const filteredRows = data.filter((row) => row.account_owners.length)
   // Unique list of account_owners (personer)
   const owners = filteredRows
@@ -80,13 +81,13 @@ export function DataTableToolbar<TData>({
         {table.getColumn("num_employees") && (
           <DataTableEmployeeFilter column={table.getColumn("num_employees")} />
         )}
-        {/*         {table.getColumn("num_employees") && (
+        {table.getColumn("user_name") && (
           <DataTableFacetedFilter
-            column={table.getColumn("num_employees")}
-            title="Ansatte"
-            options={companyStatuses}
+            column={table.getColumn("user_name")}
+            title="Laget av"
+            options={owners}
           />
-        )} */}
+        )}
         {table.getColumn("arr") && (
           <DataTableFacetedFilter
             column={table.getColumn("arr")}

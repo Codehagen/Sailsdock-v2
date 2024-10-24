@@ -21,6 +21,7 @@ import { Check, X, Pen } from "lucide-react"
 import { updateCompany } from "@/actions/company/update-companies"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { filterOwners } from "./data-table"
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -183,21 +184,7 @@ export const columns: ColumnDef<Company>[] = [
         </div>
       )
     },
-    filterFn: (row, columnId, filterValue) => {
-      const owners = row.original.account_owners
-        ? row.original.account_owners.map((owner) =>
-            `${owner?.first_name ?? ""} ${owner?.last_name ?? ""}`.trim()
-          )
-        : []
-
-      // If owners is empty, return false
-      if (owners.length === 0) return false
-
-      // Check if any owner matches any of the filter values
-      return owners.some((owner) =>
-        filterValue.some((filter: string) => owner.toLowerCase() === filter)
-      )
-    },
+    filterFn: filterOwners,
   },
   {
     accessorKey: "num_employees",
@@ -276,7 +263,7 @@ export const columns: ColumnDef<Company>[] = [
         </div>
       )
     },
-    filterFn: "inNumberRange"
+    filterFn: "inNumberRange",
   },
   {
     accessorKey: "user_name",
@@ -292,6 +279,13 @@ export const columns: ColumnDef<Company>[] = [
             : "N/A"}
         </div>
       )
+    },
+    filterFn: (row: any, columnId: string, filterValue: string[]) => {
+      const user = row.original.user
+      const username = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim()
+
+      return filterValue.some(filter => filter === username.toLowerCase())
+      
     },
   },
   {
