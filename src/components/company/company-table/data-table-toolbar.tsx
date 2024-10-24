@@ -20,6 +20,15 @@ const arrRanges = [
   { label: "> 1M", value: "1000000-" },
 ]
 
+const last_contacted_options = [
+  { label: "Én uke", value: "last-week" },
+  { label: "Én måned", value: "last-month" },
+  { label: "Tre måneder", value: "last-3-months" },
+  { label: "Seks måneder", value: "last-6-months" },
+  { label: "Ett år", value: "last-year" },
+  { label: "Over ett år", value: "more-than-year" },
+]
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
   data: any[]
@@ -64,13 +73,6 @@ export function DataTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {/*         {table.getColumn("type") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("type")}
-            title="Type"
-            options={companyTypes}
-          />
-        )} */}
         {table.getColumn("account_owners") && (
           <DataTableFacetedFilter
             column={table.getColumn("account_owners")}
@@ -86,6 +88,13 @@ export function DataTableToolbar<TData>({
             column={table.getColumn("user_name")}
             title="Laget av"
             options={owners}
+          />
+        )}
+        {table.getColumn("last_contacted") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("last_contacted")}
+            title="Sist kontaktet"
+            options={last_contacted_options}
           />
         )}
         {table.getColumn("arr") && (

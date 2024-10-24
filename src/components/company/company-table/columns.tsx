@@ -21,7 +21,7 @@ import { Check, X, Pen } from "lucide-react"
 import { updateCompany } from "@/actions/company/update-companies"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { filterOwners } from "./data-table"
+import { filterOwners, lastContactedFilter } from "./data-table"
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -301,6 +301,7 @@ export const columns: ColumnDef<Company>[] = [
         </div>
       )
     },
+    filterFn: lastContactedFilter
   },
   {
     accessorKey: "arr",
