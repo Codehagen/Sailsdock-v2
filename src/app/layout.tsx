@@ -6,6 +6,7 @@ import { cn, constructMetadata } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 export const metadata: Metadata = constructMetadata({});
 
@@ -39,7 +40,9 @@ export default function RootLayout({
             defaultTheme="light"
             enableSystem={false}
           >
+            <NuqsAdapter>
             {children}
+            </NuqsAdapter>
             <ThemeToggle />
             <Toaster richColors />
             <TailwindIndicator />
