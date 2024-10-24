@@ -17,6 +17,8 @@ import {
   Webhook,
 } from "lucide-react";
 
+import type { JSX } from "react";
+
 export const BLOG_CATEGORIES: {
   title: string;
   slug: "company" | "education";

@@ -6,7 +6,8 @@ import { Activity, FileText } from "lucide-react";
 import { TimelineContent } from "@/components/company/TimelineContent";
 import { NotesContent } from "@/components/company/NotesContent";
 
-export default async function TaskPage({ params }: { params: { id: string } }) {
+export default async function TaskPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const taskId = params.id;
   const taskDetails = await getTaskDetails(taskId);
   console.log(taskDetails);

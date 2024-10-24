@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 export async function deleteOpportunity(
   opportunityId: string
 ): Promise<boolean> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
 
-export default async function OpportunityDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function OpportunityDetailsPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const opportunityId = params.id;
   const opportunityDetails = await getOpportunityDetails(opportunityId);
   console.log(opportunityDetails);

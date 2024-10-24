@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function getSidebarData(): Promise<SidebarViewData[] | null> {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       console.error("No authenticated user found");

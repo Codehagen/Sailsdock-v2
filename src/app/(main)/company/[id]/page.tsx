@@ -17,11 +17,12 @@ import { EmailsContent } from "@/components/company/EmailsContent";
 import { CalendarContent } from "@/components/company/CalendarContent";
 import { TimelineContent } from "@/components/company/TimelineContent";
 
-export default async function CompanyUserPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function CompanyUserPage(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
 

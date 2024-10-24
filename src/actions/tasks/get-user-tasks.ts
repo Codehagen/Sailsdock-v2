@@ -13,7 +13,7 @@ export async function getUserTasks(
   totalPages: number;
 }> {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
 
     if (!userId) {
       console.error("No authenticated user found");

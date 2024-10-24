@@ -5,7 +5,7 @@ import { UserData } from "@/lib/internal-api/types";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 export async function getCurrentUser(): Promise<UserData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
   const clerkUser = await currentUser();
 
   if (!userId || !clerkUser) {

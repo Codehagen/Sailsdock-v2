@@ -8,7 +8,7 @@ export async function updateOpportunity(
   opportunityUuid: string,
   opportunityData: { companies: number[] }
 ): Promise<OpportunityData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

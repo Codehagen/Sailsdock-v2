@@ -8,7 +8,7 @@ import { getCurrentUser } from "../user/get-user-data";
 export async function createOpportunity(
   opportunityData: Partial<OpportunityData>
 ): Promise<OpportunityData | null> {
-  const { userId: clerkUserId } = auth();
+  const { userId: clerkUserId } = await auth();
 
   if (!clerkUserId) {
     console.error("No authenticated user found");

@@ -8,7 +8,7 @@ export async function updatePerson(
   personId: string,
   personData: Partial<PersonData>
 ): Promise<PersonData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

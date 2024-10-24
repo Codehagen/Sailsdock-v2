@@ -7,7 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 export async function getCompanyDetails(
   companyId: string
 ): Promise<CompanyData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

@@ -27,6 +27,7 @@ export default async function CompanyPage() {
 
 async function CompanyTableWrapper() {
   const { data: companies, totalCount } = await getCompanies(10, 1);
+  console.log(companies);
 
   if (companies && companies.length > 0) {
     return (

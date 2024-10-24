@@ -3,7 +3,7 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 export async function getClerkUser() {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No user is currently logged in.");

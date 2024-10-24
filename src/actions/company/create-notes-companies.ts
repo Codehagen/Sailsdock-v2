@@ -10,7 +10,7 @@ export async function createNotesCompany(noteData: {
   description: string;
   customer: number;
 }): Promise<NoteData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

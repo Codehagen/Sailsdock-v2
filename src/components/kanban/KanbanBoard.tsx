@@ -25,7 +25,9 @@ import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 
 // Dynamically import DragOverlay to use it only on the client side
 const DynamicDragOverlay = dynamic(
-  () => import("@dnd-kit/core").then((mod) => mod.DragOverlay),
+  () => import("@dnd-kit/core").then((mod) => ({
+    default: mod.DragOverlay
+  })),
   { ssr: false }
 );
 

@@ -17,22 +17,17 @@ const computedFields = (
       document.content || document.body?.raw || document.mdx?.code || "";
     const headings = content.match(/^##\s(.+)$/gm);
     const slugger = new GithubSlugger();
-    return (
-      headings?.map((heading: any) => {
-        const title = heading.replace(/^##\s/, "");
-        return {
-          title,
-          slug: slugger.slug(title),
-        };
-      }) || []
-    );
+    return (headings?.map((heading: any) => {
+      const title = heading.replace(/^##\s/, "");
+      return {
+        title,
+        slug: slugger.slug(title),
+      };
+    }) || []);
   },
   images: (document: any) => {
     if (!document.body?.raw) return [];
-    return (
-      document.body.raw.match(/(?<=<Image[^>]*\bsrc=")[^"]+(?="[^>]*\/>)/g) ||
-      []
-    );
+    return (document.body.raw.match(/(?<=<Image[^>]*\bsrc=")[^"]+(?="[^>]*\/>)/g) || []);
   },
   tweetIds: (document: any) => {
     if (!document.body?.raw) return [];
@@ -41,11 +36,9 @@ const computedFields = (
   },
   githubRepos: (document: any) => {
     if (!document.body?.raw) return [];
-    return (
-      document.body.raw.match(
-        /(?<=<GithubRepo[^>]*\burl=")[^"]+(?="[^>]*\/>)/g
-      ) || []
-    );
+    return (document.body.raw.match(
+      /(?<=<GithubRepo[^>]*\burl=")[^"]+(?="[^>]*\/>)/g
+    ) || []);
   },
 });
 

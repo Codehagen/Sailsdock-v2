@@ -8,7 +8,7 @@ export async function updateNotesCompany(
   noteUuid: string,
   noteData: Partial<NoteData> & { clientDate?: string }
 ): Promise<NoteData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

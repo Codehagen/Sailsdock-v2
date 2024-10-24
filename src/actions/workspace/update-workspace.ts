@@ -8,7 +8,7 @@ export async function updateCompany(
   companyId: string,
   companyData: Partial<CompanyData>
 ): Promise<CompanyData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

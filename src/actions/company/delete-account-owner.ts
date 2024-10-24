@@ -8,7 +8,7 @@ export async function removeAccountOwner(
   companyUuid: string,
   accountOwnerIdToRemove: number
 ): Promise<boolean> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

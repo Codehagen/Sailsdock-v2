@@ -12,11 +12,12 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata | undefined> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+): Promise<Metadata | undefined> {
+  const params = await props.params;
   const category = BLOG_CATEGORIES.find(
     (category) => category.slug === params.slug
   );
@@ -35,13 +36,14 @@ export async function generateMetadata({
   });
 }
 
-export default async function BlogCategory({
-  params,
-}: {
-  params: {
-    slug: string;
-  };
-}) {
+export default async function BlogCategory(
+  props: {
+    params: Promise<{
+      slug: string;
+    }>;
+  }
+) {
+  const params = await props.params;
   const data = BLOG_CATEGORIES.find(
     (category) => category.slug === params.slug
   );

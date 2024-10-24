@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/internal-api/api-client";
 import { auth } from "@clerk/nextjs/server";
 
 export async function deleteCurrentUser(): Promise<boolean> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

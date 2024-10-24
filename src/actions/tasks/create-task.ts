@@ -8,7 +8,7 @@ import { getCurrentUser } from "../user/get-user-data";
 export async function createTask(
   taskData: Partial<TaskData>
 ): Promise<TaskData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

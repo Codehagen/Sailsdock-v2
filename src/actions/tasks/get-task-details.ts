@@ -7,7 +7,7 @@ import { auth } from "@clerk/nextjs/server";
 export async function getTaskDetails(
   taskId: string
 ): Promise<TaskDetailsData | null> {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     console.error("No authenticated user found");

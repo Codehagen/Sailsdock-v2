@@ -29,7 +29,7 @@ interface EmptyPlaceholderIconProps
   name: keyof typeof Icons;
   ref?:
     | ((instance: SVGSVGElement | null) => void)
-    | React.RefObject<SVGSVGElement>
+    | React.RefObject<SVGSVGElement | null>
     | null;
 }
 
