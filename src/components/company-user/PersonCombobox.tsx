@@ -16,90 +16,151 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
 import useMediaQuery from "@/lib/hooks/use-media-query";
 import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
+import { PersonData } from "@/lib/internal-api/types"; // Assuming this type exists
+import { getAllPeople } from "@/actions/people/get-all-people";
+import { updatePerson } from "@/actions/people/update-person";
 
-type Person = {
-  uuid: string;
-  name: string;
-};
-
-const people: Person[] = [
-  { uuid: "1", name: "Christer Hagen" },
-  { uuid: "2", name: "John Doe" },
-  { uuid: "3", name: "Jane Doe" },
-  // Add more people as needed
-];
-
-export function PersonCombobox() {
+export function PersonCombobox({
+  companyId,
+  onPersonAdded,
+  currentPeople = [], // Default to an empty array if undefined
+}: {
+  companyId: number; // Ensure this is the correct type
+  onPersonAdded: (person: PersonData) => void;
+  currentPeople: number[];
+}) {
   const [open, setOpen] = React.useState(false);
   const { isDesktop } = useMediaQuery();
-  const [selectedPerson, setSelectedPerson] = React.useState<Person | null>(
+  const [selectedPerson, setSelectedPerson] = React.useState<PersonData | null>(
     null
   );
+  const [people, setPeople] = React.useState<PersonData[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  if (isDesktop) {
-    return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
-          <PersonList setOpen={setOpen} setSelectedPerson={setSelectedPerson} />
-        </PopoverContent>
-      </Popover>
-    );
-  }
+  React.useEffect(() => {
+    if (open && people.length === 0) {
+      setIsLoading(true);
+      getAllPeople().then((response) => {
+        if (response.data) {
+          setPeople(response.data);
+        }
+        setIsLoading(false);
+      });
+    }
+  }, [open, people.length]);
+
+  const handleSelectPerson = async (person: PersonData) => {
+    setSelectedPerson(person);
+    setOpen(false);
+    try {
+      const updatedPerson = await updatePerson(person.uuid, {
+        companies: [...currentPeople, companyId], // Ensure companyId is included
+      });
+      if (updatedPerson) {
+        onPersonAdded(updatedPerson);
+        toast.success(`${person.name} lagt til som person`);
+      } else {
+        throw new Error("Failed to update person");
+      }
+    } catch (error) {
+      console.error("Error adding person:", error);
+      toast.error("En feil oppstod under tillegging av person");
+    }
+  };
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Plus className="h-4 w-4" />
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <div className="mt-4 border-t">
-          <PersonList setOpen={setOpen} setSelectedPerson={setSelectedPerson} />
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <div className="flex items-center space-x-2">
+      {isDesktop ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[200px] p-0">
+            <PersonList
+              setOpen={setOpen}
+              setSelectedPerson={setSelectedPerson}
+              people={people}
+              isLoading={isLoading}
+              handleSelectPerson={handleSelectPerson}
+            />
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Plus className="h-4 w-4" />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className="mt-4 border-t">
+              <PersonList
+                setOpen={setOpen}
+                setSelectedPerson={setSelectedPerson}
+                people={people}
+                isLoading={isLoading}
+                handleSelectPerson={handleSelectPerson}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      )}
+    </div>
   );
 }
 
 function PersonList({
   setOpen,
   setSelectedPerson,
+  people,
+  isLoading,
+  handleSelectPerson,
 }: {
   setOpen: (open: boolean) => void;
-  setSelectedPerson: (person: Person | null) => void;
+  setSelectedPerson: (person: PersonData | null) => void;
+  people: PersonData[];
+  isLoading: boolean;
+  handleSelectPerson: (person: PersonData) => void;
 }) {
+  const [inputValue, setInputValue] = React.useState("");
+
   return (
     <Command>
-      <CommandInput placeholder="Search people..." />
+      <CommandInput
+        placeholder="Søk etter personer..."
+        value={inputValue}
+        onValueChange={setInputValue}
+      />
       <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>Ingen resultater funnet.</CommandEmpty>
         <CommandGroup>
-          {people.map((person) => (
-            <CommandItem
-              key={person.uuid}
-              value={person.name}
-              onSelect={() => {
-                setSelectedPerson(person);
-                setOpen(false);
-              }}
-            >
-              <div className="flex items-center">
-                <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-2">
-                  {person.name.charAt(0)}
-                </div>
-                {person.name}
-              </div>
+          {isLoading ? (
+            <CommandItem>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Laster...
             </CommandItem>
-          ))}
+          ) : (
+            people.map((person) => (
+              <CommandItem
+                key={person.id}
+                value={person.name}
+                onSelect={() => handleSelectPerson(person)}
+              >
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-2">
+                    {person.name.charAt(0).toUpperCase()}
+                  </div>
+                  {person.name}
+                </div>
+              </CommandItem>
+            ))
+          )}
         </CommandGroup>
         <Separator className="my-2" />
         <CommandItem
