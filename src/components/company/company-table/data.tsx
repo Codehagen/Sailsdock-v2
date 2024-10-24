@@ -92,16 +92,8 @@ export const companyTypes = [
 
 export const companyStatuses = [
   {
-    value: "ACTIVE",
-    label: "Aktiv",
-  },
-  {
-    value: "INACTIVE",
-    label: "Inaktiv",
-  },
-  {
-    value: "PROSPECT",
-    label: "Prospekt",
+    value: ">= 10",
+    label: "10+",
   },
 ];
 

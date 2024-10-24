@@ -16,7 +16,7 @@ export default async function CompanyPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden">
+      <div className="overflow-hidden p-1">
         <Suspense fallback={<CompanyTableSkeleton />}>
           <CompanyTableWrapper />
         </Suspense>
