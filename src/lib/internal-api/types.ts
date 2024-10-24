@@ -271,7 +271,8 @@ export interface PersonData {
   last_modified: string;
   company: CompanyData | null;
   opportunities: OpportunityData[];
-  // Add these new properties
+  companies: number[]; // Add this line to include the companies property
+  // Add other properties as needed
 }
 
 // Make sure you have CompanyData and OpportunityData interfaces defined as well
@@ -328,4 +329,6 @@ export interface TaskDetailsData extends Omit<TaskData, "company"> {
     orgnr: string;
   } | null;
   task_supervisor: number | null;
+  people: PersonData[]; 
+  opportunities: OpportunityData[]; 
 }

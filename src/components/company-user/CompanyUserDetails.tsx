@@ -49,6 +49,7 @@ import {
 } from "@/lib/internal-api/types";
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
+import { updatePerson } from "@/actions/people/update-person"; // Import updatePerson
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -120,6 +121,7 @@ export function CompanyUserDetails({
   const [removingOpportunityId, setRemovingOpportunityId] = useState<
     number | null
   >(null);
+  const [removingPersonId, setRemovingPersonId] = useState<number | null>(null);
 
   const {
     register,
@@ -393,7 +395,7 @@ export function CompanyUserDetails({
       const updatedOpportunity = await updateOpportunity(
         opportunityToRemove.uuid,
         {
-          companies: currentCompanies.filter((id) => id !== companyDetails.id),
+          companies: currentCompanies.filter((id: number) => id !== companyDetails.id), // Specify id as number
         }
       );
 
@@ -413,6 +415,48 @@ export function CompanyUserDetails({
     }
   };
 
+  const handlePersonAdded = (newPerson: PersonData) => {
+    setCompanyDetailsState((prevDetails) => ({
+      ...prevDetails,
+      people: [...prevDetails.people, newPerson],
+    }));
+  };
+
+  const handleRemovePerson = async (personId: number) => {
+    setRemovingPersonId(personId);
+    try {
+      const personToRemove = companyDetailsState.people.find(
+        (person) => person.id === personId
+      );
+      if (!personToRemove) {
+        throw new Error("Person not found");
+      }
+
+      const currentCompanies = Array.isArray(personToRemove.companies)
+        ? personToRemove.companies
+        : [];
+
+      const updatedPerson = await updatePerson(personToRemove.uuid, {
+        companies: currentCompanies.filter((id: number) => id !== companyDetails.id), // Specify id as number
+      });
+
+      if (updatedPerson) {
+        setCompanyDetailsState((prevDetails) => ({
+          ...prevDetails,
+          people: prevDetails.people.filter((person) => person.id !== personId),
+        }));
+        toast.success(`${personToRemove.name} fjernet fra personer`);
+      } else {
+        throw new Error("Failed to update person");
+      }
+    } catch (error) {
+      console.error("Error removing person:", error);
+      toast.error("En feil oppstod under fjerning av person");
+    } finally {
+      setRemovingPersonId(null);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     const date = parseISO(dateString);
     return format(date, "d. MMMM yyyy", { locale: nb });
@@ -424,14 +468,6 @@ export function CompanyUserDetails({
   };
 
   const addedTimeAgo = getTimeAgo(companyDetails.date_created);
-
-  // Define handlePersonAdded to update the state
-  const handlePersonAdded = (newPerson: PersonData) => {
-    setCompanyDetailsState((prevDetails) => ({
-      ...prevDetails,
-      people: [...prevDetails.people, newPerson],
-    }));
-  };
 
   const infoItems: InfoItem[] = [
     {
@@ -1072,27 +1108,55 @@ export function CompanyUserDetails({
                 currentPeople={companyDetailsState.people.map((person) => person.id)}
               />
             </div>
-            {companyDetailsState.people.map((person, index) => (
-              <Link
-                key={index}
-                href={`/people/${person.uuid}`}
-                className="inline-block"
-              >
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 px-2 hover:bg-secondary/80 transition-colors">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                      "text-xs font-medium"
-                    )}
+            {companyDetailsState.people.map((person) => (
+              <div key={person.uuid} className="flex items-center gap-2">
+                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                  <Link
+                    href={`/people/${person.uuid}`}
+                    className="flex items-center gap-2 flex-grow"
                   >
-                    {person.name.charAt(0)}
-                  </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {person.name}
-                  </span>
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                        "text-xs font-medium"
+                      )}
+                    >
+                      {person.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {person.name}
+                    </span>
+                  </Link>
+                  <Separator orientation="vertical" className="h-4 mx-1" />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                      >
+                        <Trash2 className="h-3 w-3 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemovePerson(person.id)}
+                        disabled={removingPersonId === person.id}
+                      >
+                        {removingPersonId === person.id ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 mr-2" />
+                        )}
+                        Fjern
+                      </Button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
