@@ -9,6 +9,7 @@ import { NotesContent } from "@/components/company/NotesContent";
 export default async function TaskPage({ params }: { params: { id: string } }) {
   const taskId = params.id;
   const taskDetails = await getTaskDetails(taskId);
+  console.log(taskDetails);
 
   if (!taskDetails) {
     return (
