@@ -45,6 +45,7 @@ import {
   AccountOwner,
   CompanyData,
   OpportunityData,
+  PersonData,
 } from "@/lib/internal-api/types";
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
@@ -423,6 +424,14 @@ export function CompanyUserDetails({
   };
 
   const addedTimeAgo = getTimeAgo(companyDetails.date_created);
+
+  // Define handlePersonAdded to update the state
+  const handlePersonAdded = (newPerson: PersonData) => {
+    setCompanyDetailsState((prevDetails) => ({
+      ...prevDetails,
+      people: [...prevDetails.people, newPerson],
+    }));
+  };
 
   const infoItems: InfoItem[] = [
     {
@@ -1055,11 +1064,15 @@ export function CompanyUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Personer ({companyDetails.people.length})
+                Personer ({companyDetailsState.people.length})
               </h4>
-              <PersonCombobox />
+              <PersonCombobox
+                companyId={companyDetails.id}
+                onPersonAdded={handlePersonAdded}
+                currentPeople={companyDetailsState.people.map((person) => person.id)}
+              />
             </div>
-            {companyDetails.people.map((person, index) => (
+            {companyDetailsState.people.map((person, index) => (
               <Link
                 key={index}
                 href={`/people/${person.uuid}`}
