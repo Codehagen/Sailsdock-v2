@@ -281,6 +281,7 @@ export const columns: ColumnDef<Company>[] = [
       )
     },
     filterFn: (row: any, columnId: string, filterValue: string[]) => {
+      if (!filterValue?.length) return true
       const user = row.original.user
       const username = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim()
 

@@ -113,13 +113,13 @@ const data = {
           icon: Building,
           items: [
             {
-              title: "Test Bedrift",
-              url: "/company/82be121f-b56c-46db-abb3-bccc5c7c0267",
+              title: "Min View",
+              url: "/company?ppl=christer+hagen&aa=10%2C20&sk=last-3-months",
               icon: Building2,
             },
             {
               title: "Placeholder",
-              url: "/company/add",
+              url: "/company?ppl=mathias+moen&aa=0%2C20",
               icon: Building2,
             },
           ],

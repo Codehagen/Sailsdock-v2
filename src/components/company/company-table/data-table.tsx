@@ -28,7 +28,7 @@ import {
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import { getCompanies } from "@/actions/company/get-companies"
-import { subDays, subMonths, subYears, parseISO } from "date-fns"
+import { parseISO } from "date-fns"
 import {
   differenceInDays,
   differenceInMonths,
@@ -36,6 +36,8 @@ import {
 } from "date-fns"
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { useQueryState } from "nuqs"
+import { useRouter } from "next/navigation"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -44,6 +46,7 @@ interface DataTableProps<TData, TValue> {
 }
 
 const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
+  if (!filterValue || !filterValue?.length) return true
   const arr = row.getValue(columnId)
   const [min, max] = filterValue.split("-").map(Number)
   return arr >= min && (max ? arr <= max : true)
@@ -54,8 +57,8 @@ export const lastContactedFilter = (
   columnId: string,
   filterValue: string[]
 ) => {
+  if (!filterValue?.length) return true
   const lastContactedDate = parseISO(row.getValue(columnId))
-  console.log(filterValue)
   const now = new Date()
   const daysDiff = differenceInDays(now, lastContactedDate)
   const monthsDiff = differenceInMonths(now, lastContactedDate)
@@ -86,6 +89,7 @@ export function filterOwners(
   columnId: string,
   filterValue: string[]
 ) {
+  if (!filterValue?.length) return true
   const owners = row.original.account_owners
     ? row.original.account_owners.map((owner: any) =>
         `${owner?.first_name ?? ""} ${owner?.last_name ?? ""}`.trim()
@@ -111,9 +115,39 @@ export function CompanyTable<TData, TValue>({
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  const [pplQuery, setPplQuery] = useQueryState("ppl", { defaultValue: "" })
+  const [employeeQuery, setEmployeeQuery] = useQueryState("aa", {
+    defaultValue: "",
+  })
+  const [creatorQuery, setCreatorQuery] = useQueryState("av", {
+    defaultValue: "",
+  })
+  const [contactQuery, setContactQuery] = useQueryState("sk", {
+    defaultValue: "",
+  })
+  const [arrQuery, setArrQuery] = useQueryState("arr", { defaultValue: "" })
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([
+    {
+      id: "account_owners",
+      value: pplQuery.length ? pplQuery?.split(",") : undefined,
+    },
+    {
+      id: "num_employees",
+      value: employeeQuery.length ? employeeQuery?.split(",") : [],
+    },
+    {
+      id: "user_name",
+      value: creatorQuery.length ? creatorQuery?.split(",") : undefined,
+    },
+    {
+      id: "last_contacted",
+      value: contactQuery ? contactQuery?.split(",") : undefined,
+    },
+    /*     {
+      id: "arr",
+      value: arrQuery ? arrQuery?.split(",") : undefined
+    }, */
+  ])
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({
@@ -159,6 +193,27 @@ export function CompanyTable<TData, TValue>({
   })
 
   React.useEffect(() => {
+    setColumnFilters([
+      {
+        id: "account_owners",
+        value: pplQuery.length ? pplQuery?.split(",") : undefined,
+      },
+      {
+        id: "num_employees",
+        value: employeeQuery.length ? employeeQuery?.split(",") : [],
+      },
+      {
+        id: "user_name",
+        value: creatorQuery.length ? creatorQuery?.split(",") : undefined,
+      },
+      {
+        id: "last_contacted",
+        value: contactQuery ? contactQuery?.split(",") : undefined,
+      },
+    ])
+  }, [pplQuery, employeeQuery, creatorQuery, contactQuery])
+
+  React.useEffect(() => {
     async function fetchData() {
       const pageIndex = table.getState().pagination.pageIndex
       const pageSize = table.getState().pagination.pageSize
@@ -171,6 +226,7 @@ export function CompanyTable<TData, TValue>({
         setTotalCount(newTotalCount)
       }
     }
+
     fetchData()
   }, [
     table.getState().pagination.pageIndex,
