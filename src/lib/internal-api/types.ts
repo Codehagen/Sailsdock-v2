@@ -288,3 +288,44 @@ export interface OpportunityData {
   name: string;
   // ... other opportunity properties
 }
+
+export interface TaskData {
+  id: number;
+  class_type: string;
+  user_details: {
+    id: number;
+    clerk_id: string;
+    email: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+  };
+  company: number | null;
+  opportunity: number | null;
+  uuid: string;
+  date_created: string;
+  title: string;
+  description: string;
+  date: string;
+  status: string;
+  type: string;
+  task_type: string;
+  estimated_time: string;
+  reminder: string;
+  auto_gen: boolean;
+  user: number;
+  person: number | null;
+  task_owner: number; // Add this line
+  flow: number | null;
+  element: number | null;
+}
+
+export interface TaskDetailsData extends Omit<TaskData, "company"> {
+  company: {
+    id: number;
+    uuid: string;
+    name: string;
+    orgnr: string;
+  } | null;
+  task_supervisor: number | null;
+}

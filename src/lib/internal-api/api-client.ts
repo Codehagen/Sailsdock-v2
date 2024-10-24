@@ -10,6 +10,8 @@ import {
   OpportunityData,
   SidebarViewData,
   PersonData,
+  TaskData,
+  TaskDetailsData,
 } from "./types";
 
 class ApiClient {
@@ -289,6 +291,33 @@ class ApiClient {
   sidebarViews = {
     getAll: (userId: string) =>
       this.request<SidebarViewData[]>("get", `users/${userId}/views/`),
+  };
+
+  // Add this new section for tasks
+  tasks = {
+    getAll: (workspaceId: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/tasks`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<TaskData[]>("get", url);
+    },
+    get: (taskId: string) => this.request<TaskData>("get", `/tasks/${taskId}`),
+    create: (taskData: Partial<TaskData>) =>
+      this.request<TaskData>("post", `/tasks/`, taskData),
+    update: (taskId: string, taskData: Partial<TaskData>) =>
+      this.request<TaskData>("patch", `/tasks/${taskId}/`, taskData),
+    delete: (taskId: string) =>
+      this.request<TaskData>("delete", `/tasks/${taskId}`),
+    getDetails: (taskId: string) =>
+      this.request<TaskDetailsData>("get", `/tasks/${taskId}/details`),
+    getUserTasks: (clerkId: string, pageSize?: number, page?: number) => {
+      let url = `users/${clerkId}/tasks`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<TaskData[]>("get", url);
+    },
   };
 }
 
