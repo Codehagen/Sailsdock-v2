@@ -25,9 +25,9 @@ export const BLOG_CATEGORIES: {
   description: string;
 }[] = [
   {
-    title: "Company News",
+    title: "Selskapsnyheter",
     slug: "company",
-    description: "Updates and announcements from Sailsdock.",
+    description: "Oppdateringer og kunngjøringer fra Sailsdock.",
   },
   // {
   //   title: "Education",
@@ -38,10 +38,12 @@ export const BLOG_CATEGORIES: {
 ];
 
 export const POPULAR_ARTICLES = [
-  "what-is-dub",
-  "how-can-i-download-my-dub-invoice",
-  "how-can-i-download-my-dub-invoice",
-  "how-can-i-download-my-dub-invoice",
+  "hva-er-sailsdock",
+  "hvordan-bruker-bedrifter-i-sailsdock",
+  "hvordan-bruke-personer-i-sailsdock",
+  "hvordan-bruke-muligheter-i-sailsdock",
+  "hva-er-favoritter",
+  "hvordan-bruke-visninger-og-filtre",
 ];
 
 export const HELP_CATEGORIES: {
@@ -58,45 +60,39 @@ export const HELP_CATEGORIES: {
   icon: JSX.Element;
 }[] = [
   {
-    title: "Sailsdock Overview",
+    title: "Oversikt over Sailsdock",
     slug: "overview",
-    description: "Learn about Sailsdock and how it can help you.",
+    description: "Lær om Sailsdock og hvordan det kan hjelpe deg.",
     icon: <Settings className="h-6 w-6 text-gray-500" />,
   },
   {
-    title: "Getting Started",
+    title: "Kom i gang",
     slug: "getting-started",
-    description: "Learn how to get started with Sailsdock.",
+    description: "Lær hvordan du kommer i gang med Sailsdock.",
     icon: <Settings className="h-6 w-6 text-gray-500" />,
   },
   {
-    title: "Link Management",
+    title: "Personer",
     slug: "link-management",
-    description: "Learn how to manage your links on Sailsdock.",
+    description: "Lær hvordan du administrerer lenkene dine på Sailsdock.",
     icon: <Link2 className="h-6 w-6 text-gray-500" />,
   },
   {
-    title: "Custom Domains",
+    title: "Bedrifter",
     slug: "custom-domains",
-    description: "Learn how to use custom domains with Sailsdock.",
+    description: "Lær hvordan du bruker egendefinerte domener med Sailsdock.",
     icon: <Globe className="h-6 w-6 text-gray-500" />,
   },
   {
-    title: "Migrating to Sailsdock",
+    title: "Migrering til Sailsdock",
     slug: "migrating",
-    description: "Easily migrate to Sailsdock from other services.",
+    description: "Enkelt migrere til Sailsdock fra andre tjenester.",
     icon: <Import className="h-6 w-6 text-gray-500" />,
-  },
-  {
-    title: "SAML SSO",
-    slug: "saml-sso",
-    description: "Secure your Sailsdock project with SAML SSO.",
-    icon: <Lock className="h-6 w-6 text-gray-500" />,
   },
   {
     title: "API",
     slug: "api",
-    description: "Learn how to use the Sailsdock API.",
+    description: "Lær hvordan du bruker Sailsdock API.",
     icon: <Webhook className="h-6 w-6 text-gray-500" />,
   },
 ];
