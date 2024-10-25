@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
 
 import {
   Collapsible,
@@ -41,6 +42,11 @@ interface NavMainProps {
 export function NavMain({ groups }: NavMainProps) {
   return (
     <>
+      <SidebarGroup>
+        <SidebarMenu>
+          <EnhancedInbox />
+        </SidebarMenu>
+      </SidebarGroup>
       {groups.map((group) => (
         <SidebarGroup key={group.group}>
           <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
