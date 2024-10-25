@@ -52,9 +52,9 @@ export default async function Author({
         className="rounded-full"
       />
       <div className="flex flex-col">
-        <p className="text-sm text-gray-500">Written by {author.name}</p>
+        <p className="text-sm text-gray-500">Skrevet av {author.name}</p>
         <time dateTime={updatedAt} className="text-sm font-light text-gray-400">
-          Last updated {timeAgo(new Date(updatedAt))}
+          Sist oppdatert {timeAgo(new Date(updatedAt))}
         </time>
       </div>
     </div>

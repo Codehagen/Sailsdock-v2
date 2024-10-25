@@ -18,7 +18,7 @@ export default function HelpCenter() {
       <MaxWidthWrapper className="max-w-screen-lg">
         <div className="flex flex-col space-y-4 py-10">
           <h1 className="font-display text-xl font-bold text-gray-700 sm:text-3xl">
-            👋 How can we help today?
+            👋 Hvordan kan vi hjelpe deg i dag?
           </h1>
           <SearchButton />
         </div>
