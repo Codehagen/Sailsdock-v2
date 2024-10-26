@@ -68,21 +68,6 @@ const data = {
   },
   navMain: [
     {
-      group: "Favorites",
-      items: [
-        {
-          title: "Bedrift 1",
-          url: "/quick-dashboard",
-          icon: Star,
-        },
-        {
-          title: "Bedrift 2",
-          url: "/recent-contacts",
-          icon: Star,
-        },
-      ],
-    },
-    {
       group: "Platform",
       items: [
         {

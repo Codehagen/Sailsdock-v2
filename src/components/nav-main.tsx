@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import { ChevronRight, Star, type LucideIcon } from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
+import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
+import { SidebarViewData } from "@/lib/internal-api/types";
+import * as LucideIcons from "lucide-react";
 
 import {
   Collapsible,
@@ -40,6 +43,64 @@ interface NavMainProps {
 }
 
 export function NavMain({ groups }: NavMainProps) {
+  const [sidebarViews, setSidebarViews] = useState<{
+    [key: string]: SidebarViewData[];
+  } | null>(null);
+
+  useEffect(() => {
+    async function fetchSidebarData() {
+      const data = await getSidebarData();
+      if (data) {
+        setSidebarViews(data);
+      }
+    }
+    fetchSidebarData();
+  }, []);
+
+  const getLucideIcon = (iconName: string): LucideIcon => {
+    // Remove the file extension if present
+    const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
+    return (
+      (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
+      LucideIcons.HelpCircle
+    );
+  };
+
+  const renderSidebarGroup = (
+    groupKey: string,
+    groupLabel: string,
+    isStarred: boolean = false
+  ) => {
+    if (
+      !sidebarViews ||
+      !sidebarViews[groupKey] ||
+      sidebarViews[groupKey].length === 0
+    ) {
+      return null;
+    }
+
+    return (
+      <SidebarGroup key={groupKey}>
+        <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
+        <SidebarMenu>
+          {sidebarViews[groupKey].map((view) => {
+            const IconComponent = isStarred ? Star : getLucideIcon(view.icon);
+            return (
+              <SidebarMenuItem key={view.uuid}>
+                <SidebarMenuButton asChild tooltip={view.name}>
+                  <Link href={view.url}>
+                    <IconComponent className="mr-2 h-4 w-4" />
+                    <span>{view.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroup>
+    );
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -47,6 +108,11 @@ export function NavMain({ groups }: NavMainProps) {
           <EnhancedInbox />
         </SidebarMenu>
       </SidebarGroup>
+
+      {renderSidebarGroup("1", "Favorites", true)}
+      {renderSidebarGroup("2", "Views")}
+
+      {/* Platform and other groups */}
       {groups.map((group) => (
         <SidebarGroup key={group.group}>
           <SidebarGroupLabel>{group.group}</SidebarGroupLabel>

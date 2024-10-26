@@ -250,14 +250,13 @@ export interface OpportunityData {
 }
 
 export interface SidebarViewData {
+  uuid: string;
   name: string;
   description: string;
   icon: string;
-  parent_element: number;
   url: string;
   sorting: number;
-  fields: null | any; // You may want to define a more specific type for fields if needed
-  user: number;
+  fields: null | any; // Update this type if you have more specific field data
 }
 
 export interface PersonData {
@@ -329,6 +328,6 @@ export interface TaskDetailsData extends Omit<TaskData, "company"> {
     orgnr: string;
   } | null;
   task_supervisor: number | null;
-  people: PersonData[]; 
-  opportunities: OpportunityData[]; 
+  people: PersonData[];
+  opportunities: OpportunityData[];
 }
