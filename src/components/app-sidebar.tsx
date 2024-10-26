@@ -3,6 +3,7 @@
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import * as LucideIcons from "lucide-react";
 import {
   LayoutDashboard,
   Users,
@@ -32,6 +33,7 @@ import {
   Sparkles,
   Brain,
   Zap,
+  LucideIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -59,6 +61,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
+import { SidebarViewData } from "@/lib/internal-api/types";
 
 const data = {
   user: {
@@ -166,6 +170,19 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
+  const [sidebarViews, setSidebarViews] = React.useState<{
+    [key: string]: SidebarViewData[];
+  } | null>(null);
+
+  React.useEffect(() => {
+    async function fetchSidebarData() {
+      const data = await getSidebarData();
+      if (data) {
+        setSidebarViews(data);
+      }
+    }
+    fetchSidebarData();
+  }, []);
 
   // Function to check if a nav item is active
   const isActiveNavItem = (item: any): boolean => {
@@ -176,19 +193,45 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return false;
   };
 
-  // Update navMain items with isActive property
+  // Update navMain items with isActive property and dynamic subsections
   const updatedNavMain = data.navMain.map((group) => ({
     ...group,
-    items: group.items.map((item) => ({
-      ...item,
-      isActive: isActiveNavItem(item),
-      items: item.items
-        ? item.items.map((subItem) => ({
-            ...subItem,
+    items: group.items.map((item) => {
+      if (item.title === "Personer" && sidebarViews && sidebarViews["3"]) {
+        return {
+          ...item,
+          isActive: isActiveNavItem(item),
+          items: sidebarViews["3"].map((subItem) => ({
+            title: subItem.name,
+            url: subItem.url,
+            icon: getLucideIcon(subItem.icon),
             isActive: subItem.url === pathname,
-          }))
-        : undefined,
-    })),
+          })),
+        };
+      }
+      if (item.title === "Bedrifter" && sidebarViews && sidebarViews["4"]) {
+        return {
+          ...item,
+          isActive: isActiveNavItem(item),
+          items: sidebarViews["4"].map((subItem) => ({
+            title: subItem.name,
+            url: subItem.url,
+            icon: getLucideIcon(subItem.icon),
+            isActive: subItem.url === pathname,
+          })),
+        };
+      }
+      return {
+        ...item,
+        isActive: isActiveNavItem(item),
+        items: item.items
+          ? item.items.map((subItem) => ({
+              ...subItem,
+              isActive: subItem.url === pathname,
+            }))
+          : undefined,
+      };
+    }),
   }));
 
   // Update the navSecondary items to include the FeedbackDialog
@@ -255,4 +298,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
     </Sidebar>
   );
+}
+
+// Helper function to get Lucide icons
+function getLucideIcon(iconName: string): LucideIcon {
+  const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
+  return (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) || LucideIcons.HelpCircle;
 }

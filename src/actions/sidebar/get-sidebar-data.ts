@@ -47,6 +47,46 @@ export async function getSidebarData(): Promise<{
         fields: null,
       },
     ],
+    "3": [
+      {
+        uuid: "4e6f8g9h-1i2j-3k4l-5m6n-7o8p9q0r1s2t",
+        name: "John Doe",
+        description: "Contact details for John Doe",
+        icon: "User",
+        url: "/people/john-doe",
+        sorting: 1,
+        fields: null,
+      },
+      {
+        uuid: "5f7g8h9i-2j3k-4l5m-6n7o-8p9q0r1s2t3u",
+        name: "Jane Smith",
+        description: "Contact details for Jane Smith",
+        icon: "User",
+        url: "/people/jane-smith",
+        sorting: 2,
+        fields: null,
+      },
+    ],
+    "4": [
+      {
+        uuid: "6g8h9i0j-3k4l-5m6n-7o8p-9q0r1s2t3u4v",
+        name: "Acme Corp",
+        description: "Details for Acme Corporation",
+        icon: "Building",
+        url: "/company/acme-corp",
+        sorting: 1,
+        fields: null,
+      },
+      {
+        uuid: "7h9i0j1k-4l5m-6n7o-8p9q-0r1s2t3u4v5w",
+        name: "TechStart Inc",
+        description: "Details for TechStart Inc",
+        icon: "Building",
+        url: "/company/techstart-inc",
+        sorting: 2,
+        fields: null,
+      },
+    ],
   };
 
   // Simulate an asynchronous operation
