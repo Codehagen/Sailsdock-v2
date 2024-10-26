@@ -63,6 +63,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
 import { SidebarViewData } from "@/lib/internal-api/types";
+import { useSidebarData } from "@/hooks/use-sidebar-data";
 
 const data = {
   user: {
@@ -170,19 +171,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
-  const [sidebarViews, setSidebarViews] = React.useState<{
-    [key: string]: SidebarViewData[];
-  } | null>(null);
-
-  React.useEffect(() => {
-    async function fetchSidebarData() {
-      const data = await getSidebarData();
-      if (data) {
-        setSidebarViews(data);
-      }
-    }
-    fetchSidebarData();
-  }, []);
+  const { data: sidebarData, isLoading, error } = useSidebarData();
 
   // Function to check if a nav item is active
   const isActiveNavItem = (item: any): boolean => {
@@ -194,45 +183,47 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   // Update navMain items with isActive property and dynamic subsections
-  const updatedNavMain = data.navMain.map((group) => ({
-    ...group,
-    items: group.items.map((item) => {
-      if (item.title === "Personer" && sidebarViews && sidebarViews["3"]) {
-        return {
-          ...item,
-          isActive: isActiveNavItem(item),
-          items: sidebarViews["3"].map((subItem) => ({
-            title: subItem.name,
-            url: subItem.url,
-            icon: getLucideIcon(subItem.icon),
-            isActive: subItem.url === pathname,
-          })),
-        };
-      }
-      if (item.title === "Bedrifter" && sidebarViews && sidebarViews["4"]) {
-        return {
-          ...item,
-          isActive: isActiveNavItem(item),
-          items: sidebarViews["4"].map((subItem) => ({
-            title: subItem.name,
-            url: subItem.url,
-            icon: getLucideIcon(subItem.icon),
-            isActive: subItem.url === pathname,
-          })),
-        };
-      }
-      return {
-        ...item,
-        isActive: isActiveNavItem(item),
-        items: item.items
-          ? item.items.map((subItem) => ({
-              ...subItem,
+  const updatedNavMain = React.useMemo(() => {
+    return data.navMain.map((group) => ({
+      ...group,
+      items: group.items.map((item) => {
+        if (item.title === "Personer" && sidebarData?.data["3"]) {
+          return {
+            ...item,
+            isActive: isActiveNavItem(item),
+            items: sidebarData.data["3"].map((subItem) => ({
+              title: subItem.name,
+              url: subItem.url,
+              icon: getLucideIcon(subItem.icon),
               isActive: subItem.url === pathname,
-            }))
-          : undefined,
-      };
-    }),
-  }));
+            })),
+          };
+        }
+        if (item.title === "Bedrifter" && sidebarData?.data["4"]) {
+          return {
+            ...item,
+            isActive: isActiveNavItem(item),
+            items: sidebarData.data["4"].map((subItem) => ({
+              title: subItem.name,
+              url: subItem.url,
+              icon: getLucideIcon(subItem.icon),
+              isActive: subItem.url === pathname,
+            })),
+          };
+        }
+        return {
+          ...item,
+          isActive: isActiveNavItem(item),
+          items: item.items
+            ? item.items.map((subItem) => ({
+                ...subItem,
+                isActive: subItem.url === pathname,
+              }))
+            : undefined,
+        };
+      }),
+    }));
+  }, [sidebarData, pathname]);
 
   // Update the navSecondary items to include the FeedbackDialog
   const navSecondaryWithFeedback = data.navSecondary.map((item) => {
@@ -251,6 +242,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     return item;
   });
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Or a skeleton loader
+  }
+
+  if (error) {
+    console.error("Error fetching sidebar data:", error);
+    return <div>Error loading sidebar data</div>;
+  }
 
   return (
     <Sidebar {...props}>
@@ -303,5 +303,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 // Helper function to get Lucide icons
 function getLucideIcon(iconName: string): LucideIcon {
   const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
-  return (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) || LucideIcons.HelpCircle;
+  return (
+    (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
+    LucideIcons.HelpCircle
+  );
 }

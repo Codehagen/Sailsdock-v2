@@ -6,6 +6,7 @@ import { cn, constructMetadata } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { QueryProvider } from "@/providers/query-provider";
 
 export const metadata: Metadata = constructMetadata({});
 
@@ -39,10 +40,12 @@ export default function RootLayout({
             defaultTheme="light"
             enableSystem={false}
           >
-            {children}
-            <ThemeToggle />
-            <Toaster richColors />
-            <TailwindIndicator />
+            <QueryProvider>
+              {children}
+              <ThemeToggle />
+              <Toaster richColors />
+              <TailwindIndicator />
+            </QueryProvider>
           </ThemeProvider>
         </body>
       </html>

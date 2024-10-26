@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { ChevronRight, Star, type LucideIcon } from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
-import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
 import { SidebarViewData } from "@/lib/internal-api/types";
 import * as LucideIcons from "lucide-react";
 
@@ -25,6 +24,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
+import { useSidebarData } from "@/hooks/use-sidebar-data";
+
 interface NavItem {
   title: string;
   url: string;
@@ -43,19 +44,7 @@ interface NavMainProps {
 }
 
 export function NavMain({ groups }: NavMainProps) {
-  const [sidebarViews, setSidebarViews] = useState<{
-    [key: string]: SidebarViewData[];
-  } | null>(null);
-
-  useEffect(() => {
-    async function fetchSidebarData() {
-      const data = await getSidebarData();
-      if (data) {
-        setSidebarViews(data);
-      }
-    }
-    fetchSidebarData();
-  }, []);
+  const { data: sidebarData } = useSidebarData();
 
   const getLucideIcon = (iconName: string): LucideIcon => {
     // Remove the file extension if present
@@ -72,9 +61,9 @@ export function NavMain({ groups }: NavMainProps) {
     isStarred: boolean = false
   ) => {
     if (
-      !sidebarViews ||
-      !sidebarViews[groupKey] ||
-      sidebarViews[groupKey].length === 0
+      !sidebarData?.data ||
+      !sidebarData.data[groupKey] ||
+      sidebarData.data[groupKey].length === 0
     ) {
       return null;
     }
@@ -83,7 +72,7 @@ export function NavMain({ groups }: NavMainProps) {
       <SidebarGroup key={groupKey}>
         <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
         <SidebarMenu>
-          {sidebarViews[groupKey].map((view) => {
+          {sidebarData.data[groupKey].map((view) => {
             const IconComponent = isStarred ? Star : getLucideIcon(view.icon);
             return (
               <SidebarMenuItem key={view.uuid}>

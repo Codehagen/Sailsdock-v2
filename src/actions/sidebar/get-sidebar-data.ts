@@ -3,8 +3,9 @@
 import { SidebarViewData } from "@/lib/internal-api/types";
 
 export async function getSidebarData(): Promise<{
-  [key: string]: SidebarViewData[];
-} | null> {
+  data: { [key: string]: SidebarViewData[] };
+  digest: string;
+}> {
   // Mock data
   const mockData: { [key: string]: SidebarViewData[] } = {
     "1": [
@@ -92,5 +93,11 @@ export async function getSidebarData(): Promise<{
   // Simulate an asynchronous operation
   await new Promise((resolve) => setTimeout(resolve, 100));
 
-  return mockData;
+  // Generate a mock digest (in a real scenario, this would come from the backend)
+  const mockDigest = Math.random().toString(36).substring(2, 15);
+
+  return {
+    data: mockData,
+    digest: mockDigest,
+  };
 }
