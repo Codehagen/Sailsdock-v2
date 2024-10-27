@@ -1,0 +1,33 @@
+import { Table } from "@tanstack/react-table";
+
+export interface Task {
+  id: number;
+  class_type: string;
+  user_details: any; // You might want to create a more specific type for this
+  company: any | null;
+  opportunity: any | null;
+  uuid: string;
+  date_created: string;
+  title: string;
+  description: string;
+  date: string;
+  status: string;
+  type: string;
+  task_type: string;
+  estimated_time: string;
+  reminder: string;
+  auto_gen: boolean;
+  user: number;
+  person: any | null;
+  task_owner: number;
+  flow: any | null;
+  element: any | null;
+}
+
+export interface DataTableMeta<TData> {
+  updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+}
+
+declare module "@tanstack/table-core" {
+  interface TableMeta<TData> extends DataTableMeta<TData> {}
+}
