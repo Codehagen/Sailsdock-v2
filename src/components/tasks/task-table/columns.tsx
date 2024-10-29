@@ -4,7 +4,6 @@ import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Task } from "./types";
 import { DataTableColumnHeader } from "@/components/company/company-table/data-table-column-header";
-import { DataTableRowActions } from "@/components/company/company-table/data-table-row-actions";
 import Link from "next/link";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
@@ -18,6 +17,7 @@ import {
 import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
 import { TaskRowActions } from "./task-row-actions";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -130,6 +130,35 @@ export const columns: ColumnDef<Task>[] = [
             locale: nb,
           })}
         </span>
+      );
+    },
+  },
+  {
+    accessorKey: "user_details",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Ansvarlig" />
+    ),
+    cell: ({ row }) => {
+      const userDetails = row.original.user_details;
+      if (!userDetails) {
+        return (
+          <span className="text-muted-foreground text-sm">Ikke tildelt</span>
+        );
+      }
+
+      return (
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
+            <AvatarFallback className="text-xs">
+              {userDetails.first_name?.[0] || userDetails.email?.[0] || "?"}
+            </AvatarFallback>
+          </Avatar>
+          <span className="text-sm">
+            {userDetails.first_name && userDetails.last_name
+              ? `${userDetails.first_name} ${userDetails.last_name}`
+              : userDetails.email}
+          </span>
+        </div>
       );
     },
   },

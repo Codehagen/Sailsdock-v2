@@ -17,9 +17,10 @@ import { Task } from "./types";
 
 interface TaskRowActionsProps {
   row: Row<Task>;
+  onAssignSuccess?: () => void;
 }
 
-export function TaskRowActions({ row }: TaskRowActionsProps) {
+export function TaskRowActions({ row, onAssignSuccess }: TaskRowActionsProps) {
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const task = row.original;
 
@@ -50,6 +51,7 @@ export function TaskRowActions({ row }: TaskRowActionsProps) {
         onOpenChange={setShowAssignDialog}
         taskId={task.uuid}
         currentUserId={task.user}
+        onAssignSuccess={onAssignSuccess}
       />
     </>
   );

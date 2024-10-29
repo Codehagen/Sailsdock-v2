@@ -1,10 +1,22 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useState } from "react";
 import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
@@ -15,6 +27,7 @@ interface AssignUserDialogProps {
   onOpenChange: (open: boolean) => void;
   taskId: string;
   currentUserId: number;
+  onAssignSuccess?: () => void;
 }
 
 interface User {
@@ -25,7 +38,13 @@ interface User {
   last_name: string | null;
 }
 
-export function AssignUserDialog({ open, onOpenChange, taskId, currentUserId }: AssignUserDialogProps) {
+export function AssignUserDialog({
+  open,
+  onOpenChange,
+  taskId,
+  currentUserId,
+  onAssignSuccess,
+}: AssignUserDialogProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -35,8 +54,9 @@ export function AssignUserDialog({ open, onOpenChange, taskId, currentUserId }: 
       getWorkspaceUsers().then((response) => {
         if (response) {
           const validUsers: User[] = response
-            .filter((user): user is WorkspaceData & { email: string } =>
-              user.email !== undefined
+            .filter(
+              (user): user is WorkspaceData & { email: string } =>
+                user.email !== undefined
             )
             .map((user) => ({
               id: user.id,
@@ -54,13 +74,22 @@ export function AssignUserDialog({ open, onOpenChange, taskId, currentUserId }: 
 
   const handleAssignUser = async (user: User) => {
     try {
+      console.log("Attempting to assign task to user:", {
+        taskId,
+        userId: user.id,
+        userData: user,
+      });
+
       const updatedTask = await updateTask(taskId, {
         user: user.id,
       });
 
+      console.log("Response from updateTask:", updatedTask);
+
       if (updatedTask) {
         toast.success(`Oppgave tildelt ${user.first_name || user.email}`);
         onOpenChange(false);
+        onAssignSuccess?.();
       } else {
         toast.error("Kunne ikke tildele oppgave");
       }
@@ -90,7 +119,9 @@ export function AssignUserDialog({ open, onOpenChange, taskId, currentUserId }: 
                 users.map((user) => (
                   <CommandItem
                     key={user.id}
-                    value={`${user.first_name || ""} ${user.last_name || ""} ${user.email}`.trim()}
+                    value={`${user.first_name || ""} ${user.last_name || ""} ${
+                      user.email
+                    }`.trim()}
                     onSelect={() => handleAssignUser(user)}
                   >
                     <div className="flex items-center">
@@ -112,4 +143,4 @@ export function AssignUserDialog({ open, onOpenChange, taskId, currentUserId }: 
       </DialogContent>
     </Dialog>
   );
-} 
+}

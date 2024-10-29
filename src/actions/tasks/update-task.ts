@@ -16,7 +16,14 @@ export async function updateTask(
   }
 
   try {
+    console.log("Updating task with data:", {
+      taskId,
+      taskData,
+    });
+
     const response = await apiClient.tasks.update(taskId, taskData);
+
+    console.log("API Response:", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
