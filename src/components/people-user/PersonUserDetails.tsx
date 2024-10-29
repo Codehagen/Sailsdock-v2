@@ -35,6 +35,9 @@ import {
   CompanyData,
   OpportunityData,
 } from "@/lib/internal-api/types";
+import { CompanyCombobox } from "@/components/people/company-combobox";
+import { OpportunityCombobox } from "@/components/people/opportunity-combobox";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -63,8 +66,12 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<CompanyData | null>(personDetails.company || null);
-  const [opportunities, setOpportunities] = useState<OpportunityData[]>(personDetails.opportunities || []);
+  const [company, setCompany] = useState<CompanyData | null>(
+    personDetails.company || null
+  );
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(
+    personDetails.opportunities || []
+  );
   const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
 
   const handleUpdateField = async (field: string, value: string) => {
@@ -353,7 +360,20 @@ export function PersonUserDetails({
               <h4 className="text-sm font-medium text-muted-foreground">
                 Selskap
               </h4>
-              {/* Add a company selector component here if needed */}
+              {!company && (
+                <CompanyCombobox
+                  personId={personDetails.uuid}
+                  onCompanyAdded={(newCompany) => {
+                    setCompany({
+                      ...newCompany,
+                      workspace: personDetails.workspace,
+                      date_created: new Date().toISOString(),
+                      last_modified: new Date().toISOString(),
+                    });
+                    toast.success(`${newCompany.name} lagt til som selskap`);
+                  }}
+                />
+              )}
             </div>
             {company ? (
               <div className="flex items-center gap-2">
@@ -390,10 +410,26 @@ export function PersonUserDetails({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          // Add logic to remove company association
-                          setCompany(null);
-                          toast.success("Selskapstilknytning fjernet");
+                        onClick={async () => {
+                          try {
+                            const updatedPerson = await updatePerson(
+                              personDetails.uuid,
+                              {
+                                company: null,
+                              }
+                            );
+                            if (updatedPerson) {
+                              setCompany(null);
+                              toast.success("Selskapstilknytning fjernet");
+                            } else {
+                              throw new Error("Failed to remove company");
+                            }
+                          } catch (error) {
+                            console.error("Error removing company:", error);
+                            toast.error(
+                              "En feil oppstod under fjerning av selskap"
+                            );
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -418,7 +454,14 @@ export function PersonUserDetails({
               <h4 className="text-sm font-medium text-muted-foreground">
                 Muligheter ({opportunities.length})
               </h4>
-              {/* Add an opportunity selector component here if needed */}
+              <OpportunityCombobox
+                personId={personDetails.id}
+                onOpportunityAdded={(newOpportunity) => {
+                  setOpportunities((prev) => [...prev, newOpportunity]);
+                  toast.success(`${newOpportunity.name} lagt til som mulighet`);
+                }}
+                currentOpportunities={opportunities.map((opp) => opp.id)}
+              />
             </div>
             {opportunities.map((opportunity) => (
               <div key={opportunity.uuid} className="flex items-center gap-2">
@@ -455,16 +498,34 @@ export function PersonUserDetails({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          // Add logic to remove opportunity
-                          setOpportunities(
-                            opportunities.filter(
-                              (opp) => opp.uuid !== opportunity.uuid
-                            )
-                          );
-                          toast.success(
-                            `${opportunity.name} fjernet fra muligheter`
-                          );
+                        onClick={async () => {
+                          try {
+                            const updatedOpportunity = await updateOpportunity(
+                              opportunity.uuid,
+                              {
+                                people: (opportunity.people || []).filter(
+                                  (id) => id !== personDetails.id
+                                ),
+                              }
+                            );
+                            if (updatedOpportunity) {
+                              setOpportunities(
+                                opportunities.filter(
+                                  (opp) => opp.id !== opportunity.id
+                                )
+                              );
+                              toast.success(
+                                `${opportunity.name} fjernet fra muligheter`
+                              );
+                            } else {
+                              throw new Error("Failed to remove opportunity");
+                            }
+                          } catch (error) {
+                            console.error("Error removing opportunity:", error);
+                            toast.error(
+                              "En feil oppstod under fjerning av mulighet"
+                            );
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />

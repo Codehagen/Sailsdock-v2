@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
-import { DataTableToolbar } from "@/components/company/company-table/data-table-toolbar";
+import { DataTableToolbar } from "./data-table-toolbar";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
