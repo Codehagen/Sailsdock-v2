@@ -36,6 +36,8 @@ import {
   OpportunityData,
 } from "@/lib/internal-api/types";
 import { CompanyCombobox } from "@/components/people/company-combobox";
+import { OpportunityCombobox } from "@/components/people/opportunity-combobox";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -452,7 +454,14 @@ export function PersonUserDetails({
               <h4 className="text-sm font-medium text-muted-foreground">
                 Muligheter ({opportunities.length})
               </h4>
-              {/* Add an opportunity selector component here if needed */}
+              <OpportunityCombobox
+                personId={personDetails.id}
+                onOpportunityAdded={(newOpportunity) => {
+                  setOpportunities((prev) => [...prev, newOpportunity]);
+                  toast.success(`${newOpportunity.name} lagt til som mulighet`);
+                }}
+                currentOpportunities={opportunities.map((opp) => opp.id)}
+              />
             </div>
             {opportunities.map((opportunity) => (
               <div key={opportunity.uuid} className="flex items-center gap-2">
@@ -489,16 +498,34 @@ export function PersonUserDetails({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          // Add logic to remove opportunity
-                          setOpportunities(
-                            opportunities.filter(
-                              (opp) => opp.uuid !== opportunity.uuid
-                            )
-                          );
-                          toast.success(
-                            `${opportunity.name} fjernet fra muligheter`
-                          );
+                        onClick={async () => {
+                          try {
+                            const updatedOpportunity = await updateOpportunity(
+                              opportunity.uuid,
+                              {
+                                people: (opportunity.people || []).filter(
+                                  (id) => id !== personDetails.id
+                                ),
+                              }
+                            );
+                            if (updatedOpportunity) {
+                              setOpportunities(
+                                opportunities.filter(
+                                  (opp) => opp.id !== opportunity.id
+                                )
+                              );
+                              toast.success(
+                                `${opportunity.name} fjernet fra muligheter`
+                              );
+                            } else {
+                              throw new Error("Failed to remove opportunity");
+                            }
+                          } catch (error) {
+                            console.error("Error removing opportunity:", error);
+                            toast.error(
+                              "En feil oppstod under fjerning av mulighet"
+                            );
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
