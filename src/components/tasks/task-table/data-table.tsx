@@ -27,9 +27,8 @@ import {
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { getAllTasks } from "@/actions/tasks/get-all-tasks";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { getUserTasks } from "@/actions/tasks/get-user-tasks";
+import { Task } from "./types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -89,34 +88,15 @@ export function TaskTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
+    pageCount: Math.ceil(totalCount / 10),
     meta: {
       updateData,
     },
   });
 
-  React.useEffect(() => {
-    async function fetchData() {
-      const pageIndex = table.getState().pagination.pageIndex;
-      const pageSize = table.getState().pagination.pageSize;
-      const { data: newData, totalCount: newTotalCount } = await getUserTasks(
-        pageSize,
-        pageIndex + 1
-      );
-      if (newData) {
-        setData(newData as TData[]);
-        setTotalCount(newTotalCount);
-      }
-    }
-    fetchData();
-  }, [
-    table.getState().pagination.pageIndex,
-    table.getState().pagination.pageSize,
-  ]);
-
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} data={data as Task[]} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

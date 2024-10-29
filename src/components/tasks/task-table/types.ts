@@ -3,7 +3,14 @@ import { Table } from "@tanstack/react-table";
 export interface Task {
   id: number;
   class_type: string;
-  user_details: any; // You might want to create a more specific type for this
+  user_details: {
+    id: number;
+    email: string;
+    username: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    clerk_id: string;
+  } | null;
   company: any | null;
   opportunity: any | null;
   uuid: string;
@@ -28,6 +35,6 @@ export interface DataTableMeta<TData> {
   updateData: (rowIndex: number, columnId: string, value: unknown) => void;
 }
 
-declare module "@tanstack/table-core" {
+declare module "@tanstack/react-table" {
   interface TableMeta<TData> extends DataTableMeta<TData> {}
 }
