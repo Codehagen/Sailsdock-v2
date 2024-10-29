@@ -329,6 +329,6 @@ export interface TaskDetailsData extends Omit<TaskData, "company"> {
     orgnr: string;
   } | null;
   task_supervisor: number | null;
-  people: PersonData[]; 
-  opportunities: OpportunityData[]; 
+  people: PersonData[];
+  opportunities: OpportunityData[];
 }

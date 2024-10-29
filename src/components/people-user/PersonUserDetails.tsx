@@ -35,6 +35,7 @@ import {
   CompanyData,
   OpportunityData,
 } from "@/lib/internal-api/types";
+import { CompanyCombobox } from "@/components/people/company-combobox";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -63,8 +64,12 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<CompanyData | null>(personDetails.company || null);
-  const [opportunities, setOpportunities] = useState<OpportunityData[]>(personDetails.opportunities || []);
+  const [company, setCompany] = useState<CompanyData | null>(
+    personDetails.company || null
+  );
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(
+    personDetails.opportunities || []
+  );
   const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
 
   const handleUpdateField = async (field: string, value: string) => {
@@ -353,7 +358,15 @@ export function PersonUserDetails({
               <h4 className="text-sm font-medium text-muted-foreground">
                 Selskap
               </h4>
-              {/* Add a company selector component here if needed */}
+              {!company && (
+                <CompanyCombobox
+                  personId={personDetails.uuid}
+                  onCompanyAdded={(newCompany) => {
+                    setCompany(newCompany);
+                    toast.success(`${newCompany.name} lagt til som selskap`);
+                  }}
+                />
+              )}
             </div>
             {company ? (
               <div className="flex items-center gap-2">
@@ -390,10 +403,26 @@ export function PersonUserDetails({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          // Add logic to remove company association
-                          setCompany(null);
-                          toast.success("Selskapstilknytning fjernet");
+                        onClick={async () => {
+                          try {
+                            const updatedPerson = await updatePerson(
+                              personDetails.uuid,
+                              {
+                                company: null,
+                              }
+                            );
+                            if (updatedPerson) {
+                              setCompany(null);
+                              toast.success("Selskapstilknytning fjernet");
+                            } else {
+                              throw new Error("Failed to remove company");
+                            }
+                          } catch (error) {
+                            console.error("Error removing company:", error);
+                            toast.error(
+                              "En feil oppstod under fjerning av selskap"
+                            );
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
