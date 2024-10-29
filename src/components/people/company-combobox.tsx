@@ -63,11 +63,18 @@ export function CompanyCombobox({
     setOpen(false);
     try {
       const updatedPerson = await updatePerson(personId, {
-        company_id: company.id,
+        company: company.id,
       });
       if (updatedPerson) {
-        onCompanyAdded(company);
-        toast.success(`${company.name} lagt til som selskap`);
+        onCompanyAdded({
+          id: company.id,
+          uuid: company.uuid,
+          name: company.name,
+          last_contacted: new Date().toISOString(),
+          potential_revenue: 0,
+          contact_points: [],
+          num_tasks: 0,
+        });
       } else {
         throw new Error("Failed to update person");
       }

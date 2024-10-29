@@ -362,7 +362,12 @@ export function PersonUserDetails({
                 <CompanyCombobox
                   personId={personDetails.uuid}
                   onCompanyAdded={(newCompany) => {
-                    setCompany(newCompany);
+                    setCompany({
+                      ...newCompany,
+                      workspace: personDetails.workspace,
+                      date_created: new Date().toISOString(),
+                      last_modified: new Date().toISOString(),
+                    });
                     toast.success(`${newCompany.name} lagt til som selskap`);
                   }}
                 />
