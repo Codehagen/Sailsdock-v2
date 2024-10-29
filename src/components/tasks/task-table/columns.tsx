@@ -5,7 +5,17 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Task } from "./types";
 import { DataTableColumnHeader } from "@/components/company/company-table/data-table-column-header";
 import Link from "next/link";
-import { formatDistanceToNow, parseISO } from "date-fns";
+import {
+  formatDistanceToNow,
+  parseISO,
+  isToday,
+  isThisWeek,
+  isThisMonth,
+  isPast,
+  addWeeks,
+  isBefore,
+  isAfter,
+} from "date-fns";
 import { nb } from "date-fns/locale";
 import {
   Select,
@@ -18,6 +28,53 @@ import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
 import { TaskRowActions } from "./task-row-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+export const deadlineFilter = (
+  row: any,
+  columnId: string,
+  filterValue: string[]
+) => {
+  const date = parseISO(row.getValue(columnId));
+  const now = new Date();
+  const nextWeekStart = addWeeks(now, 1);
+  const nextWeekEnd = addWeeks(now, 2);
+
+  return filterValue.some((filter) => {
+    switch (filter) {
+      case "overdue":
+        return isPast(date) && !isToday(date);
+      case "today":
+        return isToday(date);
+      case "this-week":
+        return isThisWeek(date) && !isToday(date);
+      case "next-week":
+        return isAfter(date, nextWeekStart) && isBefore(date, nextWeekEnd);
+      case "this-month":
+        return isThisMonth(date) && !isThisWeek(date);
+      case "later":
+        return isAfter(date, nextWeekEnd);
+      default:
+        return true;
+    }
+  });
+};
+
+export const userFilter = (
+  row: any,
+  columnId: string,
+  filterValue: string[]
+) => {
+  const userDetails = row.original.user_details;
+  if (!userDetails) return false;
+
+  const userName = `${userDetails.first_name ?? ""} ${
+    userDetails.last_name ?? ""
+  }`
+    .trim()
+    .toLowerCase();
+
+  return filterValue.some((filter) => userName === filter);
+};
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -104,20 +161,8 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "type",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Type" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <span className="max-w-[500px] truncate text-muted-foreground">
-          {row.getValue("type")}
-        </span>
-      );
-    },
-  },
-  {
     accessorKey: "date",
+    filterFn: deadlineFilter,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Frist" />
     ),
@@ -135,6 +180,7 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: "user_details",
+    filterFn: userFilter,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ansvarlig" />
     ),
@@ -164,6 +210,17 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <TaskRowActions row={row} />,
+    cell: ({ row, table }) => (
+      <TaskRowActions
+        row={row}
+        onAssignSuccess={(updatedTask) => {
+          table.options.meta?.updateData(
+            row.index,
+            "user_details",
+            updatedTask.user_details
+          );
+        }}
+      />
+    ),
   },
 ];

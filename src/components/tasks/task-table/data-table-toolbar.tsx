@@ -7,17 +7,49 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "@/components/company/company-table/data-table-view-options";
-
 import { DataTableFacetedFilter } from "@/components/company/company-table/data-table-faceted-filter";
+import { Task } from "./types";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
+  data: Task[];
 }
+
+const deadline_options = [
+  { label: "Forfalt", value: "overdue" },
+  { label: "I dag", value: "today" },
+  { label: "Denne uken", value: "this-week" },
+  { label: "Neste uke", value: "next-week" },
+  { label: "Denne måneden", value: "this-month" },
+  { label: "Senere", value: "later" },
+];
 
 export function DataTableToolbar<TData>({
   table,
+  data = [],
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+
+  // Get unique list of users from tasks
+  const users = (data || [])
+    .filter((row) => row.user_details)
+    .reduce((uniqueUsers: any[], row: any) => {
+      const user = row.user_details;
+      const userName = `${user?.first_name ?? ""} ${
+        user?.last_name ?? ""
+      }`.trim();
+      const userValue = userName.toLowerCase();
+
+      if (!uniqueUsers.some((u) => u.value === userValue)) {
+        uniqueUsers.push({
+          value: userValue,
+          label: userName || user.email,
+          icon: undefined,
+        });
+      }
+
+      return uniqueUsers;
+    }, []);
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
@@ -41,15 +73,18 @@ export function DataTableToolbar<TData>({
             ]}
           />
         )}
-        {table.getColumn("type") && (
+        {table.getColumn("date") && (
           <DataTableFacetedFilter
-            column={table.getColumn("type")}
-            title="Type"
-            options={[
-              { label: "Generell", value: "general" },
-              { label: "Møte", value: "meeting" },
-              { label: "Oppfølging", value: "follow_up" },
-            ]}
+            column={table.getColumn("date")}
+            title="Frist"
+            options={deadline_options}
+          />
+        )}
+        {table.getColumn("user_details") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("user_details")}
+            title="Ansvarlig"
+            options={users}
           />
         )}
         {isFiltered && (

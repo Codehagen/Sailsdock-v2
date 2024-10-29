@@ -21,13 +21,14 @@ import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { WorkspaceData } from "@/lib/internal-api/types";
+import { Task } from "@/lib/internal-api/types";
 
 interface AssignUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   taskId: string;
   currentUserId: number;
-  onAssignSuccess?: () => void;
+  onAssignSuccess?: (updatedTask: Task) => void;
 }
 
 interface User {
@@ -74,22 +75,14 @@ export function AssignUserDialog({
 
   const handleAssignUser = async (user: User) => {
     try {
-      console.log("Attempting to assign task to user:", {
-        taskId,
-        userId: user.id,
-        userData: user,
-      });
-
       const updatedTask = await updateTask(taskId, {
         user: user.id,
       });
 
-      console.log("Response from updateTask:", updatedTask);
-
       if (updatedTask) {
         toast.success(`Oppgave tildelt ${user.first_name || user.email}`);
         onOpenChange(false);
-        onAssignSuccess?.();
+        onAssignSuccess?.(updatedTask);
       } else {
         toast.error("Kunne ikke tildele oppgave");
       }

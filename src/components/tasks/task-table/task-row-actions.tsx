@@ -17,7 +17,7 @@ import { Task } from "./types";
 
 interface TaskRowActionsProps {
   row: Row<Task>;
-  onAssignSuccess?: () => void;
+  onAssignSuccess?: (updatedTask: Task) => void;
 }
 
 export function TaskRowActions({ row, onAssignSuccess }: TaskRowActionsProps) {
