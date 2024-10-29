@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
+import { TaskRowActions } from "./task-row-actions";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -134,6 +135,6 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <TaskRowActions row={row} />,
   },
 ];
