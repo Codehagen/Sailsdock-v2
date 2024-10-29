@@ -21,7 +21,7 @@ import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { WorkspaceData } from "@/lib/internal-api/types";
-import { Task } from "@/lib/internal-api/types";
+import { Task } from "./types";
 
 interface AssignUserDialogProps {
   open: boolean;

@@ -35,6 +35,6 @@ export interface DataTableMeta<TData> {
   updateData: (rowIndex: number, columnId: string, value: unknown) => void;
 }
 
-declare module "@tanstack/table-core" {
+declare module "@tanstack/react-table" {
   interface TableMeta<TData> extends DataTableMeta<TData> {}
 }

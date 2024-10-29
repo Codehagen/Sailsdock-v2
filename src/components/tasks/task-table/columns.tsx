@@ -152,9 +152,9 @@ export const columns: ColumnDef<Task>[] = [
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todo">Å gjøre</SelectItem>
-            <SelectItem value="in_progress">Pågår</SelectItem>
-            <SelectItem value="done">Ferdig</SelectItem>
+            <SelectItem value="todo">Todo</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="done">Done</SelectItem>
           </SelectContent>
         </Select>
       );
