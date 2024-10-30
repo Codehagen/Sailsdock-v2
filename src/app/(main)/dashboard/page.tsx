@@ -3,6 +3,7 @@ import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DashboardCardsTop } from "@/components/dashboard/dashboard-cards-top";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -30,12 +31,16 @@ export default async function DashboardPage() {
           <TabsTrigger value="market">Markedet</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
+          <DashboardCardsTop />
+
           <EmptyPlaceholder>
             <EmptyPlaceholder.Icon name="layout" />
-            <EmptyPlaceholder.Title>Dashboard under utvikling</EmptyPlaceholder.Title>
+            <EmptyPlaceholder.Title>
+              Dashboard under utvikling
+            </EmptyPlaceholder.Title>
             <EmptyPlaceholder.Description>
-              Her vil det komme et dashboard, men vi jobber fortsatt med utviklingen. 
-              Kom tilbake snart for å se fremgangen!
+              Her vil det komme et dashboard, men vi jobber fortsatt med
+              utviklingen. Kom tilbake snart for å se fremgangen!
             </EmptyPlaceholder.Description>
             <Button className="mt-4">Få varsel når det er klart</Button>
           </EmptyPlaceholder>
