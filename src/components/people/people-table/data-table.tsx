@@ -36,11 +36,11 @@ interface DataTableProps<TData, TValue> {
   initialTotalCount: number;
 }
 
-export function PeopleTable<TData, TValue>({
+export function PeopleTable({
   columns,
   initialData,
   initialTotalCount,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<Person, unknown>) {
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});

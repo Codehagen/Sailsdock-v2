@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Person } from "./types";
+import { Person, Company } from "./types";
 import { DataTableColumnHeader } from "@/components/company/company-table/data-table-column-header";
 import { DataTableRowActions } from "@/components/company/company-table/data-table-row-actions";
 import Link from "next/link";
@@ -275,15 +275,20 @@ export const columns: ColumnDef<Person>[] = [
     },
   },
   {
-    accessorKey: "company",
+    accessorKey: "companies",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Selskap" />
     ),
     cell: ({ row }) => {
-      const company = row.original.company;
-      if (!company || !company.name) {
+      const companies = row.getValue("companies") as Company[];
+
+      if (!companies?.length) {
         return <span className="text-muted-foreground">Tom</span>;
       }
+
+      // Display the first company if there are multiple
+      const company = companies[0];
+
       return (
         <Link href={`/company/${company.uuid}`} className="inline-block">
           <Badge variant="secondary" className="font-normal whitespace-nowrap">

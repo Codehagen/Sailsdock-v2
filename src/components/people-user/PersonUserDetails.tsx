@@ -66,9 +66,12 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<CompanyData | null>(
-    personDetails.company || null
-  );
+  const [company, setCompany] = useState<{
+    id: number;
+    uuid: string;
+    name: string;
+    orgnr: string;
+  } | null>(personDetails.companies?.[0] || null);
   const [opportunities, setOpportunities] = useState<OpportunityData[]>(
     personDetails.opportunities || []
   );
@@ -366,7 +369,6 @@ export function PersonUserDetails({
                   onCompanyAdded={(newCompany) => {
                     setCompany({
                       ...newCompany,
-                      workspace: personDetails.workspace,
                       date_created: new Date().toISOString(),
                       last_modified: new Date().toISOString(),
                     });
@@ -415,7 +417,7 @@ export function PersonUserDetails({
                             const updatedPerson = await updatePerson(
                               personDetails.uuid,
                               {
-                                company: null,
+                                companies: null,
                               }
                             );
                             if (updatedPerson) {
@@ -503,9 +505,7 @@ export function PersonUserDetails({
                             const updatedOpportunity = await updateOpportunity(
                               opportunity.uuid,
                               {
-                                people: (opportunity.people || []).filter(
-                                  (id) => id !== personDetails.id
-                                ),
+                                companies: opportunity.companies || [],
                               }
                             );
                             if (updatedOpportunity) {
@@ -538,15 +538,14 @@ export function PersonUserDetails({
             ))}
           </div>
 
-          <Separator className="my-4" />
+          {/* <Separator className="my-4" /> */}
 
           {/* Other People Section */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
                 Personer ({otherPeople.length})
               </h4>
-              {/* Add a person selector component here if needed */}
             </div>
             {otherPeople.map((person) => (
               <Link
@@ -570,7 +569,7 @@ export function PersonUserDetails({
                 </div>
               </Link>
             ))}
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>
