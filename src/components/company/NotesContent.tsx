@@ -64,10 +64,13 @@ export function NotesContent({
         });
 
         if (createdNote) {
-          setNotes((prevNotes) => [
-            createdNote as unknown as Note,
-            ...prevNotes,
-          ]);
+          setNotes((prevNotes) => {
+            const noteExists = prevNotes.some(
+              (note) => note.uuid === (createdNote as Note).uuid
+            );
+            if (noteExists) return prevNotes;
+            return [createdNote as Note, ...prevNotes];
+          });
           toast.success("Notat lagt til");
         }
       } catch (error) {
