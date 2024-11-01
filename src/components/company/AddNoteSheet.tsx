@@ -106,7 +106,7 @@ export function AddNoteSheet({
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
-      if (isSaving) return; // Prevent multiple submissions
+      if (isSaving) return;
       setIsSaving(true);
       try {
         if (noteToEdit) {
@@ -115,14 +115,7 @@ export function AddNoteSheet({
             content: noteContent,
           });
         } else {
-          const newNote = await createNotesCompany({
-            title: noteTitle,
-            description: noteContent?.toString() ?? "",
-            customer: companyId,
-          });
-          if (newNote) {
-            onNoteAdded({ title: noteTitle, content: noteContent });
-          }
+          onNoteAdded({ title: noteTitle, content: noteContent });
         }
         setNoteTitle("");
         setNoteContent("");
@@ -133,15 +126,7 @@ export function AddNoteSheet({
         setIsSaving(false);
       }
     },
-    [
-      noteTitle,
-      noteContent,
-      onNoteAdded,
-      onNoteEdited,
-      noteToEdit,
-      companyId,
-      isSaving,
-    ]
+    [noteTitle, noteContent, onNoteAdded, onNoteEdited, noteToEdit, isSaving]
   );
 
   const handleDelete = useCallback(async () => {
