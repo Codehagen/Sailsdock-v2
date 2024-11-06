@@ -137,27 +137,48 @@ export const columns: ColumnDef<Task>[] = [
         }
       };
 
+      const getStatusLabel = (status: string) => {
+        switch (status) {
+          case "todo":
+            return "Todo";
+          case "in_progress":
+            return "In Progress";
+          case "done":
+            return "Done";
+          default:
+            return status;
+        }
+      };
+
       return (
         <Select defaultValue={task.status} onValueChange={onStatusChange}>
-          <SelectTrigger className="w-full h-9 px-2 py-1 text-left">
+          <SelectTrigger className="w-full border-0 bg-transparent h-8 p-0 hover:bg-accent hover:text-accent-foreground focus:ring-0 focus:ring-offset-0">
             <SelectValue>
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
                   task.status
                 )}`}
               >
-                {task.status === "todo"
-                  ? "Todo"
-                  : task.status === "in_progress"
-                  ? "In Progress"
-                  : "Done"}
+                {getStatusLabel(task.status)}
               </span>
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todo">Todo</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="todo">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                Todo
+              </span>
+            </SelectItem>
+            <SelectItem value="in_progress">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                In Progress
+              </span>
+            </SelectItem>
+            <SelectItem value="done">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Done
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
       );
