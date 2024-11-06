@@ -29,11 +29,17 @@ import { DataTablePagination } from "@/components/company/company-table/data-tab
 import { DataTableToolbar } from "./data-table-toolbar";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Task } from "./types";
+import { getUserTasks } from "@/actions/tasks/get-user-tasks";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   initialData: TData[];
   initialTotalCount: number;
+}
+
+interface DataTableMeta<TData> {
+  updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+  refreshData: () => Promise<void>;
 }
 
 export function TaskTable<TData, TValue>({
@@ -51,23 +57,6 @@ export function TaskTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const updateData = React.useCallback(
-    (rowIndex: number, columnId: string, value: unknown) => {
-      setData((old) =>
-        old.map((row, index) => {
-          if (index === rowIndex) {
-            return {
-              ...old[rowIndex]!,
-              [columnId]: value,
-            };
-          }
-          return row;
-        })
-      );
-    },
-    []
-  );
-
   const table = useReactTable({
     data,
     columns,
@@ -77,6 +66,32 @@ export function TaskTable<TData, TValue>({
       rowSelection,
       columnFilters,
     },
+    meta: {
+      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex]!,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+      refreshData: async () => {
+        const { data: freshData, totalCount: newTotalCount } =
+          await getUserTasks(
+            table.getState().pagination.pageSize,
+            table.getState().pagination.pageIndex + 1
+          );
+        if (freshData) {
+          setData(freshData as TData[]);
+          setTotalCount(newTotalCount);
+        }
+      },
+    } as DataTableMeta<TData>,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -89,9 +104,6 @@ export function TaskTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
     pageCount: Math.ceil(totalCount / 10),
-    meta: {
-      updateData,
-    },
   });
 
   return (

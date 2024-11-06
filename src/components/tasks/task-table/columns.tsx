@@ -26,8 +26,11 @@ import {
 } from "@/components/ui/select";
 import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
-import { TaskRowActions } from "./task-row-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { TaskUserCombobox } from "./task-user-combobox";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { AssignUserDialog } from "./assign-user-dialog";
 
 export const deadlineFilter = (
   row: any,
@@ -134,27 +137,48 @@ export const columns: ColumnDef<Task>[] = [
         }
       };
 
+      const getStatusLabel = (status: string) => {
+        switch (status) {
+          case "todo":
+            return "Todo";
+          case "in_progress":
+            return "In Progress";
+          case "done":
+            return "Done";
+          default:
+            return status;
+        }
+      };
+
       return (
         <Select defaultValue={task.status} onValueChange={onStatusChange}>
-          <SelectTrigger className="w-full h-9 px-2 py-1 text-left">
+          <SelectTrigger className="w-full border-0 bg-transparent h-8 p-0 hover:bg-accent hover:text-accent-foreground focus:ring-0 focus:ring-offset-0">
             <SelectValue>
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
                   task.status
                 )}`}
               >
-                {task.status === "todo"
-                  ? "Todo"
-                  : task.status === "in_progress"
-                  ? "In Progress"
-                  : "Done"}
+                {getStatusLabel(task.status)}
               </span>
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="todo">Todo</SelectItem>
-            <SelectItem value="in_progress">In Progress</SelectItem>
-            <SelectItem value="done">Done</SelectItem>
+            <SelectItem value="todo">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                Todo
+              </span>
+            </SelectItem>
+            <SelectItem value="in_progress">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                In Progress
+              </span>
+            </SelectItem>
+            <SelectItem value="done">
+              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Done
+              </span>
+            </SelectItem>
           </SelectContent>
         </Select>
       );
@@ -184,43 +208,49 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ansvarlig" />
     ),
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
+      const [isDialogOpen, setIsDialogOpen] = useState(false);
       const userDetails = row.original.user_details;
-      if (!userDetails) {
-        return (
-          <span className="text-muted-foreground text-sm">Ikke tildelt</span>
+
+      const handleAssignSuccess = (updatedTask: Task) => {
+        table.options.meta?.updateData(row.index, "user", updatedTask.user);
+        table.options.meta?.updateData(
+          row.index,
+          "user_details",
+          updatedTask.user_details
         );
-      }
+      };
 
       return (
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarFallback className="text-xs">
-              {userDetails.first_name?.[0] || userDetails.email?.[0] || "?"}
-            </AvatarFallback>
-          </Avatar>
-          <span className="text-sm">
-            {userDetails.first_name && userDetails.last_name
-              ? `${userDetails.first_name} ${userDetails.last_name}`
-              : userDetails.email}
-          </span>
-        </div>
+        <>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 h-8 w-full justify-start p-0"
+            onClick={() => setIsDialogOpen(true)}
+          >
+            <Avatar className="h-6 w-6">
+              <AvatarFallback className="text-xs">
+                {userDetails?.first_name?.[0] || userDetails?.email?.[0] || "?"}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-sm">
+              {userDetails
+                ? userDetails.first_name && userDetails.last_name
+                  ? `${userDetails.first_name} ${userDetails.last_name}`
+                  : userDetails.email
+                : "Ikke tildelt"}
+            </span>
+          </Button>
+
+          <AssignUserDialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            taskId={row.original.uuid}
+            currentUserId={row.original.user}
+            onAssignSuccess={handleAssignSuccess}
+          />
+        </>
       );
     },
-  },
-  {
-    id: "actions",
-    cell: ({ row, table }) => (
-      <TaskRowActions
-        row={row}
-        onAssignSuccess={(updatedTask) => {
-          table.options.meta?.updateData(
-            row.index,
-            "user_details",
-            updatedTask.user_details
-          );
-        }}
-      />
-    ),
   },
 ];
