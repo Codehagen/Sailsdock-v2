@@ -66,6 +66,8 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   const initialTasks: Task[] = useMemo(() => {
+    if (!Array.isArray(opportunities)) return [];
+
     return opportunities.map((opp) => ({
       id: opp.uuid,
       columnId: getColumnIdFromStage(opp.stage),
@@ -106,7 +108,12 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
     })
   );
 
-  function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
+  function getDraggingTaskData(
+    taskId: UniqueIdentifier,
+    columnId: ColumnId | null
+  ) {
+    if (!columnId) return { tasksInColumn: [], taskPosition: -1, column: null };
+
     const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
     const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
     const column = columns.find((col) => col.id === columnId);

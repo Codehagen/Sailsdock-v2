@@ -106,7 +106,7 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
         <div className="flex items-center justify-between">
           <h3
             onClick={handleTitleClick}
-            className="text-sm font-medium hover:text-blue-200 cursor-pointer"
+            className="text-sm font-medium hover:text-blue-300 cursor-pointer"
           >
             {task.title}
           </h3>

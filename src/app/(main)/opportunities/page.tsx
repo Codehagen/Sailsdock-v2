@@ -1,26 +1,20 @@
-import Link from "next/link";
-import { DashboardShell } from "@/components/shell/shell";
-import { DashboardHeader } from "@/components/shell/header";
-import { AddCompanySheet } from "@/components/company/AddCompanySheet";
-import { getOpportunities } from "@/actions/opportunity/get-opportunities";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
-import { OpportunityData } from "@/lib/internal-api/types";
+import { getOpportunities } from "@/actions/opportunity/get-opportunities";
+import { DashboardShell } from "@/components/shell/shell";
 
-export default async function OpportunityPage() {
-  const { data: opportunities, totalCount } = await getOpportunities(10, 1);
-  console.log(opportunities);
+export default async function OpportunitiesPage() {
+  const { data: opportunities } = await getOpportunities();
 
   return (
-    <DashboardShell>
-      <DashboardHeader heading="Muligheter" text="UNDER UTVIKLING 🧹">
-        <AddCompanySheet />
-      </DashboardHeader>
-
-      {opportunities && opportunities.length > 0 ? (
-        <KanbanBoard opportunities={opportunities as OpportunityData[]} />
-      ) : (
-        <p className="text-center py-4">Ingen muligheter funnet.</p>
-      )}
+    <DashboardShell className="p-0">
+      <div className="h-full flex flex-col">
+        <div className="px-6 py-4 border-b">
+          <h1 className="text-3xl font-bold">Opportunities</h1>
+        </div>
+        <div className="flex-grow">
+          <KanbanBoard opportunities={opportunities || []} />
+        </div>
+      </div>
     </DashboardShell>
   );
 }
