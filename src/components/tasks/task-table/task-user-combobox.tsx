@@ -1,14 +1,7 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useState } from "react";
-import { updateTask } from "@/actions/tasks/update-task";
-import { toast } from "sonner";
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -17,21 +10,19 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Loader2, UserCircle } from "lucide-react";
 import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users";
-import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { updateTask } from "@/actions/tasks/update-task";
+import { toast } from "sonner";
 import { WorkspaceData } from "@/lib/internal-api/types";
-import { Task } from "./types";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface AssignUserDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  taskId: string;
-  currentUserId?: number;
-  onAssignSuccess: (updatedTask: Task) => void;
-}
-
-interface User {
+interface TaskUser {
   id: number;
   email: string;
   username: string | null;
@@ -39,22 +30,27 @@ interface User {
   last_name: string | null;
 }
 
-export function AssignUserDialog({
-  open,
-  onOpenChange,
+interface TaskUserComboboxProps {
+  taskId: string;
+  currentUserId?: number | null;
+  onUserUpdated: () => void;
+}
+
+export function TaskUserCombobox({
   taskId,
   currentUserId,
-  onAssignSuccess,
-}: AssignUserDialogProps) {
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  onUserUpdated,
+}: TaskUserComboboxProps) {
+  const [open, setOpen] = React.useState(false);
+  const [users, setUsers] = React.useState<TaskUser[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (open && users.length === 0) {
       setIsLoading(true);
       getWorkspaceUsers().then((response) => {
         if (response) {
-          const validUsers: User[] = response
+          const validUsers: TaskUser[] = response
             .filter(
               (user): user is WorkspaceData & { email: string } =>
                 user.email !== undefined
@@ -73,31 +69,37 @@ export function AssignUserDialog({
     }
   }, [open, users.length]);
 
-  const handleAssignUser = async (user: User) => {
+  const handleSelectUser = async (user: TaskUser) => {
+    setOpen(false);
     try {
-      const updatedTask = await updateTask(taskId, {
+      await updateTask(taskId, {
         user: user.id,
       });
-
-      if (updatedTask) {
-        onAssignSuccess(updatedTask);
-        toast.success(`Oppgave tildelt ${user.first_name || user.email}`);
-        onOpenChange(false);
-      } else {
-        toast.error("Kunne ikke tildele oppgave");
-      }
+      onUserUpdated();
+      toast.success(`Oppgave tildelt ${user.first_name || user.email}`);
     } catch (error) {
-      console.error("Error assigning task:", error);
-      toast.error("En feil oppstod under tildeling av oppgave");
+      console.error("Error updating task user:", error);
+      toast.error("Kunne ikke oppdatere bruker");
     }
   };
 
+  const currentUser = users.find((user) => user.id === currentUserId);
+  const buttonLabel = currentUser
+    ? currentUser.first_name || currentUser.email
+    : "Tildel bruker";
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Tildel oppgave til bruker</DialogTitle>
-        </DialogHeader>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex items-center gap-2 h-8 w-full justify-start"
+        >
+          <UserCircle className="h-4 w-4" />
+          <span className="truncate">{buttonLabel}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
         <Command>
           <CommandInput placeholder="Søk etter personer..." />
           <CommandList>
@@ -115,14 +117,16 @@ export function AssignUserDialog({
                     value={`${user.first_name || ""} ${user.last_name || ""} ${
                       user.email
                     }`.trim()}
-                    onSelect={() => handleAssignUser(user)}
+                    onSelect={() => handleSelectUser(user)}
                   >
                     <div className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2">
-                        {user.first_name
-                          ? user.first_name.charAt(0).toUpperCase()
-                          : user.email.charAt(0).toUpperCase()}
-                      </div>
+                      <Avatar className="h-6 w-6 mr-2">
+                        <AvatarFallback>
+                          {user.first_name
+                            ? user.first_name.charAt(0).toUpperCase()
+                            : user.email.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                       {user.first_name && user.last_name
                         ? `${user.first_name} ${user.last_name}`
                         : user.email}
@@ -133,7 +137,7 @@ export function AssignUserDialog({
             </CommandGroup>
           </CommandList>
         </Command>
-      </DialogContent>
-    </Dialog>
+      </PopoverContent>
+    </Popover>
   );
 }
