@@ -27,16 +27,24 @@ interface Company {
   id: number;
   uuid: string;
   name: string;
+  orgnr: string;
 }
 
 interface CompanyComboboxProps {
   personId: string;
-  onCompanyAdded: (company: Company) => void;
+  onCompanyAdded: (company: {
+    id: number;
+    uuid: string;
+    name: string;
+    orgnr: string;
+  }) => void;
+  currentCompanies?: number[];
 }
 
 export function CompanyCombobox({
   personId,
   onCompanyAdded,
+  currentCompanies = [],
 }: CompanyComboboxProps) {
   const [open, setOpen] = React.useState(false);
   const { isDesktop } = useMediaQuery();
@@ -62,18 +70,18 @@ export function CompanyCombobox({
     setSelectedCompany(company);
     setOpen(false);
     try {
+      const updatedCompanyIds = [...currentCompanies, company.id];
+
       const updatedPerson = await updatePerson(personId, {
-        company: company.id,
+        companies: updatedCompanyIds,
       });
+
       if (updatedPerson) {
         onCompanyAdded({
           id: company.id,
           uuid: company.uuid,
           name: company.name,
-          last_contacted: new Date().toISOString(),
-          potential_revenue: 0,
-          contact_points: [],
-          num_tasks: 0,
+          orgnr: company.orgnr,
         });
       } else {
         throw new Error("Failed to update person");
@@ -84,6 +92,11 @@ export function CompanyCombobox({
     }
   };
 
+  // Filter out companies that are already added
+  const filteredCompanies = companies.filter(
+    (company) => !currentCompanies.includes(company.id)
+  );
+
   return (
     <div className="flex items-center space-x-2">
       {isDesktop ? (
@@ -91,12 +104,11 @@ export function CompanyCombobox({
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="h-8">
               <Plus className="h-4 w-4 mr-2" />
-              Legg til selskap
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-[300px] p-0">
             <CompanyList
-              companies={companies}
+              companies={filteredCompanies}
               isLoading={isLoading}
               handleSelectCompany={handleSelectCompany}
             />
@@ -113,7 +125,7 @@ export function CompanyCombobox({
           <DrawerContent>
             <div className="mt-4 border-t">
               <CompanyList
-                companies={companies}
+                companies={filteredCompanies}
                 isLoading={isLoading}
                 handleSelectCompany={handleSelectCompany}
               />

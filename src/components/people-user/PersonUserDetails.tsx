@@ -66,12 +66,14 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<{
-    id: number;
-    uuid: string;
-    name: string;
-    orgnr: string;
-  } | null>(personDetails.companies?.[0] || null);
+  const [companies, setCompanies] = useState<
+    {
+      id: number;
+      uuid: string;
+      name: string;
+      orgnr: string;
+    }[]
+  >(personDetails.companies || []);
   const [opportunities, setOpportunities] = useState<OpportunityData[]>(
     personDetails.opportunities || []
   );
@@ -361,89 +363,95 @@ export function PersonUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Selskap
+                Selskap ({companies.length})
               </h4>
-              {!company && (
-                <CompanyCombobox
-                  personId={personDetails.uuid}
-                  onCompanyAdded={(newCompany) => {
-                    setCompany({
-                      ...newCompany,
-                      date_created: new Date().toISOString(),
-                      last_modified: new Date().toISOString(),
-                    });
-                    toast.success(`${newCompany.name} lagt til som selskap`);
-                  }}
-                />
-              )}
+              <CompanyCombobox
+                personId={personDetails.uuid}
+                onCompanyAdded={(newCompany) => {
+                  setCompanies((prev) => [...prev, newCompany]);
+                  toast.success(`${newCompany.name} lagt til som selskap`);
+                }}
+                currentCompanies={companies.map((comp) => comp.id)}
+              />
             </div>
-            {company ? (
-              <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
-                  <Link
-                    href={`/company/${company.uuid}`}
-                    className="flex items-center gap-2 flex-grow"
-                  >
-                    <div
-                      className={cn(
-                        "flex items-center justify-center",
-                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                        "text-xs font-medium"
-                      )}
-                    >
-                      {company.name.charAt(0)}
-                    </div>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {company.name}
-                    </span>
-                  </Link>
-                  <Separator orientation="vertical" className="h-4 mx-1" />
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+            {companies.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {companies.map((company) => (
+                  <div key={company.uuid} className="flex items-center gap-2">
+                    <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                      <Link
+                        href={`/company/${company.uuid}`}
+                        className="flex items-center gap-2 flex-grow"
                       >
-                        <Trash2 className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-2">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={async () => {
-                          try {
-                            const updatedPerson = await updatePerson(
-                              personDetails.uuid,
-                              {
-                                companies: null,
+                        <div
+                          className={cn(
+                            "flex items-center justify-center",
+                            "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                            "text-xs font-medium"
+                          )}
+                        >
+                          {company.name.charAt(0)}
+                        </div>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {company.name}
+                        </span>
+                      </Link>
+                      <Separator orientation="vertical" className="h-4 mx-1" />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                          >
+                            <Trash2 className="h-3 w-3 text-muted-foreground" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const updatedCompanyIds = companies
+                                  .filter((c) => c.id !== company.id)
+                                  .map((c) => c.id);
+
+                                const updatedPerson = await updatePerson(
+                                  personDetails.uuid,
+                                  {
+                                    companies: updatedCompanyIds,
+                                  }
+                                );
+
+                                if (updatedPerson) {
+                                  setCompanies(
+                                    companies.filter((c) => c.id !== company.id)
+                                  );
+                                  toast.success("Selskapstilknytning fjernet");
+                                } else {
+                                  throw new Error("Failed to remove company");
+                                }
+                              } catch (error) {
+                                console.error("Error removing company:", error);
+                                toast.error(
+                                  "En feil oppstod under fjerning av selskap"
+                                );
                               }
-                            );
-                            if (updatedPerson) {
-                              setCompany(null);
-                              toast.success("Selskapstilknytning fjernet");
-                            } else {
-                              throw new Error("Failed to remove company");
-                            }
-                          } catch (error) {
-                            console.error("Error removing company:", error);
-                            toast.error(
-                              "En feil oppstod under fjerning av selskap"
-                            );
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Fjern
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Fjern
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <span className="text-sm text-muted-foreground">
-                Ingen tilknyttet selskap
+                Ingen tilknyttede selskap
               </span>
             )}
           </div>
