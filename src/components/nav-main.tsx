@@ -24,6 +24,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
+import { useSidebarStore } from "@/stores/use-sidebar-store";
 
 interface NavItem {
   title: string;
@@ -43,19 +44,13 @@ interface NavMainProps {
 }
 
 export function NavMain({ groups }: NavMainProps) {
-  const [sidebarViews, setSidebarViews] = useState<{
-    [key: string]: SidebarViewData[];
-  } | null>(null);
+  const { sidebarData, isLoading, fetchSidebarData } = useSidebarStore();
 
   useEffect(() => {
-    async function fetchSidebarData() {
-      const data = await getSidebarData();
-      if (data) {
-        setSidebarViews(data);
-      }
+    if (!sidebarData) {
+      fetchSidebarData();
     }
-    fetchSidebarData();
-  }, []);
+  }, [sidebarData, fetchSidebarData]);
 
   const getLucideIcon = (iconName: string): LucideIcon => {
     // Remove the file extension if present
@@ -71,10 +66,29 @@ export function NavMain({ groups }: NavMainProps) {
     groupLabel: string,
     isStarred: boolean = false
   ) => {
+    if (isLoading) {
+      return (
+        <SidebarGroup key={groupKey}>
+          <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
+          <SidebarMenu>
+            {/* Add skeleton loading state here */}
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SidebarMenuItem key={i}>
+                <div className="flex h-9 items-center px-4 animate-pulse">
+                  <div className="h-4 w-4 rounded bg-muted mr-2" />
+                  <div className="h-4 w-24 rounded bg-muted" />
+                </div>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
+      );
+    }
+
     if (
-      !sidebarViews ||
-      !sidebarViews[groupKey] ||
-      sidebarViews[groupKey].length === 0
+      !sidebarData ||
+      !sidebarData[groupKey] ||
+      sidebarData[groupKey].length === 0
     ) {
       return null;
     }
@@ -83,7 +97,7 @@ export function NavMain({ groups }: NavMainProps) {
       <SidebarGroup key={groupKey}>
         <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
         <SidebarMenu>
-          {sidebarViews[groupKey].map((view) => {
+          {sidebarData[groupKey].map((view) => {
             const IconComponent = isStarred ? Star : getLucideIcon(view.icon);
             return (
               <SidebarMenuItem key={view.uuid}>

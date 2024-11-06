@@ -61,8 +61,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
-import { SidebarViewData } from "@/lib/internal-api/types";
+import { useSidebarStore } from "@/stores/use-sidebar-store";
 
 const data = {
   user: {
@@ -170,19 +169,13 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
-  const [sidebarViews, setSidebarViews] = React.useState<{
-    [key: string]: SidebarViewData[];
-  } | null>(null);
+  const { sidebarData, fetchSidebarData } = useSidebarStore();
 
   React.useEffect(() => {
-    async function fetchSidebarData() {
-      const data = await getSidebarData();
-      if (data) {
-        setSidebarViews(data);
-      }
+    if (!sidebarData) {
+      fetchSidebarData();
     }
-    fetchSidebarData();
-  }, []);
+  }, [sidebarData, fetchSidebarData]);
 
   // Function to check if a nav item is active
   const isActiveNavItem = (item: any): boolean => {
@@ -197,11 +190,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const updatedNavMain = data.navMain.map((group) => ({
     ...group,
     items: group.items.map((item) => {
-      if (item.title === "Personer" && sidebarViews && sidebarViews["3"]) {
+      if (item.title === "Personer" && sidebarData && sidebarData["3"]) {
         return {
           ...item,
           isActive: isActiveNavItem(item),
-          items: sidebarViews["3"].map((subItem) => ({
+          items: sidebarData["3"].map((subItem) => ({
             title: subItem.name,
             url: subItem.url,
             icon: getLucideIcon(subItem.icon),
@@ -209,11 +202,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           })),
         };
       }
-      if (item.title === "Bedrifter" && sidebarViews && sidebarViews["4"]) {
+      if (item.title === "Bedrifter" && sidebarData && sidebarData["4"]) {
         return {
           ...item,
           isActive: isActiveNavItem(item),
-          items: sidebarViews["4"].map((subItem) => ({
+          items: sidebarData["4"].map((subItem) => ({
             title: subItem.name,
             url: subItem.url,
             icon: getLucideIcon(subItem.icon),
@@ -303,5 +296,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 // Helper function to get Lucide icons
 function getLucideIcon(iconName: string): LucideIcon {
   const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
-  return (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) || LucideIcons.HelpCircle;
+  return (
+    (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
+    LucideIcons.HelpCircle
+  );
 }
