@@ -25,9 +25,10 @@ import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 
 // Dynamically import DragOverlay to use it only on the client side
 const DynamicDragOverlay = dynamic(
-  () => import("@dnd-kit/core").then((mod) => ({
-    default: mod.DragOverlay
-  })),
+  () =>
+    import("@dnd-kit/core").then((mod) => ({
+      default: mod.DragOverlay,
+    })),
   { ssr: false }
 );
 
@@ -89,8 +90,17 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: coordinateGetter,
     })

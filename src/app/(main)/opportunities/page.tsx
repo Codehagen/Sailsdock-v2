@@ -12,7 +12,7 @@ export default async function OpportunityPage() {
 
   return (
     <DashboardShell>
-      <DashboardHeader heading="Muligheter" text="Dine muligheter">
+      <DashboardHeader heading="Muligheter" text="UNDER UTVIKLING 🧹">
         <AddCompanySheet />
       </DashboardHeader>
 
