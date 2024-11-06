@@ -256,7 +256,9 @@ export interface SidebarViewData {
   icon: string;
   url: string;
   sorting: number;
-  fields: null | any; // Update this type if you have more specific field data
+  fields: any | null;
+  section?: string;
+  user: number;
 }
 
 export interface PersonData {

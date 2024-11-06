@@ -291,6 +291,12 @@ class ApiClient {
   sidebarViews = {
     getAll: (userId: string) =>
       this.request<SidebarViewData[]>("get", `users/${userId}/views/`),
+    create: (viewData: Partial<SidebarViewData>) =>
+      this.request<SidebarViewData>("post", "views/", viewData),
+    update: (viewId: string, viewData: Partial<SidebarViewData>) =>
+      this.request<SidebarViewData>("patch", `views/${viewId}/`, viewData),
+    delete: (viewId: string) =>
+      this.request<SidebarViewData>("delete", `views/${viewId}/`),
   };
 
   // Add this new section for tasks
