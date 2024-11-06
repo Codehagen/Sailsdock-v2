@@ -259,6 +259,7 @@ export interface SidebarViewData {
   fields: any | null;
   section?: string;
   user: number;
+  parent_element: number;
 }
 
 export interface PersonData {
