@@ -2,9 +2,10 @@ export interface ApiResponse<T> {
   success: boolean;
   status: number;
   data: T[];
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
 }
-
-export interface TaskResponse extends ApiResponse<Task> {}
 
 export interface UserData {
   id: number;

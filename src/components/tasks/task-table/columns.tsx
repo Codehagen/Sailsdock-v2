@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/select";
 import { updateTask } from "@/actions/tasks/update-task";
 import { toast } from "sonner";
-import { TaskRowActions } from "./task-row-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { TaskUserCombobox } from "./task-user-combobox";
 import { useState } from "react";
@@ -199,8 +198,6 @@ export const columns: ColumnDef<Task>[] = [
           "user_details",
           updatedTask.user_details
         );
-        // Optionally refresh the entire table data
-        table.options.meta?.refreshData();
       };
 
       return (
@@ -234,20 +231,5 @@ export const columns: ColumnDef<Task>[] = [
         </>
       );
     },
-  },
-  {
-    id: "actions",
-    cell: ({ row, table }) => (
-      <TaskRowActions
-        row={row}
-        onAssignSuccess={(updatedTask) => {
-          table.options.meta?.updateData(
-            row.index,
-            "user_details",
-            updatedTask.user_details
-          );
-        }}
-      />
-    ),
   },
 ];
