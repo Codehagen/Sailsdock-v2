@@ -29,6 +29,7 @@ import { DataTablePagination } from "@/components/company/company-table/data-tab
 import { DataTableToolbar } from "@/components/company/company-table/data-table-toolbar";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Person } from "./types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -115,7 +116,7 @@ export function PeopleTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} viewType="people" />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

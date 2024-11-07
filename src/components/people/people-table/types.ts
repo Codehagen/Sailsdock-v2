@@ -1,4 +1,4 @@
-import { Table } from "@tanstack/react-table";
+import { RowData, Table } from "@tanstack/react-table";
 
 export interface Person {
   id: number;
