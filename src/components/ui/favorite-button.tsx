@@ -89,7 +89,9 @@ export function FavoriteButton({
     >
       <Star
         className={`h-4 w-4 ${
-          isFavorite ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"
+          isFavorite
+            ? "fill-yellow-400 text-yellow-400"
+            : "text-muted-foreground"
         }`}
       />
       <span className="sr-only">
