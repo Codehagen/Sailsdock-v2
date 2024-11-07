@@ -26,9 +26,10 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
-import { DataTableToolbar } from "@/components/company/company-table/data-table-toolbar";
+import { DataTableToolbar } from "./data-table-toolbar";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Person } from "./types";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,11 +37,11 @@ interface DataTableProps<TData, TValue> {
   initialTotalCount: number;
 }
 
-export function PeopleTable<TData, TValue>({
+export function PeopleTable({
   columns,
   initialData,
   initialTotalCount,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<Person, unknown>) {
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -115,7 +116,7 @@ export function PeopleTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} viewType="people" />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -23,63 +23,64 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
-import { getCompanies } from "@/actions/company/get-companies"
-import { subDays, subMonths, subYears, parseISO } from "date-fns"
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { getCompanies } from "@/actions/company/get-companies";
+import { subDays, subMonths, subYears, parseISO } from "date-fns";
 import {
   differenceInDays,
   differenceInMonths,
   differenceInYears,
-} from "date-fns"
+} from "date-fns";
 
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { DataTableViewOptions } from "./data-table-view-options";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  initialData: TData[]
-  initialTotalCount: number
+  columns: ColumnDef<TData, TValue>[];
+  initialData: TData[];
+  initialTotalCount: number;
 }
 
 const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
-  const arr = row.getValue(columnId)
-  const [min, max] = filterValue.split("-").map(Number)
-  return arr >= min && (max ? arr <= max : true)
-}
+  const arr = row.getValue(columnId);
+  const [min, max] = filterValue.split("-").map(Number);
+  return arr >= min && (max ? arr <= max : true);
+};
 
 export const lastContactedFilter = (
   row: any,
   columnId: string,
   filterValue: string[]
 ) => {
-  const lastContactedDate = parseISO(row.getValue(columnId))
-  console.log(filterValue)
-  const now = new Date()
-  const daysDiff = differenceInDays(now, lastContactedDate)
-  const monthsDiff = differenceInMonths(now, lastContactedDate)
-  const yearsDiff = differenceInYears(now, lastContactedDate)
+  const lastContactedDate = parseISO(row.getValue(columnId));
+  console.log(filterValue);
+  const now = new Date();
+  const daysDiff = differenceInDays(now, lastContactedDate);
+  const monthsDiff = differenceInMonths(now, lastContactedDate);
+  const yearsDiff = differenceInYears(now, lastContactedDate);
 
   return filterValue.some((filter) => {
     switch (filter) {
       case "last-week":
-        return daysDiff < 7
+        return daysDiff < 7;
       case "last-month":
-        return daysDiff < 30
+        return daysDiff < 30;
       case "last-3-months":
-        return monthsDiff < 3
+        return monthsDiff < 3;
       case "last-6-months":
-        return monthsDiff < 6
+        return monthsDiff < 6;
       case "last-year":
-        return yearsDiff < 1
+        return yearsDiff < 1;
       case "more-than-year":
-        return yearsDiff >= 1
+        return yearsDiff >= 1;
       default:
-        return true
+        return true;
     }
-  })
-}
+  });
+};
 
 export function filterOwners(
   row: any,
@@ -90,15 +91,15 @@ export function filterOwners(
     ? row.original.account_owners.map((owner: any) =>
         `${owner?.first_name ?? ""} ${owner?.last_name ?? ""}`.trim()
       )
-    : []
+    : [];
 
   // If owners is empty, return false
-  if (owners.length === 0) return false
+  if (owners.length === 0) return false;
 
   // Check if any owner matches any of the filter values
   return owners.some((owner: any) =>
     filterValue.some((filter: string) => owner.toLowerCase() === filter)
-  )
+  );
 }
 
 export function CompanyTable<TData, TValue>({
@@ -106,15 +107,15 @@ export function CompanyTable<TData, TValue>({
   initialData,
   initialTotalCount,
 }: DataTableProps<TData, TValue>) {
-  const [data, setData] = React.useState(initialData)
-  const [totalCount, setTotalCount] = React.useState(initialTotalCount)
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [data, setData] = React.useState(initialData);
+  const [totalCount, setTotalCount] = React.useState(initialTotalCount);
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
@@ -149,37 +150,37 @@ export function CompanyTable<TData, TValue>({
               return {
                 ...old[rowIndex]!,
                 [columnId]: value,
-              }
+              };
             }
-            return row
+            return row;
           })
-        )
+        );
       },
     },
-  })
+  });
 
   React.useEffect(() => {
     async function fetchData() {
-      const pageIndex = table.getState().pagination.pageIndex
-      const pageSize = table.getState().pagination.pageSize
+      const pageIndex = table.getState().pagination.pageIndex;
+      const pageSize = table.getState().pagination.pageSize;
       const { data: newData, totalCount: newTotalCount } = await getCompanies(
         pageSize,
         pageIndex + 1
-      )
+      );
       if (newData) {
-        setData(newData as TData[])
-        setTotalCount(newTotalCount)
+        setData(newData as TData[]);
+        setTotalCount(newTotalCount);
       }
     }
-    fetchData()
+    fetchData();
   }, [
     table.getState().pagination.pageIndex,
     table.getState().pagination.pageSize,
-  ])
+  ]);
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar data={data} table={table} />
+      <DataTableToolbar data={data} table={table} viewType="company" />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
@@ -203,11 +204,13 @@ export function CompanyTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}>
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="p-0.5 px-2 border w-min max-w-[300px]">
+                      className="p-0.5 px-2 border w-min max-w-[300px]"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -220,7 +223,8 @@ export function CompanyTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center">
+                  className="h-24 text-center"
+                >
                   Ingen resultater.
                 </TableCell>
               </TableRow>
@@ -231,5 +235,5 @@ export function CompanyTable<TData, TValue>({
       </ScrollArea>
       <DataTablePagination table={table} />
     </div>
-  )
+  );
 }
