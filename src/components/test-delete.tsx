@@ -26,16 +26,22 @@ export function TestSidebarView() {
         }
       };
 
+      const getUrl = (section: number) => {
+        switch (section) {
+          case 2:
+            return "/people/f5f3c97a-93ec-41a1-a509-94e238570a69";
+          case 3:
+            return "/company/ae8fe6f1-e5b8-465b-b67a-138791a41401";
+          default:
+            return "/dashboard";
+        }
+      };
+
       const testView = {
         name: `Test View ${parentElement} - ${new Date().toISOString()}`,
         description: `This is a test view in section ${parentElement}`,
         icon: getIcon(parentElement),
-        url:
-          parentElement === 2
-            ? "https://sailsdock.no/people/f5f3c97a-93ec-41a1-a509-94e238570a69"
-            : parentElement === 3
-            ? "https://sailsdock.no/people/f5f3c97a-93ec-41a1-a509-94e238570a69"
-            : "https://sailsdock.no/company/ae8fe6f1-e5b8-465b-b67a-138791a41401",
+        url: getUrl(parentElement),
         sorting: 1,
         fields: { test: "data" },
         parent_element: parentElement,

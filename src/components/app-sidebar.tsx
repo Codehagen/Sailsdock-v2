@@ -11,29 +11,12 @@ import {
   Target,
   ListTodo,
   BookOpen,
-  ArrowRight,
-  Settings2,
+  Settings,
   LifeBuoy,
   Send,
-  UserPlus,
-  UsersRound,
-  Building2,
-  Star,
-  Command,
-  Settings,
-  Bot,
-  Frame,
-  PieChart,
-  Map,
-  MoreHorizontal,
-  Folder,
-  Share,
-  Trash2,
+  LucideIcon,
   MessageSquare,
   Sparkles,
-  Brain,
-  Zap,
-  LucideIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -49,18 +32,10 @@ import {
   SidebarMenuItem,
   SidebarGroup,
   SidebarGroupLabel,
-  SidebarMenuAction,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
 import { FeedbackDialog } from "@/components/feedback-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useSidebarStore } from "@/stores/use-sidebar-store";
 
 const data = {
@@ -82,35 +57,11 @@ const data = {
           title: "Personer",
           url: "/people",
           icon: Users,
-          items: [
-            {
-              title: "Test Person",
-              url: "/people/82be121f-b56c-46db-abb3-bccc5c7c0267",
-              icon: UsersRound,
-            },
-            {
-              title: "Placeholder",
-              url: "/people/add",
-              icon: UserPlus,
-            },
-          ],
         },
         {
           title: "Bedrifter",
           url: "/company",
           icon: Building,
-          items: [
-            {
-              title: "Test Bedrift",
-              url: "/company/82be121f-b56c-46db-abb3-bccc5c7c0267",
-              icon: Building2,
-            },
-            {
-              title: "Placeholder",
-              url: "/company/add",
-              icon: Building2,
-            },
-          ],
         },
         {
           title: "Opportunities",
@@ -130,6 +81,18 @@ const data = {
       ],
     },
   ],
+  aiProjects: [
+    {
+      name: "AI Assistants",
+      url: "/generator",
+      icon: Sparkles,
+    },
+    {
+      name: "Chat",
+      url: "/ai/chat",
+      icon: MessageSquare,
+    },
+  ],
   navSecondary: [
     {
       title: "Support",
@@ -146,23 +109,6 @@ const data = {
       url: "/settings",
       icon: Settings,
     },
-  ],
-  aiProjects: [
-    {
-      name: "AI Assistants",
-      url: "/generator",
-      icon: Sparkles,
-    },
-    {
-      name: "Chat",
-      url: "/ai/chat",
-      icon: MessageSquare,
-    },
-    // {
-    //   name: "AI Models",
-    //   url: "/ai/models",
-    //   icon: Brain,
-    // },
   ],
 };
 
@@ -189,42 +135,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Update navMain items with isActive property and dynamic subsections
   const updatedNavMain = data.navMain.map((group) => ({
     ...group,
-    items: group.items.map((item) => {
-      if (item.title === "Personer" && sidebarData && sidebarData["3"]) {
-        return {
-          ...item,
-          isActive: isActiveNavItem(item),
-          items: sidebarData["3"].map((subItem) => ({
-            title: subItem.name,
-            url: subItem.url,
-            icon: getLucideIcon(subItem.icon),
-            isActive: subItem.url === pathname,
-          })),
-        };
-      }
-      if (item.title === "Bedrifter" && sidebarData && sidebarData["4"]) {
-        return {
-          ...item,
-          isActive: isActiveNavItem(item),
-          items: sidebarData["4"].map((subItem) => ({
-            title: subItem.name,
-            url: subItem.url,
-            icon: getLucideIcon(subItem.icon),
-            isActive: subItem.url === pathname,
-          })),
-        };
-      }
-      return {
-        ...item,
-        isActive: isActiveNavItem(item),
-        items: item.items
-          ? item.items.map((subItem) => ({
-              ...subItem,
-              isActive: subItem.url === pathname,
-            }))
-          : undefined,
-      };
-    }),
+    items: group.items.map((item) => ({
+      ...item,
+      isActive: isActiveNavItem(item),
+    })),
   }));
 
   // Update the navSecondary items to include the FeedbackDialog
@@ -267,7 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain groups={updatedNavMain} />
 
-        {/* Update the AI Projects section */}
+        {/* AI Projects Section */}
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>AI Projects</SidebarGroupLabel>
           <SidebarMenu>
@@ -290,14 +204,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  );
-}
-
-// Helper function to get Lucide icons
-function getLucideIcon(iconName: string): LucideIcon {
-  const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
-  return (
-    (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
-    LucideIcons.HelpCircle
   );
 }
