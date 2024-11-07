@@ -98,39 +98,32 @@ export function NavMain({ groups }: NavMainProps) {
       {/* Favorites Section */}
       {sidebarData?.["1"] && (
         <SidebarGroup>
-          <SidebarGroupLabel>Favorites</SidebarGroupLabel>
+          <SidebarGroupLabel>Favoritter</SidebarGroupLabel>
           <SidebarMenu>
             {sidebarData["1"].map((view) => {
               const Icon = getLucideIcon(view.icon);
               return (
-                <SidebarMenuItem key={view.uuid}>
-                  <SidebarMenuButton asChild tooltip={view.name}>
-                    <Link href={view.url}>
-                      <Icon className="mr-2 h-4 w-4" />
-                      <span>{view.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <SidebarMenuAction showOnHover>
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">More</span>
-                      </SidebarMenuAction>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent
-                      className="w-48"
-                      side="bottom"
-                      align="end"
+                <ContextMenu key={view.uuid}>
+                  <ContextMenuTrigger>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip={view.name}>
+                        <Link href={view.url}>
+                          <Icon className="mr-2 h-4 w-4" />
+                          <span>{view.name}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-[160px]">
+                    <ContextMenuItem
+                      onClick={() => handleRemoveView(view.uuid, view.name)}
+                      className="text-destructive"
                     >
-                      <ContextMenuItem
-                        onClick={() => handleRemoveView(view.uuid, view.name)}
-                      >
-                        <Star className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Remove from Favorites</span>
-                      </ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                </SidebarMenuItem>
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Fjern
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               );
             })}
           </SidebarMenu>

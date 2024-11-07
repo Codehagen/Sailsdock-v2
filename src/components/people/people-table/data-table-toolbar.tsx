@@ -9,12 +9,12 @@ import { SaveViewButton } from "@/components/ui/save-view-button";
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
-  viewType: "people" | "company";
+  data?: TData[];
 }
 
 export function DataTableToolbar<TData>({
   table,
-  viewType,
+  data,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
 
@@ -42,8 +42,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center space-x-2">
-        <SaveViewButton parentElement={2} /> {/* Always 2 for people views */}
-        <DataTableViewOptions table={table} />
+        <SaveViewButton parentElement={2} />
       </div>
     </div>
   );
