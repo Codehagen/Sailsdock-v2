@@ -1,3 +1,5 @@
+"use client";
+
 import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -15,6 +17,7 @@ import { ColumnId } from "./KanbanBoard";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { nb } from "date-fns/locale";
+import { useRouter } from "next/navigation";
 
 export interface Task {
   id: UniqueIdentifier;
@@ -45,6 +48,8 @@ export interface TaskDragData {
 }
 
 export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
+  const router = useRouter();
+
   const {
     setNodeRef,
     attributes,
@@ -83,6 +88,10 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
     return formatDistanceToNow(date, { addSuffix: true, locale: nb });
   };
 
+  const handleTitleClick = () => {
+    router.push(`/opportunities/${task.id}`);
+  };
+
   return (
     <Card
       ref={setNodeRef}
@@ -95,7 +104,12 @@ export function TaskCard({ task, onStatusChange, isOverlay }: TaskCardProps) {
     >
       <CardContent className="p-3 space-y-2 cursor-grab active:cursor-grabbing">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium">{task.title}</h3>
+          <h3
+            onClick={handleTitleClick}
+            className="text-sm font-medium hover:text-blue-300 cursor-pointer"
+          >
+            {task.title}
+          </h3>
         </div>
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <Badge variant="secondary" className="text-xs font-normal">

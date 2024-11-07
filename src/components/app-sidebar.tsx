@@ -3,7 +3,6 @@
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import * as LucideIcons from "lucide-react";
 import {
   LayoutDashboard,
   Users,
@@ -11,12 +10,28 @@ import {
   Target,
   ListTodo,
   BookOpen,
-  Settings,
+  ArrowRight,
+  Settings2,
   LifeBuoy,
   Send,
-  LucideIcon,
+  UserPlus,
+  UsersRound,
+  Building2,
+  Star,
+  Command,
+  Settings,
+  Bot,
+  Frame,
+  PieChart,
+  Map,
+  MoreHorizontal,
+  Folder,
+  Share,
+  Trash2,
   MessageSquare,
   Sparkles,
+  Brain,
+  Zap,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -32,11 +47,18 @@ import {
   SidebarMenuItem,
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarMenuAction,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Icons } from "@/components/icons";
 import { FeedbackDialog } from "@/components/feedback-dialog";
-import { useSidebar } from "@/components/ui/sidebar";
-import { useSidebarStore } from "@/stores/use-sidebar-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const data = {
   user: {
@@ -45,6 +67,21 @@ const data = {
     avatar: "/avatars/john-doe.jpg",
   },
   navMain: [
+    {
+      group: "Favorites",
+      items: [
+        {
+          title: "Bedrift 1",
+          url: "/quick-dashboard",
+          icon: Star,
+        },
+        {
+          title: "Bedrift 2",
+          url: "/recent-contacts",
+          icon: Star,
+        },
+      ],
+    },
     {
       group: "Platform",
       items: [
@@ -57,11 +94,35 @@ const data = {
           title: "Personer",
           url: "/people",
           icon: Users,
+          items: [
+            {
+              title: "Test Person",
+              url: "/people/82be121f-b56c-46db-abb3-bccc5c7c0267",
+              icon: UsersRound,
+            },
+            {
+              title: "Placeholder",
+              url: "/people/add",
+              icon: UserPlus,
+            },
+          ],
         },
         {
           title: "Bedrifter",
           url: "/company",
           icon: Building,
+          items: [
+            {
+              title: "Test Bedrift",
+              url: "/company/82be121f-b56c-46db-abb3-bccc5c7c0267",
+              icon: Building2,
+            },
+            {
+              title: "Placeholder",
+              url: "/company/add",
+              icon: Building2,
+            },
+          ],
         },
         {
           title: "Opportunities",
@@ -81,18 +142,6 @@ const data = {
       ],
     },
   ],
-  aiProjects: [
-    {
-      name: "AI Assistants",
-      url: "/generator",
-      icon: Sparkles,
-    },
-    {
-      name: "Chat",
-      url: "/ai/chat",
-      icon: MessageSquare,
-    },
-  ],
   navSecondary: [
     {
       title: "Support",
@@ -110,18 +159,28 @@ const data = {
       icon: Settings,
     },
   ],
+  aiProjects: [
+    {
+      name: "AI Assistants",
+      url: "/generator",
+      icon: Sparkles,
+    },
+    {
+      name: "Chat",
+      url: "/ai/chat",
+      icon: MessageSquare,
+    },
+    // {
+    //   name: "AI Models",
+    //   url: "/ai/models",
+    //   icon: Brain,
+    // },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { isMobile } = useSidebar();
-  const { sidebarData, fetchSidebarData } = useSidebarStore();
-
-  React.useEffect(() => {
-    if (!sidebarData) {
-      fetchSidebarData();
-    }
-  }, [sidebarData, fetchSidebarData]);
 
   // Function to check if a nav item is active
   const isActiveNavItem = (item: any): boolean => {
@@ -132,12 +191,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return false;
   };
 
-  // Update navMain items with isActive property and dynamic subsections
+  // Update navMain items with isActive property
   const updatedNavMain = data.navMain.map((group) => ({
     ...group,
     items: group.items.map((item) => ({
       ...item,
       isActive: isActiveNavItem(item),
+      items: item.items
+        ? item.items.map((subItem) => ({
+            ...subItem,
+            isActive: subItem.url === pathname,
+          }))
+        : undefined,
     })),
   }));
 
@@ -181,7 +246,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain groups={updatedNavMain} />
 
-        {/* AI Projects Section */}
+        {/* Update the AI Projects section */}
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <SidebarGroupLabel>AI Projects</SidebarGroupLabel>
           <SidebarMenu>

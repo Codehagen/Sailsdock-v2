@@ -17,15 +17,13 @@ import { EmailsContent } from "@/components/company/EmailsContent";
 import { CalendarContent } from "@/components/company/CalendarContent";
 import { TimelineContent } from "@/components/company/TimelineContent";
 
-export default async function PersonUserPage(
-  props: {
-    params: Promise<{ id: string }>;
-  }
-) {
+export default async function PersonUserPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = await props.params;
   const personId = params.id;
   const personDetails = await getPersonDetails(personId);
-  console.log(personDetails);
+  console.log("personDetails", personDetails);
 
   if (!personDetails) {
     return (

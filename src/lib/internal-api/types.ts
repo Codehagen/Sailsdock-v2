@@ -250,31 +250,41 @@ export interface OpportunityData {
 }
 
 export interface SidebarViewData {
-  uuid: string;
   name: string;
   description: string;
   icon: string;
+  parent_element: number;
   url: string;
   sorting: number;
-  fields: any | null;
-  section?: string;
+  fields: null | any; // You may want to define a more specific type for fields if needed
   user: number;
-  parent_element: number;
 }
 
 export interface PersonData {
   id: number;
+  companies: Array<{
+    id: number;
+    uuid: string;
+    name: string;
+    orgnr: string;
+  }>;
+  opportunities: OpportunityData[];
   uuid: string;
-  name: string;
-  title?: string;
-  phone?: string;
-  email?: string;
   date_created: string;
   last_modified: string;
-  company: CompanyData | null;
-  opportunities: OpportunityData[];
-  companies: number[]; // Add this line to include the companies property
-  // Add other properties as needed
+  name: string;
+  title: string | null;
+  phone: string | null;
+  email: string | null;
+  department: string;
+  address_street: string;
+  address_zip: string;
+  address_city: string;
+  pref_com: string;
+  url: string;
+  user: number;
+  workspace: number;
+  company: number;
 }
 
 // Make sure you have CompanyData and OpportunityData interfaces defined as well

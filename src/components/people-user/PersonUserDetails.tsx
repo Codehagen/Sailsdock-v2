@@ -35,8 +35,9 @@ import {
   CompanyData,
   OpportunityData,
 } from "@/lib/internal-api/types";
-import { FavoriteButton } from "@/components/ui/favorite-button";
-import { useSidebarStore } from "@/stores/use-sidebar-store";
+import { CompanyCombobox } from "@/components/people/company-combobox";
+import { OpportunityCombobox } from "@/components/people/opportunity-combobox";
+import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -65,20 +66,18 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<CompanyData | null>(
-    personDetails.company || null
-  );
+  const [companies, setCompanies] = useState<
+    {
+      id: number;
+      uuid: string;
+      name: string;
+      orgnr: string;
+    }[]
+  >(personDetails.companies || []);
   const [opportunities, setOpportunities] = useState<OpportunityData[]>(
     personDetails.opportunities || []
   );
   const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
-
-  const { sidebarData } = useSidebarStore();
-
-  // Check if this person is in favorites
-  const favoriteView = sidebarData?.["1"]?.find(
-    (view) => view.url === `/people/${personDetails.uuid}`
-  );
 
   const handleUpdateField = async (field: string, value: string) => {
     try {
@@ -216,16 +215,7 @@ export function PersonUserDetails({
             </AvatarFallback>
           </Avatar>
           <div className="flex-grow min-w-0">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold truncate">{editedName}</h3>
-              <FavoriteButton
-                name={personDetails.name}
-                icon="User"
-                description={`Person details for ${personDetails.name}`}
-                initialIsFavorite={!!favoriteView}
-                favoriteId={favoriteView?.uuid}
-              />
-            </div>
+            <h3 className="text-lg font-semibold truncate">{editedName}</h3>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>
@@ -373,61 +363,95 @@ export function PersonUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Selskap
+                Selskap ({companies.length})
               </h4>
-              {/* Add a company selector component here if needed */}
+              <CompanyCombobox
+                personId={personDetails.uuid}
+                onCompanyAdded={(newCompany) => {
+                  setCompanies((prev) => [...prev, newCompany]);
+                  toast.success(`${newCompany.name} lagt til som selskap`);
+                }}
+                currentCompanies={companies.map((comp) => comp.id)}
+              />
             </div>
-            {company ? (
-              <div className="flex items-center gap-2">
-                <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
-                  <Link
-                    href={`/company/${company.uuid}`}
-                    className="flex items-center gap-2 flex-grow"
-                  >
-                    <div
-                      className={cn(
-                        "flex items-center justify-center",
-                        "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
-                        "text-xs font-medium"
-                      )}
-                    >
-                      {company.name.charAt(0)}
+            {companies.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {companies.map((company) => (
+                  <div key={company.uuid} className="flex items-center gap-2">
+                    <div className="inline-flex items-center gap-2 bg-secondary rounded-full py-1 pl-2 pr-1 hover:bg-secondary/80 transition-colors">
+                      <Link
+                        href={`/company/${company.uuid}`}
+                        className="flex items-center gap-2 flex-grow"
+                      >
+                        <div
+                          className={cn(
+                            "flex items-center justify-center",
+                            "w-6 h-6 rounded-full bg-orange-100 text-orange-500",
+                            "text-xs font-medium"
+                          )}
+                        >
+                          {company.name.charAt(0)}
+                        </div>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {company.name}
+                        </span>
+                      </Link>
+                      <Separator orientation="vertical" className="h-4 mx-1" />
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
+                          >
+                            <Trash2 className="h-3 w-3 text-muted-foreground" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-2">
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={async () => {
+                              try {
+                                const updatedCompanyIds = companies
+                                  .filter((c) => c.id !== company.id)
+                                  .map((c) => c.id);
+
+                                const updatedPerson = await updatePerson(
+                                  personDetails.uuid,
+                                  {
+                                    companies: updatedCompanyIds,
+                                  }
+                                );
+
+                                if (updatedPerson) {
+                                  setCompanies(
+                                    companies.filter((c) => c.id !== company.id)
+                                  );
+                                  toast.success("Selskapstilknytning fjernet");
+                                } else {
+                                  throw new Error("Failed to remove company");
+                                }
+                              } catch (error) {
+                                console.error("Error removing company:", error);
+                                toast.error(
+                                  "En feil oppstod under fjerning av selskap"
+                                );
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Fjern
+                          </Button>
+                        </PopoverContent>
+                      </Popover>
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {company.name}
-                    </span>
-                  </Link>
-                  <Separator orientation="vertical" className="h-4 mx-1" />
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 hover:bg-transparent -ml-2"
-                      >
-                        <Trash2 className="h-3 w-3 text-muted-foreground" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-2">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => {
-                          // Add logic to remove company association
-                          setCompany(null);
-                          toast.success("Selskapstilknytning fjernet");
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Fjern
-                      </Button>
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <span className="text-sm text-muted-foreground">
-                Ingen tilknyttet selskap
+                Ingen tilknyttede selskap
               </span>
             )}
           </div>
@@ -440,7 +464,14 @@ export function PersonUserDetails({
               <h4 className="text-sm font-medium text-muted-foreground">
                 Muligheter ({opportunities.length})
               </h4>
-              {/* Add an opportunity selector component here if needed */}
+              <OpportunityCombobox
+                personId={personDetails.id}
+                onOpportunityAdded={(newOpportunity) => {
+                  setOpportunities((prev) => [...prev, newOpportunity]);
+                  toast.success(`${newOpportunity.name} lagt til som mulighet`);
+                }}
+                currentOpportunities={opportunities.map((opp) => opp.id)}
+              />
             </div>
             {opportunities.map((opportunity) => (
               <div key={opportunity.uuid} className="flex items-center gap-2">
@@ -477,16 +508,32 @@ export function PersonUserDetails({
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => {
-                          // Add logic to remove opportunity
-                          setOpportunities(
-                            opportunities.filter(
-                              (opp) => opp.uuid !== opportunity.uuid
-                            )
-                          );
-                          toast.success(
-                            `${opportunity.name} fjernet fra muligheter`
-                          );
+                        onClick={async () => {
+                          try {
+                            const updatedOpportunity = await updateOpportunity(
+                              opportunity.uuid,
+                              {
+                                companies: opportunity.companies || [],
+                              }
+                            );
+                            if (updatedOpportunity) {
+                              setOpportunities(
+                                opportunities.filter(
+                                  (opp) => opp.id !== opportunity.id
+                                )
+                              );
+                              toast.success(
+                                `${opportunity.name} fjernet fra muligheter`
+                              );
+                            } else {
+                              throw new Error("Failed to remove opportunity");
+                            }
+                          } catch (error) {
+                            console.error("Error removing opportunity:", error);
+                            toast.error(
+                              "En feil oppstod under fjerning av mulighet"
+                            );
+                          }
                         }}
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -499,15 +546,14 @@ export function PersonUserDetails({
             ))}
           </div>
 
-          <Separator className="my-4" />
+          {/* <Separator className="my-4" /> */}
 
           {/* Other People Section */}
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
                 Personer ({otherPeople.length})
               </h4>
-              {/* Add a person selector component here if needed */}
             </div>
             {otherPeople.map((person) => (
               <Link
@@ -531,7 +577,7 @@ export function PersonUserDetails({
                 </div>
               </Link>
             ))}
-          </div>
+          </div> */}
         </div>
       </CardContent>
     </Card>

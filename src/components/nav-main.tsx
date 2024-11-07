@@ -1,16 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import {
-  ChevronRight,
-  type LucideIcon,
-  MoreHorizontal,
-  Star,
-  Trash2,
-} from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
-import * as LucideIcons from "lucide-react";
 
 import {
   Collapsible,
@@ -28,15 +21,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { useSidebarStore } from "@/stores/use-sidebar-store";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from "@/components/ui/context-menu";
-import { removeSidebarView } from "@/actions/sidebar/remove-view";
-import { toast } from "sonner";
 
 interface NavItem {
   title: string;
@@ -56,37 +40,6 @@ interface NavMainProps {
 }
 
 export function NavMain({ groups }: NavMainProps) {
-  const { sidebarData, isLoading, fetchSidebarData } = useSidebarStore();
-
-  useEffect(() => {
-    if (!sidebarData) {
-      fetchSidebarData();
-    }
-  }, [sidebarData, fetchSidebarData]);
-
-  const getLucideIcon = (iconName: string): LucideIcon => {
-    const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
-    return (
-      (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
-      LucideIcons.HelpCircle
-    );
-  };
-
-  const handleRemoveView = async (viewId: string, viewName: string) => {
-    try {
-      const success = await removeSidebarView(viewId);
-      if (success) {
-        await fetchSidebarData();
-        toast.success(`Visning "${viewName}" er fjernet`);
-      } else {
-        toast.error("Kunne ikke fjerne visning");
-      }
-    } catch (error) {
-      console.error("Error removing view:", error);
-      toast.error("Kunne ikke fjerne visning");
-    }
-  };
-
   return (
     <>
       <SidebarGroup>
@@ -94,50 +47,6 @@ export function NavMain({ groups }: NavMainProps) {
           <EnhancedInbox />
         </SidebarMenu>
       </SidebarGroup>
-
-      {/* Favorites Section */}
-      {sidebarData?.["1"] && (
-        <SidebarGroup>
-          <SidebarGroupLabel>Favorites</SidebarGroupLabel>
-          <SidebarMenu>
-            {sidebarData["1"].map((view) => {
-              const Icon = getLucideIcon(view.icon);
-              return (
-                <SidebarMenuItem key={view.uuid}>
-                  <SidebarMenuButton asChild tooltip={view.name}>
-                    <Link href={view.url}>
-                      <Icon className="mr-2 h-4 w-4" />
-                      <span>{view.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <SidebarMenuAction showOnHover>
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">More</span>
-                      </SidebarMenuAction>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent
-                      className="w-48"
-                      side="bottom"
-                      align="end"
-                    >
-                      <ContextMenuItem
-                        onClick={() => handleRemoveView(view.uuid, view.name)}
-                      >
-                        <Star className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Remove from Favorites</span>
-                      </ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
-      )}
-
-      {/* Platform Groups */}
       {groups.map((group) => (
         <SidebarGroup key={group.group}>
           <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
@@ -155,9 +64,7 @@ export function NavMain({ groups }: NavMainProps) {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {(item.items?.length ||
-                    (item.title === "Personer" && sidebarData?.["2"]) ||
-                    (item.title === "Bedrifter" && sidebarData?.["3"])) && (
+                  {item.items?.length ? (
                     <>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuAction className="data-[state=open]:rotate-90">
@@ -167,7 +74,6 @@ export function NavMain({ groups }: NavMainProps) {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {/* Default items */}
                           {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
@@ -181,78 +87,10 @@ export function NavMain({ groups }: NavMainProps) {
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
-
-                          {/* Dynamic Person Views */}
-                          {item.title === "Personer" &&
-                            sidebarData?.["2"]?.map((view) => {
-                              const Icon = getLucideIcon(view.icon);
-                              return (
-                                <ContextMenu key={view.uuid}>
-                                  <ContextMenuTrigger>
-                                    <SidebarMenuSubItem>
-                                      <SidebarMenuSubButton asChild>
-                                        <Link
-                                          href={view.url}
-                                          className="flex-1"
-                                        >
-                                          <Icon className="mr-2 h-4 w-4" />
-                                          <span>{view.name}</span>
-                                        </Link>
-                                      </SidebarMenuSubButton>
-                                    </SidebarMenuSubItem>
-                                  </ContextMenuTrigger>
-                                  <ContextMenuContent className="w-[160px]">
-                                    <ContextMenuItem
-                                      onClick={() =>
-                                        handleRemoveView(view.uuid, view.name)
-                                      }
-                                      className="text-destructive"
-                                    >
-                                      <Trash2 className="mr-2 h-4 w-4" />
-                                      Fjern visning
-                                    </ContextMenuItem>
-                                  </ContextMenuContent>
-                                </ContextMenu>
-                              );
-                            })}
-
-                          {/* Dynamic Company Views */}
-                          {item.title === "Bedrifter" &&
-                            sidebarData?.["3"]?.map((view) => {
-                              const Icon = getLucideIcon(view.icon);
-                              return (
-                                <ContextMenu key={view.uuid}>
-                                  <ContextMenuTrigger>
-                                    <SidebarMenuSubItem>
-                                      <SidebarMenuSubButton asChild>
-                                        <Link
-                                          href={view.url}
-                                          className="flex-1"
-                                        >
-                                          <Icon className="mr-2 h-4 w-4" />
-                                          <span>{view.name}</span>
-                                        </Link>
-                                      </SidebarMenuSubButton>
-                                    </SidebarMenuSubItem>
-                                  </ContextMenuTrigger>
-                                  <ContextMenuContent className="w-[160px]">
-                                    <ContextMenuItem
-                                      onClick={() =>
-                                        handleRemoveView(view.uuid, view.name)
-                                      }
-                                      className="text-destructive"
-                                    >
-                                      <Trash2 className="mr-2 h-4 w-4" />
-                                      Fjern visning
-                                    </ContextMenuItem>
-                                  </ContextMenuContent>
-                                </ContextMenu>
-                              );
-                            })}
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </>
-                  )}
+                  ) : null}
                 </SidebarMenuItem>
               </Collapsible>
             ))}

@@ -27,8 +27,9 @@ import {
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Task } from "./types";
+import { getUserTasks } from "@/actions/tasks/get-user-tasks";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -36,11 +37,16 @@ interface DataTableProps<TData, TValue> {
   initialTotalCount: number;
 }
 
-export function PeopleTable({
+interface DataTableMeta<TData> {
+  updateData: (rowIndex: number, columnId: string, value: unknown) => void;
+  refreshData: () => Promise<void>;
+}
+
+export function TaskTable<TData, TValue>({
   columns,
   initialData,
   initialTotalCount,
-}: DataTableProps<Person, unknown>) {
+}: DataTableProps<TData, TValue>) {
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -51,23 +57,6 @@ export function PeopleTable({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const updateData = React.useCallback(
-    (rowIndex: number, columnId: string, value: unknown) => {
-      setData((old) =>
-        old.map((row, index) => {
-          if (index === rowIndex) {
-            return {
-              ...old[rowIndex]!,
-              [columnId]: value,
-            };
-          }
-          return row;
-        })
-      );
-    },
-    []
-  );
-
   const table = useReactTable({
     data,
     columns,
@@ -77,6 +66,32 @@ export function PeopleTable({
       rowSelection,
       columnFilters,
     },
+    meta: {
+      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex]!,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
+      refreshData: async () => {
+        const { data: freshData, totalCount: newTotalCount } =
+          await getUserTasks(
+            table.getState().pagination.pageSize,
+            table.getState().pagination.pageIndex + 1
+          );
+        if (freshData) {
+          setData(freshData as TData[]);
+          setTotalCount(newTotalCount);
+        }
+      },
+    } as DataTableMeta<TData>,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -88,34 +103,12 @@ export function PeopleTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
-    meta: {
-      updateData,
-    },
+    pageCount: Math.ceil(totalCount / 10),
   });
-
-  React.useEffect(() => {
-    async function fetchData() {
-      const pageIndex = table.getState().pagination.pageIndex;
-      const pageSize = table.getState().pagination.pageSize;
-      const { data: newData, totalCount: newTotalCount } = await getAllPeople(
-        pageSize,
-        pageIndex + 1
-      );
-      if (newData) {
-        setData(newData as TData[]);
-        setTotalCount(newTotalCount);
-      }
-    }
-    fetchData();
-  }, [
-    table.getState().pagination.pageIndex,
-    table.getState().pagination.pageSize,
-  ]);
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar table={table} data={data as Task[]} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
