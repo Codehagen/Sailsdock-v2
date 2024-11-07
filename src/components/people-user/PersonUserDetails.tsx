@@ -35,6 +35,8 @@ import {
   CompanyData,
   OpportunityData,
 } from "@/lib/internal-api/types";
+import { FavoriteButton } from "@/components/ui/favorite-button";
+import { useSidebarStore } from "@/stores/use-sidebar-store";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -63,9 +65,20 @@ export function PersonUserDetails({
   const [isEmailPopoverOpen, setIsEmailPopoverOpen] = useState(false);
 
   // New state for company, opportunities, and other people
-  const [company, setCompany] = useState<CompanyData | null>(personDetails.company || null);
-  const [opportunities, setOpportunities] = useState<OpportunityData[]>(personDetails.opportunities || []);
+  const [company, setCompany] = useState<CompanyData | null>(
+    personDetails.company || null
+  );
+  const [opportunities, setOpportunities] = useState<OpportunityData[]>(
+    personDetails.opportunities || []
+  );
   const [otherPeople, setOtherPeople] = useState<PersonData[]>([]); // You might need to fetch this data
+
+  const { sidebarData } = useSidebarStore();
+
+  // Check if this person is in favorites
+  const favoriteView = sidebarData?.["1"]?.find(
+    (view) => view.url === `/people/${personDetails.uuid}`
+  );
 
   const handleUpdateField = async (field: string, value: string) => {
     try {
@@ -203,7 +216,16 @@ export function PersonUserDetails({
             </AvatarFallback>
           </Avatar>
           <div className="flex-grow min-w-0">
-            <h3 className="text-lg font-semibold truncate">{editedName}</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold truncate">{editedName}</h3>
+              <FavoriteButton
+                name={personDetails.name}
+                icon="User"
+                description={`Person details for ${personDetails.name}`}
+                initialIsFavorite={!!favoriteView}
+                favoriteId={favoriteView?.uuid}
+              />
+            </div>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>

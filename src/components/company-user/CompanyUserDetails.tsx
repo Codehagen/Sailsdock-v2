@@ -570,7 +570,7 @@ export function CompanyUserDetails({
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="p-0 h-auto font-normal w-full text-left"
+                    className="p-0 h-auto font-normal text-left"
                   >
                     <h3 className="text-lg font-semibold truncate">
                       {editedCompanyName}
