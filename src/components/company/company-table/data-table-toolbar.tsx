@@ -32,80 +32,91 @@ const last_contacted_options = [
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
-  data: any[];
+  data?: any[];
   viewType: "people" | "company";
 }
 
 export function DataTableToolbar<TData>({
   table,
-  data,
+  data = [],
   viewType,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
-  // Remove all rows with empty "people" col
-  const filteredRows = data.filter((row) => row.account_owners.length);
-  // Unique list of account_owners (personer)
-  const owners = filteredRows
-    .flatMap((row) => row.account_owners)
-    .reduce((uniqueOwners, owner: any) => {
-      const ownerName = `${owner?.first_name ?? ""} ${
-        owner?.last_name ?? ""
-      }`.trim();
-      const ownerValue = ownerName.toLowerCase();
 
-      // Check if owner already exists
-      if (!uniqueOwners.some((o: any) => o.value === ownerValue)) {
-        uniqueOwners.push({
-          value: ownerValue,
-          label: ownerName,
-          icon: undefined,
-        });
-      }
+  const owners =
+    viewType === "company" && data.length > 0
+      ? data
+          .filter((row) => row.account_owners?.length > 0)
+          .flatMap((row) => row.account_owners)
+          .reduce((uniqueOwners: any[], owner: any) => {
+            const ownerName = `${owner?.first_name ?? ""} ${
+              owner?.last_name ?? ""
+            }`.trim();
+            const ownerValue = ownerName.toLowerCase();
 
-      return uniqueOwners;
-    }, [] as { value: string; label: string; icon: undefined }[]);
+            if (!uniqueOwners.some((o) => o.value === ownerValue)) {
+              uniqueOwners.push({
+                value: ownerValue,
+                label: ownerName,
+                icon: undefined,
+              });
+            }
+
+            return uniqueOwners;
+          }, [])
+      : [];
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
       <div className="flex flex-1 items-center space-x-2 flex-wrap">
         <Input
-          placeholder="Filtrer selskaper..."
+          placeholder={
+            viewType === "people"
+              ? "Filtrer personer..."
+              : "Filtrer selskaper..."
+          }
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("account_owners") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("account_owners")}
-            title="Personer"
-            options={owners}
-          />
-        )}
-        {table.getColumn("num_employees") && (
-          <DataTableEmployeeFilter column={table.getColumn("num_employees")} />
-        )}
-        {table.getColumn("user_name") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("user_name")}
-            title="Laget av"
-            options={owners}
-          />
-        )}
-        {table.getColumn("last_contacted") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("last_contacted")}
-            title="Sist kontaktet"
-            options={last_contacted_options}
-          />
-        )}
-        {table.getColumn("arr") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("arr")}
-            title="ARR"
-            options={arrRanges}
-          />
+        {viewType === "company" && (
+          <>
+            {table.getColumn("account_owners") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("account_owners")}
+                title="Personer"
+                options={owners}
+              />
+            )}
+            {table.getColumn("num_employees") && (
+              <DataTableEmployeeFilter
+                column={table.getColumn("num_employees")}
+              />
+            )}
+            {table.getColumn("user_name") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("user_name")}
+                title="Laget av"
+                options={owners}
+              />
+            )}
+            {table.getColumn("last_contacted") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("last_contacted")}
+                title="Sist kontaktet"
+                options={last_contacted_options}
+              />
+            )}
+            {table.getColumn("arr") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("arr")}
+                title="ARR"
+                options={arrRanges}
+              />
+            )}
+          </>
         )}
         {isFiltered && (
           <Button

@@ -116,7 +116,7 @@ export function PeopleTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} viewType="people" />
+      <DataTableToolbar table={table} data={data} viewType="people" />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

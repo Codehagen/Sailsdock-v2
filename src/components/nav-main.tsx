@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
   Star,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
 import * as LucideIcons from "lucide-react";
@@ -37,6 +38,14 @@ import {
 } from "@/components/ui/context-menu";
 import { removeSidebarView } from "@/actions/sidebar/remove-view";
 import { toast } from "sonner";
+import { updateSidebarView } from "@/actions/sidebar/update-view";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   title: string;
@@ -57,6 +66,10 @@ interface NavMainProps {
 
 export function NavMain({ groups }: NavMainProps) {
   const { sidebarData, isLoading, fetchSidebarData } = useSidebarStore();
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [selectedViewId, setSelectedViewId] = useState<string | null>(null);
+  const [editingViewId, setEditingViewId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sidebarData) {
@@ -87,6 +100,46 @@ export function NavMain({ groups }: NavMainProps) {
     }
   };
 
+  const handleRenameView = async (viewId: string, newName: string) => {
+    try {
+      const success = await updateSidebarView(viewId, { name: newName });
+      if (success) {
+        await fetchSidebarData();
+        toast.success("Navn oppdatert");
+        setIsRenaming(false);
+        setNewName("");
+        setSelectedViewId(null);
+      } else {
+        toast.error("Kunne ikke oppdatere navn");
+      }
+    } catch (error) {
+      console.error("Error renaming view:", error);
+      toast.error("Kunne ikke oppdatere navn");
+    }
+  };
+
+  const handleStartEditing = (viewId: string, currentName: string) => {
+    setEditingViewId(viewId);
+    setNewName(currentName);
+  };
+
+  const handleKeyDown = async (
+    e: React.KeyboardEvent,
+    viewId: string,
+    originalName: string
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (newName.trim() && newName !== originalName) {
+        await handleRenameView(viewId, newName);
+      }
+      setEditingViewId(null);
+    } else if (e.key === "Escape") {
+      setEditingViewId(null);
+      setNewName(originalName);
+    }
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -98,39 +151,58 @@ export function NavMain({ groups }: NavMainProps) {
       {/* Favorites Section */}
       {sidebarData?.["1"] && (
         <SidebarGroup>
-          <SidebarGroupLabel>Favorites</SidebarGroupLabel>
+          <SidebarGroupLabel>Favoritter</SidebarGroupLabel>
           <SidebarMenu>
             {sidebarData["1"].map((view) => {
               const Icon = getLucideIcon(view.icon);
               return (
-                <SidebarMenuItem key={view.uuid}>
-                  <SidebarMenuButton asChild tooltip={view.name}>
-                    <Link href={view.url}>
-                      <Icon className="mr-2 h-4 w-4" />
-                      <span>{view.name}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                  <ContextMenu>
-                    <ContextMenuTrigger>
-                      <SidebarMenuAction showOnHover>
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">More</span>
-                      </SidebarMenuAction>
-                    </ContextMenuTrigger>
-                    <ContextMenuContent
-                      className="w-48"
-                      side="bottom"
-                      align="end"
+                <ContextMenu key={view.uuid}>
+                  <ContextMenuTrigger>
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip={view.name}>
+                        <Link href={view.url}>
+                          <Icon className="mr-2 h-4 w-4" />
+                          {editingViewId === view.uuid ? (
+                            <Input
+                              className="h-6 w-[120px]"
+                              value={newName}
+                              onChange={(e) => setNewName(e.target.value)}
+                              onKeyDown={(e) =>
+                                handleKeyDown(e, view.uuid, view.name)
+                              }
+                              onBlur={() => {
+                                setEditingViewId(null);
+                                setNewName(view.name);
+                              }}
+                              autoFocus
+                              onClick={(e) => e.preventDefault()}
+                            />
+                          ) : (
+                            <span>{view.name}</span>
+                          )}
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-[160px]">
+                    <ContextMenuItem
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleStartEditing(view.uuid, view.name);
+                      }}
                     >
-                      <ContextMenuItem
-                        onClick={() => handleRemoveView(view.uuid, view.name)}
-                      >
-                        <Star className="mr-2 h-4 w-4 text-muted-foreground" />
-                        <span>Remove from Favorites</span>
-                      </ContextMenuItem>
-                    </ContextMenuContent>
-                  </ContextMenu>
-                </SidebarMenuItem>
+                      <Pencil className="mr-2 h-4 w-4" />
+                      Bytt navn
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      onClick={() => handleRemoveView(view.uuid, view.name)}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Fjern
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               );
             })}
           </SidebarMenu>
@@ -196,12 +268,49 @@ export function NavMain({ groups }: NavMainProps) {
                                           className="flex-1"
                                         >
                                           <Icon className="mr-2 h-4 w-4" />
-                                          <span>{view.name}</span>
+                                          {editingViewId === view.uuid ? (
+                                            <Input
+                                              className="h-6 w-[120px]"
+                                              value={newName}
+                                              onChange={(e) =>
+                                                setNewName(e.target.value)
+                                              }
+                                              onKeyDown={(e) =>
+                                                handleKeyDown(
+                                                  e,
+                                                  view.uuid,
+                                                  view.name
+                                                )
+                                              }
+                                              onBlur={() => {
+                                                setEditingViewId(null);
+                                                setNewName(view.name);
+                                              }}
+                                              autoFocus
+                                              onClick={(e) =>
+                                                e.preventDefault()
+                                              }
+                                            />
+                                          ) : (
+                                            <span>{view.name}</span>
+                                          )}
                                         </Link>
                                       </SidebarMenuSubButton>
                                     </SidebarMenuSubItem>
                                   </ContextMenuTrigger>
                                   <ContextMenuContent className="w-[160px]">
+                                    <ContextMenuItem
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleStartEditing(
+                                          view.uuid,
+                                          view.name
+                                        );
+                                      }}
+                                    >
+                                      <Pencil className="mr-2 h-4 w-4" />
+                                      Bytt navn
+                                    </ContextMenuItem>
                                     <ContextMenuItem
                                       onClick={() =>
                                         handleRemoveView(view.uuid, view.name)
@@ -209,7 +318,7 @@ export function NavMain({ groups }: NavMainProps) {
                                       className="text-destructive"
                                     >
                                       <Trash2 className="mr-2 h-4 w-4" />
-                                      Fjern visning
+                                      Fjern
                                     </ContextMenuItem>
                                   </ContextMenuContent>
                                 </ContextMenu>
@@ -230,12 +339,49 @@ export function NavMain({ groups }: NavMainProps) {
                                           className="flex-1"
                                         >
                                           <Icon className="mr-2 h-4 w-4" />
-                                          <span>{view.name}</span>
+                                          {editingViewId === view.uuid ? (
+                                            <Input
+                                              className="h-6 w-[120px]"
+                                              value={newName}
+                                              onChange={(e) =>
+                                                setNewName(e.target.value)
+                                              }
+                                              onKeyDown={(e) =>
+                                                handleKeyDown(
+                                                  e,
+                                                  view.uuid,
+                                                  view.name
+                                                )
+                                              }
+                                              onBlur={() => {
+                                                setEditingViewId(null);
+                                                setNewName(view.name);
+                                              }}
+                                              autoFocus
+                                              onClick={(e) =>
+                                                e.preventDefault()
+                                              }
+                                            />
+                                          ) : (
+                                            <span>{view.name}</span>
+                                          )}
                                         </Link>
                                       </SidebarMenuSubButton>
                                     </SidebarMenuSubItem>
                                   </ContextMenuTrigger>
                                   <ContextMenuContent className="w-[160px]">
+                                    <ContextMenuItem
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleStartEditing(
+                                          view.uuid,
+                                          view.name
+                                        );
+                                      }}
+                                    >
+                                      <Pencil className="mr-2 h-4 w-4" />
+                                      Bytt navn
+                                    </ContextMenuItem>
                                     <ContextMenuItem
                                       onClick={() =>
                                         handleRemoveView(view.uuid, view.name)
@@ -243,7 +389,7 @@ export function NavMain({ groups }: NavMainProps) {
                                       className="text-destructive"
                                     >
                                       <Trash2 className="mr-2 h-4 w-4" />
-                                      Fjern visning
+                                      Fjern
                                     </ContextMenuItem>
                                   </ContextMenuContent>
                                 </ContextMenu>
