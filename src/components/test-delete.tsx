@@ -7,6 +7,7 @@ import { useState } from "react";
 export function TestSidebarView() {
   const [isLoading1, setIsLoading1] = useState(false);
   const [isLoading2, setIsLoading2] = useState(false);
+  const [isLoading3, setIsLoading3] = useState(false);
 
   const handleCreateView = async (
     parentElement: number,
@@ -14,11 +15,27 @@ export function TestSidebarView() {
   ) => {
     setLoading(true);
     try {
+      const getIcon = (section: number) => {
+        switch (section) {
+          case 2:
+            return "Users";
+          case 3:
+            return "Building";
+          default:
+            return "layout";
+        }
+      };
+
       const testView = {
         name: `Test View ${parentElement} - ${new Date().toISOString()}`,
         description: `This is a test view in section ${parentElement}`,
-        icon: "layout",
-        url: "https://sailsdock.no/company/a16148be-d919-4a60-a736-e54ef368edff",
+        icon: getIcon(parentElement),
+        url:
+          parentElement === 2
+            ? "/people/test-person-id"
+            : parentElement === 3
+            ? "/company/test-company-id"
+            : "/dashboard",
         sorting: 1,
         fields: { test: "data" },
         parent_element: parentElement,
@@ -48,7 +65,15 @@ export function TestSidebarView() {
         disabled={isLoading2}
         variant="outline"
       >
-        {isLoading2 ? "Creating..." : "Create View in Section 2"}
+        {isLoading2 ? "Creating..." : "Create Person View"}
+      </Button>
+
+      <Button
+        onClick={() => handleCreateView(3, setIsLoading3)}
+        disabled={isLoading3}
+        variant="outline"
+      >
+        {isLoading3 ? "Creating..." : "Create Company View"}
       </Button>
     </div>
   );

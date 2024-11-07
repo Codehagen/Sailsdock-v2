@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, Star, type LucideIcon } from "lucide-react";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
-import { getSidebarData } from "@/actions/sidebar/get-sidebar-data";
-import { SidebarViewData } from "@/lib/internal-api/types";
 import * as LucideIcons from "lucide-react";
 
 import {
@@ -53,65 +51,10 @@ export function NavMain({ groups }: NavMainProps) {
   }, [sidebarData, fetchSidebarData]);
 
   const getLucideIcon = (iconName: string): LucideIcon => {
-    // Remove the file extension if present
     const cleanIconName = iconName.replace(/\.[^/.]+$/, "");
     return (
       (LucideIcons[cleanIconName as keyof typeof LucideIcons] as LucideIcon) ||
       LucideIcons.HelpCircle
-    );
-  };
-
-  const renderSidebarGroup = (
-    groupKey: string,
-    groupLabel: string,
-    isStarred: boolean = false
-  ) => {
-    if (isLoading) {
-      return (
-        <SidebarGroup key={groupKey}>
-          <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
-          <SidebarMenu>
-            {/* Add skeleton loading state here */}
-            {Array.from({ length: 3 }).map((_, i) => (
-              <SidebarMenuItem key={i}>
-                <div className="flex h-9 items-center px-4 animate-pulse">
-                  <div className="h-4 w-4 rounded bg-muted mr-2" />
-                  <div className="h-4 w-24 rounded bg-muted" />
-                </div>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
-      );
-    }
-
-    if (
-      !sidebarData ||
-      !sidebarData[groupKey] ||
-      sidebarData[groupKey].length === 0
-    ) {
-      return null;
-    }
-
-    return (
-      <SidebarGroup key={groupKey}>
-        <SidebarGroupLabel>{groupLabel}</SidebarGroupLabel>
-        <SidebarMenu>
-          {sidebarData[groupKey].map((view) => {
-            const IconComponent = isStarred ? Star : getLucideIcon(view.icon);
-            return (
-              <SidebarMenuItem key={view.uuid}>
-                <SidebarMenuButton asChild tooltip={view.name}>
-                  <Link href={view.url}>
-                    <IconComponent className="mr-2 h-4 w-4" />
-                    <span>{view.name}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            );
-          })}
-        </SidebarMenu>
-      </SidebarGroup>
     );
   };
 
@@ -123,10 +66,29 @@ export function NavMain({ groups }: NavMainProps) {
         </SidebarMenu>
       </SidebarGroup>
 
-      {renderSidebarGroup("1", "Favorites", true)}
-      {renderSidebarGroup("2", "Views")}
+      {/* Favorites Section */}
+      {sidebarData?.["1"] && (
+        <SidebarGroup>
+          <SidebarGroupLabel>Favorites</SidebarGroupLabel>
+          <SidebarMenu>
+            {sidebarData["1"].map((view) => {
+              const Icon = getLucideIcon(view.icon);
+              return (
+                <SidebarMenuItem key={view.uuid}>
+                  <SidebarMenuButton asChild tooltip={view.name}>
+                    <Link href={view.url}>
+                      <Icon className="mr-2 h-4 w-4" />
+                      <span>{view.name}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+      )}
 
-      {/* Platform and other groups */}
+      {/* Platform Groups */}
       {groups.map((group) => (
         <SidebarGroup key={group.group}>
           <SidebarGroupLabel>{group.group}</SidebarGroupLabel>
@@ -144,7 +106,9 @@ export function NavMain({ groups }: NavMainProps) {
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.items?.length ? (
+                  {(item.items?.length ||
+                    (item.title === "Personer" && sidebarData?.["2"]) ||
+                    (item.title === "Bedrifter" && sidebarData?.["3"])) && (
                     <>
                       <CollapsibleTrigger asChild>
                         <SidebarMenuAction className="data-[state=open]:rotate-90">
@@ -154,6 +118,7 @@ export function NavMain({ groups }: NavMainProps) {
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
+                          {/* Default items */}
                           {item.items?.map((subItem) => (
                             <SidebarMenuSubItem key={subItem.title}>
                               <SidebarMenuSubButton
@@ -167,10 +132,42 @@ export function NavMain({ groups }: NavMainProps) {
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}
+
+                          {/* Dynamic Person Views */}
+                          {item.title === "Personer" &&
+                            sidebarData?.["2"]?.map((view) => {
+                              const Icon = getLucideIcon(view.icon);
+                              return (
+                                <SidebarMenuSubItem key={view.uuid}>
+                                  <SidebarMenuSubButton asChild>
+                                    <Link href={view.url}>
+                                      <Icon className="mr-2 h-4 w-4" />
+                                      <span>{view.name}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            })}
+
+                          {/* Dynamic Company Views */}
+                          {item.title === "Bedrifter" &&
+                            sidebarData?.["3"]?.map((view) => {
+                              const Icon = getLucideIcon(view.icon);
+                              return (
+                                <SidebarMenuSubItem key={view.uuid}>
+                                  <SidebarMenuSubButton asChild>
+                                    <Link href={view.url}>
+                                      <Icon className="mr-2 h-4 w-4" />
+                                      <span>{view.name}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              );
+                            })}
                         </SidebarMenuSub>
                       </CollapsibleContent>
                     </>
-                  ) : null}
+                  )}
                 </SidebarMenuItem>
               </Collapsible>
             ))}
