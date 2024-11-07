@@ -71,7 +71,7 @@ export function SaveViewButton({ parentElement }: SaveViewButtonProps) {
       // Get the current pathname and search params
       const currentUrl = window.location.pathname;
       const queryString = searchParams.toString();
-      
+
       // Construct the full URL with search params
       const fullUrl = `https://www.sailsdock.no${currentUrl}${
         queryString ? `?${queryString}` : ""
