@@ -178,3 +178,19 @@ export function formatCurrency(amount: number): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
+
+export function getBaseUrl() {
+  if (typeof window !== "undefined") {
+    return ""; // Empty string for client-side, will use relative URLs
+  }
+  // Server-side
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  return "https://www.sailsdock.no";
+}
+
+export function getFullUrl(path: string) {
+  const baseUrl = getBaseUrl();
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${baseUrl}${cleanPath}`;
+}

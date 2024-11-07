@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Person, Company } from "./types";
+import { Person } from "./types";
 import { DataTableColumnHeader } from "@/components/company/company-table/data-table-column-header";
 import { DataTableRowActions } from "@/components/company/company-table/data-table-row-actions";
 import Link from "next/link";
@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, X, Building2 } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { updatePerson } from "@/actions/people/update-person";
 import { toast } from "sonner";
 
@@ -275,69 +275,34 @@ export const columns: ColumnDef<Person>[] = [
     },
   },
   {
-    accessorKey: "companies",
+    accessorKey: "company",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Selskap" />
     ),
     cell: ({ row }) => {
-      const companies = row.original.companies || [];
-
-      if (companies.length === 0) {
-        return (
-          <div className="flex items-center text-muted-foreground text-sm">
-            <Building2 className="mr-2 h-4 w-4" />
-            <span>Ikke tilknyttet</span>
-          </div>
-        );
+      const company = row.original.company;
+      if (!company || !company.name) {
+        return <span className="text-muted-foreground">Tom</span>;
       }
-
-      const displayCompanies = companies.slice(0, 2);
-      const remainingCount = companies.length - 2;
-
       return (
-        <div className="flex gap-1 items-center">
-          {displayCompanies.map((company) => (
-            <Link
-              key={company.uuid}
-              href={`/company/${company.uuid}`}
-              className="inline-block"
-            >
-              <Badge
-                variant="secondary"
-                className="font-normal whitespace-nowrap"
+        <Link href={`/company/${company.uuid}`} className="inline-block">
+          <Badge variant="secondary" className="font-normal whitespace-nowrap">
+            <div className="flex items-center gap-1">
+              <div
+                className={cn(
+                  "flex items-center justify-center",
+                  "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
+                  "text-[10px] font-medium"
+                )}
               >
-                <div className="flex items-center gap-1">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
-                      "text-[10px] font-medium"
-                    )}
-                  >
-                    {company.name.charAt(0)}
-                  </div>
-                  <span className="text-xs text-muted-foreground">
-                    {company.name}
-                  </span>
-                </div>
-              </Badge>
-            </Link>
-          ))}
-          {remainingCount > 0 && (
-            <Badge
-              variant="outline"
-              className="font-normal whitespace-nowrap text-xs text-muted-foreground"
-            >
-              +{remainingCount} flere bedrifter
-            </Badge>
-          )}
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      const companies = row.original.companies || [];
-      return companies.some((company) =>
-        company.name.toLowerCase().includes(value.toLowerCase())
+                {company.name.charAt(0)}
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {company.name}
+              </span>
+            </div>
+          </Badge>
+        </Link>
       );
     },
   },

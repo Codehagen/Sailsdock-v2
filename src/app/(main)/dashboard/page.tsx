@@ -3,9 +3,14 @@ import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { Button } from "@/components/ui/button";
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getSidebarViews } from "@/actions/sidebar/get-views";
+import { TestSidebarView } from "@/components/test-delete";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
+  console.log("User:", user);
+  const sidebarViews = await getSidebarViews();
+  console.log("Sidebar views:", sidebarViews);
 
   if (!user) {
     console.error("No user data found");
@@ -14,6 +19,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
+      <TestSidebarView />
+
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-2xl font-bold tracking-tight">
           Hei {user.first_name}, Velkommen tilbake 👋
@@ -32,10 +39,12 @@ export default async function DashboardPage() {
         <TabsContent value="overview" className="space-y-4">
           <EmptyPlaceholder>
             <EmptyPlaceholder.Icon name="layout" />
-            <EmptyPlaceholder.Title>Dashboard under utvikling</EmptyPlaceholder.Title>
+            <EmptyPlaceholder.Title>
+              Dashboard under utvikling
+            </EmptyPlaceholder.Title>
             <EmptyPlaceholder.Description>
-              Her vil det komme et dashboard, men vi jobber fortsatt med utviklingen. 
-              Kom tilbake snart for å se fremgangen!
+              Her vil det komme et dashboard, men vi jobber fortsatt med
+              utviklingen. Kom tilbake snart for å se fremgangen!
             </EmptyPlaceholder.Description>
             <Button className="mt-4">Få varsel når det er klart</Button>
           </EmptyPlaceholder>

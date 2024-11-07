@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
-import { DataTableToolbar } from "./data-table-toolbar";
+import { DataTableToolbar } from "@/components/company/company-table/data-table-toolbar";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
@@ -36,11 +36,11 @@ interface DataTableProps<TData, TValue> {
   initialTotalCount: number;
 }
 
-export function PeopleTable({
+export function PeopleTable<TData, TValue>({
   columns,
   initialData,
   initialTotalCount,
-}: DataTableProps<Person, unknown>) {
+}: DataTableProps<TData, TValue>) {
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});

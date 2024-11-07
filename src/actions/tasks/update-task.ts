@@ -1,13 +1,13 @@
 "use server";
 
 import { apiClient } from "@/lib/internal-api/api-client";
-import { Task } from "@/components/tasks/task-table/types";
+import { TaskData } from "@/lib/internal-api/types";
 import { auth } from "@clerk/nextjs/server";
 
 export async function updateTask(
   taskId: string,
-  taskData: Partial<Task>
-): Promise<Task | null> {
+  taskData: Partial<TaskData>
+): Promise<TaskData | null> {
   const { userId } = await auth();
 
   if (!userId) {
@@ -18,12 +18,12 @@ export async function updateTask(
   try {
     const response = await apiClient.tasks.update(taskId, taskData);
 
-    if (response.success && response.data?.[0]) {
+    if (response.success && response.data.length > 0) {
       return response.data[0];
+    } else {
+      console.error("Failed to update task:", response.status);
+      return null;
     }
-
-    console.error("Failed to update task:", response);
-    return null;
   } catch (error: any) {
     console.error("Error in updateTask:", error.message);
     return null;
