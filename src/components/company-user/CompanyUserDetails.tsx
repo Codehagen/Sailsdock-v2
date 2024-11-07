@@ -50,6 +50,8 @@ import {
 import { removeAccountOwner } from "@/actions/company/delete-account-owner";
 import { updateOpportunity } from "@/actions/opportunity/update-opportunities";
 import { updatePerson } from "@/actions/people/update-person"; // Import updatePerson
+import { FavoriteButton } from "@/components/ui/favorite-button";
+import { useSidebarStore } from "@/stores/use-sidebar-store";
 
 interface InfoItem {
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
@@ -138,6 +140,13 @@ export function CompanyUserDetails({
       city: companyDetails.address_city || "",
     },
   });
+
+  const { sidebarData } = useSidebarStore();
+
+  // Check if this company is in favorites
+  const favoriteView = sidebarData?.["1"]?.find(
+    (view) => view.url === `/company/${companyDetails.uuid}`
+  );
 
   const handleUpdateOrgNumber = async () => {
     try {
@@ -395,7 +404,9 @@ export function CompanyUserDetails({
       const updatedOpportunity = await updateOpportunity(
         opportunityToRemove.uuid,
         {
-          companies: currentCompanies.filter((id: number) => id !== companyDetails.id), // Specify id as number
+          companies: currentCompanies.filter(
+            (id: number) => id !== companyDetails.id
+          ), // Specify id as number
         }
       );
 
@@ -437,7 +448,9 @@ export function CompanyUserDetails({
         : [];
 
       const updatedPerson = await updatePerson(personToRemove.uuid, {
-        companies: currentCompanies.filter((id: number) => id !== companyDetails.id), // Specify id as number
+        companies: currentCompanies.filter(
+          (id: number) => id !== companyDetails.id
+        ), // Specify id as number
       });
 
       if (updatedPerson) {
@@ -549,43 +562,52 @@ export function CompanyUserDetails({
             </AvatarFallback>
           </Avatar>
           <div className="flex-grow min-w-0">
-            <Popover
-              open={isCompanyNamePopoverOpen}
-              onOpenChange={setIsCompanyNamePopoverOpen}
-            >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="p-0 h-auto font-normal w-full text-left"
-                >
-                  <h3 className="text-lg font-semibold truncate">
-                    {editedCompanyName}
-                  </h3>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="space-y-2">
-                  <Input
-                    value={editedCompanyName}
-                    onChange={(e) => setEditedCompanyName(e.target.value)}
-                  />
-                  <div className="flex justify-end space-x-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCancelCompanyNameEdit}
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Avbryt
-                    </Button>
-                    <Button size="sm" onClick={handleUpdateCompanyName}>
-                      <Check className="h-4 w-4 mr-1" />
-                      Bekreft
-                    </Button>
+            <div className="flex items-center gap-2">
+              <Popover
+                open={isCompanyNamePopoverOpen}
+                onOpenChange={setIsCompanyNamePopoverOpen}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="p-0 h-auto font-normal w-full text-left"
+                  >
+                    <h3 className="text-lg font-semibold truncate">
+                      {editedCompanyName}
+                    </h3>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <div className="space-y-2">
+                    <Input
+                      value={editedCompanyName}
+                      onChange={(e) => setEditedCompanyName(e.target.value)}
+                    />
+                    <div className="flex justify-end space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancelCompanyNameEdit}
+                      >
+                        <X className="h-4 w-4 mr-1" />
+                        Avbryt
+                      </Button>
+                      <Button size="sm" onClick={handleUpdateCompanyName}>
+                        <Check className="h-4 w-4 mr-1" />
+                        Bekreft
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+                </PopoverContent>
+              </Popover>
+              <FavoriteButton
+                name={companyDetails.name}
+                icon="Star"
+                description={`Company details for ${companyDetails.name}`}
+                initialIsFavorite={!!favoriteView}
+                favoriteId={favoriteView?.uuid}
+              />
+            </div>
             <span className="block text-xs text-muted-foreground mt-1">
               Lagt til {addedTimeAgo}
             </span>
@@ -1105,7 +1127,9 @@ export function CompanyUserDetails({
               <PersonCombobox
                 companyId={companyDetails.id}
                 onPersonAdded={handlePersonAdded}
-                currentPeople={companyDetailsState.people.map((person) => person.id)}
+                currentPeople={companyDetailsState.people.map(
+                  (person) => person.id
+                )}
               />
             </div>
             {companyDetailsState.people.map((person) => (
