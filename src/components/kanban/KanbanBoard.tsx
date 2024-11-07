@@ -25,9 +25,10 @@ import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 
 // Dynamically import DragOverlay to use it only on the client side
 const DynamicDragOverlay = dynamic(
-  () => import("@dnd-kit/core").then((mod) => ({
-    default: mod.DragOverlay
-  })),
+  () =>
+    import("@dnd-kit/core").then((mod) => ({
+      default: mod.DragOverlay,
+    })),
   { ssr: false }
 );
 
@@ -65,6 +66,8 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   const initialTasks: Task[] = useMemo(() => {
+    if (!Array.isArray(opportunities)) return [];
+
     return opportunities.map((opp) => ({
       id: opp.uuid,
       columnId: getColumnIdFromStage(opp.stage),
@@ -89,14 +92,28 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor),
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: coordinateGetter,
     })
   );
 
-  function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnId) {
+  function getDraggingTaskData(
+    taskId: UniqueIdentifier,
+    columnId: ColumnId | null
+  ) {
+    if (!columnId) return { tasksInColumn: [], taskPosition: -1, column: null };
+
     const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
     const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
     const column = columns.find((col) => col.id === columnId);
