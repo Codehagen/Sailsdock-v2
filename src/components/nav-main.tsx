@@ -2,7 +2,13 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { ChevronRight, type LucideIcon } from "lucide-react";
+import {
+  ChevronRight,
+  type LucideIcon,
+  MoreHorizontal,
+  Star,
+  Trash2,
+} from "lucide-react";
 import { EnhancedInbox } from "@/components/notifications/components-enhanced-inbox";
 import * as LucideIcons from "lucide-react";
 
@@ -23,6 +29,14 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useSidebarStore } from "@/stores/use-sidebar-store";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { removeSidebarView } from "@/actions/sidebar/remove-view";
+import { toast } from "sonner";
 
 interface NavItem {
   title: string;
@@ -58,6 +72,23 @@ export function NavMain({ groups }: NavMainProps) {
     );
   };
 
+  const handleRemoveView = async (viewId: string) => {
+    try {
+      const success = await removeSidebarView(viewId);
+
+      if (success) {
+        // Refresh the sidebar data
+        await fetchSidebarData();
+        toast.success("View removed from favorites");
+      } else {
+        toast.error("Failed to remove view");
+      }
+    } catch (error) {
+      console.error("Error removing view:", error);
+      toast.error("Failed to remove view");
+    }
+  };
+
   return (
     <>
       <SidebarGroup>
@@ -81,6 +112,26 @@ export function NavMain({ groups }: NavMainProps) {
                       <span>{view.name}</span>
                     </Link>
                   </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction showOnHover>
+                        <MoreHorizontal className="h-4 w-4" />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      className="w-48"
+                      side="bottom"
+                      align="end"
+                    >
+                      <DropdownMenuItem
+                        onClick={() => handleRemoveView(view.uuid)}
+                      >
+                        <Star className="mr-2 h-4 w-4 text-muted-foreground" />
+                        <span>Remove from Favorites</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </SidebarMenuItem>
               );
             })}

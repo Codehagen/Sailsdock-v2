@@ -32,10 +32,10 @@ export function TestSidebarView() {
         icon: getIcon(parentElement),
         url:
           parentElement === 2
-            ? "/people/test-person-id"
+            ? "https://sailsdock.no/people/f5f3c97a-93ec-41a1-a509-94e238570a69"
             : parentElement === 3
-            ? "/company/test-company-id"
-            : "/dashboard",
+            ? "https://sailsdock.no/people/f5f3c97a-93ec-41a1-a509-94e238570a69"
+            : "https://sailsdock.no/company/ae8fe6f1-e5b8-465b-b67a-138791a41401",
         sorting: 1,
         fields: { test: "data" },
         parent_element: parentElement,
