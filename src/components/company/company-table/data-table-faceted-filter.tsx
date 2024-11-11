@@ -20,6 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import FilterButton from "@/components/filter-button"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -38,6 +40,20 @@ export function DataTableFacetedFilter<TData, TValue>({
 }: DataTableFacetedFilterProps<TData, TValue>) {
   const facets = column?.getFacetedUniqueValues();
   const selectedValues = new Set(column?.getFilterValue() as string[]);
+
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams]
+  )
 
   return (
     <Popover>
@@ -101,6 +117,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       column?.setFilterValue(
                         filterValues.length ? filterValues : undefined
                       );
+                      window.history.pushState({}, "", pathname + '?' + createQueryString(column?.id as string, filterValues.join(",")))
                     }}
                   >
                     <div

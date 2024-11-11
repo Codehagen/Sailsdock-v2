@@ -13,6 +13,8 @@ import { companyTypes, companyStatuses, companyPriorities } from "./data";
 import { set } from "date-fns";
 import { RotateCwSquare } from "lucide-react";
 import DataTableEmployeeFilter from "./employee-filter";
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 const arrRanges = [
   { label: "< 100k", value: "0-100000" },
@@ -42,6 +44,7 @@ export function DataTableToolbar<TData>({
   viewType,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const path = usePathname()
 
   const owners =
     viewType === "company" && data.length > 0
@@ -121,7 +124,10 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              table.resetColumnFilters()
+              window.history.pushState({}, "", path)
+            }}
             className="h-8 px-2 lg:px-3"
           >
             Tilbakestill
