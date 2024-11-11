@@ -3,19 +3,22 @@
 import Link from "next/link"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback } from "react"
+import { Button, ButtonProps } from "./ui/button"
 
 export default function FilterButton({
   param,
   value,
   children,
   className,
-  scroll,
+  size,
+  variant,
 }: {
-  scroll?: boolean
   param: string
   value: string
   children: React.ReactNode
   className?: string
+  size?: any
+  variant?: any
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -31,11 +34,19 @@ export default function FilterButton({
   )
 
   return (
-    <Link
-      scroll={scroll}
+    <Button
+      asChild
+      size={size}
+      variant={variant}
       className={className}
-      href={pathname + "?" + createQueryString(param, value)}>
+      onClick={() => {
+        window.history.pushState(
+          {},
+          "",
+          pathname + "?" + createQueryString(param, value)
+        )
+      }}>
       {children}
-    </Link>
+    </Button>
   )
 }

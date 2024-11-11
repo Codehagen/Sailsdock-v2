@@ -12,7 +12,6 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import DataTableEmployeeFilter from "./employee-filter"
 import { usePathname } from "next/navigation"
 
-
 const arrRanges = [
   { label: "< 100k", value: "0-100000" },
   { label: "100k - 500k", value: "100000-500000" },
@@ -32,49 +31,41 @@ const last_contacted_options = [
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
   data?: any[]
-  viewType: "people" | "company"
   users: any
 }
 
 export function DataTableToolbar<TData>({
   table,
   data = [],
-  viewType,
   users,
 }: DataTableToolbarProps<TData>) {
+  //! SERVER FILTERING WILL BREAK FILTER OPTIONS
   const path = usePathname()
   const isFiltered = table.getState().columnFilters.length > 0
   const userList = users
-  .filter((usr: any) => usr.first_name && usr.last_name)
-  .reduce((acc: { value: string; label: string; icon: any }[], user: any) => {
-    const name = `${user.first_name} ${user.last_name}`;
-    const value = name.toLowerCase();
+    .filter((usr: any) => usr.first_name && usr.last_name)
+    .reduce((acc: { value: string; label: string; icon: any }[], user: any) => {
+      const name = `${user.first_name} ${user.last_name}`
+      const value = name.toLowerCase()
 
+      if (!acc.some((item) => item.value === value)) {
+        acc.push({ value, label: name, icon: undefined })
+      }
 
-    if (!acc.some((item) => item.value === value)) {
-      acc.push({ value, label: name, icon: undefined });
-    }
-
-    return acc;
-  }, []);
-
+      return acc
+    }, [])
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
       <div className="flex flex-1 items-center space-x-2 flex-wrap">
         <Input
-          placeholder={
-            viewType === "people"
-              ? "Filtrer personer..."
-              : "Filtrer selskaper..."
-          }
+          placeholder={"Filtrer selskaper..."}
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {viewType === "company" && (
           <>
             {table.getColumn("account_owners") && (
               <DataTableFacetedFilter
@@ -110,24 +101,21 @@ export function DataTableToolbar<TData>({
               />
             )}
           </>
-        )}
         {isFiltered && (
           <Button
             variant="ghost"
-
             onClick={() => {
               table.resetColumnFilters()
               window.history.pushState({}, "", path)
             }}
-            className="h-8 px-2 lg:px-3"
-          >
+            className="h-8 px-2 lg:px-3">
             Tilbakestill
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
         )}
       </div>
       <div className="flex items-center space-x-2">
-        <SaveViewButton parentElement={viewType === "people" ? 2 : 3} />
+        <SaveViewButton parentElement={3} />
         <DataTableViewOptions table={table} />
       </div>
     </div>

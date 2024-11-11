@@ -274,6 +274,11 @@ export const columns: ColumnDef<Person>[] = [
         </div>
       );
     },
+    filterFn: (row: any, columnId: string, filterValue: string[]) => {
+      if (!filterValue?.length) return true
+
+      return filterValue.some((filter) => filter === row.original.title.toLowerCase());
+    },
   },
   {
     accessorKey: "companies",
@@ -323,6 +328,11 @@ export const columns: ColumnDef<Person>[] = [
           ))}
         </div>
       );
+    },
+    filterFn: (row: any, columnId: string, filterValue: string[]) => {
+      if (!filterValue?.length) return true
+
+      return filterValue.some((filter) => row.original.companies.some((company: any) => company.name.toLowerCase() === filter));
     },
   },
   {

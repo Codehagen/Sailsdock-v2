@@ -198,7 +198,7 @@ export function CompanyTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar data={data} table={table} viewType="company" users={users} />
+      <DataTableToolbar data={data} table={table} users={users} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

@@ -16,7 +16,7 @@ export default async function PeoplePage() {
         </div>
       </div>
 
-      <div className="overflow-hidden">
+      <div className="overflow-hidden p-1">
         <Suspense fallback={<PeopleTableSkeleton />}>
           <PeopleTableWrapper />
         </Suspense>

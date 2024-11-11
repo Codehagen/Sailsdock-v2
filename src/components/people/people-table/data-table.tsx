@@ -26,10 +26,11 @@ import {
 } from "@/components/ui/table";
 
 import { DataTablePagination } from "@/components/company/company-table/data-table-pagination";
-import { DataTableToolbar } from "@/components/company/company-table/data-table-toolbar";
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Person } from "./types";
+import { DataTableToolbar } from "./data-table-toolbar"
+import { useSearchParams } from "next/navigation"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -42,6 +43,10 @@ export function PeopleTable<TData, TValue>({
   initialData,
   initialTotalCount,
 }: DataTableProps<TData, TValue>) {
+  const searchParams = useSearchParams()
+  const defaultFilterValues = Object.entries(
+    Object.fromEntries(searchParams)
+  ).map(([key, value]) => ({ id: key, value: value ? value.split(",") : "" }))
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -51,6 +56,15 @@ export function PeopleTable<TData, TValue>({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+
+    // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
+    React.useEffect(() => {
+      if (defaultFilterValues) {
+        setColumnFilters(defaultFilterValues)
+      }
+    }, [searchParams])
+    // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
+    
 
   const updateData = React.useCallback(
     (rowIndex: number, columnId: string, value: unknown) => {
@@ -116,7 +130,7 @@ export function PeopleTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar table={table} data={data} viewType="people" />
+      <DataTableToolbar table={table} data={data} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>
