@@ -381,7 +381,7 @@ export function PersonUserDetails({
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h4 className="text-sm font-medium text-muted-foreground">
-                Selskap ({companies.length})
+                Bedrifter ({companies.length})
               </h4>
               <CompanyCombobox
                 personId={personDetails.uuid}

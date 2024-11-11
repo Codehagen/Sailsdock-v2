@@ -12,6 +12,11 @@ export interface Person {
     name: string;
     uuid: string;
   } | null;
+  companies: Array<{
+    id: number;
+    name: string;
+    uuid: string;
+  }>;
   last_modified: string;
 }
 
