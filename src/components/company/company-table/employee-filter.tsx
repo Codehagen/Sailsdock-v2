@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Column } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,8 @@ import {
 import { PlusCircledIcon } from "@radix-ui/react-icons"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { useDebouncedCallback } from 'use-debounce';
 
 type EmployeeFilterProps<TData, TValue> = {
   column?: Column<TData, TValue>
@@ -24,16 +26,31 @@ export default function DataTableEmployeeFilter<TData, TValue>({
   const [minValue, setMinValue] = useState("")
   const [maxValue, setMaxValue] = useState("")
 
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set(name, value)
+
+      return params.toString()
+    },
+    [searchParams]
+  )
+
+
   useEffect(() => {
     const filterValue = column?.getFilterValue() as string[] | undefined
-    if (filterValue) {
-      setMinValue(filterValue[0] ? filterValue[0].toString() : "")
-      setMaxValue(filterValue[1] ? filterValue[1].toString() : "")
-    } else {
+    if (filterValue && filterValue[0] !== minValue || filterValue?.[1] !== maxValue) {
+      setMinValue(filterValue?.[0] ? filterValue[0].toString() : "")
+      setMaxValue(filterValue?.[1] ? filterValue[1].toString() : "")
+    } else if (!filterValue) {
       setMinValue("")
       setMaxValue("")
     }
-  }, [column?.getFilterValue()])
+  }, [column?.getFilterValue(), router])
 
 
   const handleMinChange = (value: string) => {
@@ -46,17 +63,24 @@ export default function DataTableEmployeeFilter<TData, TValue>({
     setMaxValue(value)
   }
 
+  const debounce = useDebouncedCallback((min: number, max: number) => {
+    window.history.pushState({}, "", pathname + '?' + createQueryString(column?.id as string, [isNaN(min) ? 0 : min, isNaN(max) ? "" : max].toString()))
+    
+  }, 300)
+
   const applyFilter = () => {
     const min = parseFloat(minValue)
     const max = parseFloat(maxValue)
 
     column?.setFilterValue([isNaN(min) ? 0 : min, isNaN(max) ? "" : max])
+    debounce(min, max)
   }
 
   const resetFilter = () => {
     setMinValue("")
     setMaxValue("")
     column?.setFilterValue(undefined)
+    window.history.pushState({}, "", pathname)
   }
 
   return (

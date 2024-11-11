@@ -37,6 +37,7 @@ export const deadlineFilter = (
   columnId: string,
   filterValue: string[]
 ) => {
+  if (!filterValue?.length) return true
   const date = parseISO(row.getValue(columnId));
   const now = new Date();
   const nextWeekStart = addWeeks(now, 1);
@@ -67,6 +68,7 @@ export const userFilter = (
   columnId: string,
   filterValue: string[]
 ) => {
+  if (!filterValue?.length) return true
   const userDetails = row.original.user_details;
   if (!userDetails) return false;
 

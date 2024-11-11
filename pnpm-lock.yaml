@@ -261,6 +261,9 @@ dependencies:
   unified:
     specifier: ^11.0.5
     version: 11.0.5
+  use-debounce:
+    specifier: ^10.0.4
+    version: 10.0.4(react@19.0.0-rc-69d4b800-20241021)
   vaul:
     specifier: ^0.9.9
     version: 0.9.9(react-dom@19.0.0-rc-69d4b800-20241021)(react@19.0.0-rc-69d4b800-20241021)(types-react-dom@19.0.0-rc.1)(types-react@19.0.0-rc.1)
@@ -8237,6 +8240,15 @@ packages:
       '@types/react': /types-react@19.0.0-rc.1
       react: 19.0.0-rc-69d4b800-20241021
       tslib: 2.7.0
+    dev: false
+
+  /use-debounce@10.0.4(react@19.0.0-rc-69d4b800-20241021):
+    resolution: {integrity: sha512-6Cf7Yr7Wk7Kdv77nnJMf6de4HuDE4dTxKij+RqE9rufDsI6zsbjyAxcH5y2ueJCQAnfgKbzXbZHYlkFwmBlWkw==}
+    engines: {node: '>= 16.0.0'}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 19.0.0-rc-69d4b800-20241021
     dev: false
 
   /use-sidecar@1.1.2(react@19.0.0-rc-69d4b800-20241021)(types-react@19.0.0-rc.1):

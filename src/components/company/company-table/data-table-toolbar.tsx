@@ -16,6 +16,7 @@ import DataTableEmployeeFilter from "./employee-filter"
 import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users"
 import { useEffect } from "react"
 
+
 const arrRanges = [
   { label: "< 100k", value: "0-100000" },
   { label: "100k - 500k", value: "100000-500000" },
@@ -51,6 +52,7 @@ export function DataTableToolbar<TData>({
   .reduce((acc: { value: string; label: string; icon: any }[], user: any) => {
     const name = `${user.first_name} ${user.last_name}`;
     const value = name.toLowerCase();
+
 
     if (!acc.some((item) => item.value === value)) {
       acc.push({ value, label: name, icon: undefined });
@@ -115,8 +117,13 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3">
+
+            onClick={() => {
+              table.resetColumnFilters()
+              window.history.pushState({}, "", path)
+            }}
+            className="h-8 px-2 lg:px-3"
+          >
             Tilbakestill
             <Cross2Icon className="ml-2 h-4 w-4" />
           </Button>
