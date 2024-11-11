@@ -20,6 +20,7 @@ import {
 import { Check, X } from "lucide-react";
 import { updatePerson } from "@/actions/people/update-person";
 import { toast } from "sonner";
+import { Building2 } from "lucide-react";
 
 export const columns: ColumnDef<Person>[] = [
   {
@@ -275,34 +276,52 @@ export const columns: ColumnDef<Person>[] = [
     },
   },
   {
-    accessorKey: "company",
+    accessorKey: "companies",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Selskap" />
+      <DataTableColumnHeader column={column} title="Selskaper" />
     ),
     cell: ({ row }) => {
-      const company = row.original.company;
-      if (!company || !company.name) {
-        return <span className="text-muted-foreground">Tom</span>;
+      const companies = row.original.companies;
+
+      if (!companies || companies.length === 0) {
+        return (
+          <span className="flex items-center gap-2 text-muted-foreground text-sm">
+            <Building2 className="h-4 w-4" />
+            <span>Ingen tilknyttet selskap</span>
+          </span>
+        );
       }
+
       return (
-        <Link href={`/company/${company.uuid}`} className="inline-block">
-          <Badge variant="secondary" className="font-normal whitespace-nowrap">
-            <div className="flex items-center gap-1">
-              <div
-                className={cn(
-                  "flex items-center justify-center",
-                  "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
-                  "text-[10px] font-medium"
-                )}
+        <div className="flex flex-wrap gap-1">
+          {companies.map((company) => (
+            <Link
+              key={company.uuid}
+              href={`/company/${company.uuid}`}
+              className="inline-block"
+            >
+              <Badge
+                variant="secondary"
+                className="font-normal whitespace-nowrap"
               >
-                {company.name.charAt(0)}
-              </div>
-              <span className="text-xs text-muted-foreground">
-                {company.name}
-              </span>
-            </div>
-          </Badge>
-        </Link>
+                <div className="flex items-center gap-1">
+                  <div
+                    className={cn(
+                      "flex items-center justify-center",
+                      "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
+                      "text-[10px] font-medium"
+                    )}
+                  >
+                    {company.name.charAt(0)}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {company.name}
+                  </span>
+                </div>
+              </Badge>
+            </Link>
+          ))}
+        </div>
       );
     },
   },

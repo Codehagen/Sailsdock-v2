@@ -1,27 +1,36 @@
-"use client"
+"use client";
 
-import React, { useState } from "react"
-import { ColumnDef } from "@tanstack/react-table"
-import { DataTableColumnHeader } from "./data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import Link from "next/link"
-import { Company } from "./types"
-import { formatDistanceToNow, parseISO } from "date-fns"
-import { nb } from "date-fns/locale"
-import { nFormatter, extractDomain } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import React, { useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
+import Link from "next/link";
+import { Company } from "./types";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import { nb } from "date-fns/locale";
+import { nFormatter, extractDomain } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { Check, X, Pen } from "lucide-react"
-import { updateCompany } from "@/actions/company/update-companies"
-import { toast } from "sonner"
-import { cn } from "@/lib/utils"
-import { filterOwners, lastContactedFilter } from "./data-table"
+} from "@/components/ui/popover";
+import {
+  Check,
+  X,
+  Pen,
+  Building2,
+  Globe,
+  Phone,
+  Users2,
+  UserCircle2,
+} from "lucide-react";
+import { updateCompany } from "@/actions/company/update-companies";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { filterOwners, lastContactedFilter } from "./data-table";
 
 export const columns: ColumnDef<Company>[] = [
   {
@@ -34,11 +43,12 @@ export const columns: ColumnDef<Company>[] = [
         <div className="text-sm text-muted-foreground">
           <Link
             href={`/company/${row.original.uuid}`}
-            className="font-medium hover:underline">
+            className="font-medium hover:underline"
+          >
             {row.getValue("name")}
           </Link>
         </div>
-      )
+      );
     },
   },
   {
@@ -47,7 +57,7 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="Org.nr" />
     ),
     cell: ({ row }) => {
-      const orgnr = row.getValue("orgnr") as string
+      const orgnr = row.getValue("orgnr") as string;
       return (
         <div className="text-sm text-muted-foreground">
           {orgnr ? (
@@ -55,14 +65,18 @@ export const columns: ColumnDef<Company>[] = [
               href={`https://www.proff.no/bransjesøk?q=${orgnr}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:underline">
+              className="hover:underline"
+            >
               {orgnr}
             </Link>
           ) : (
-            "N/A"
+            <span className="flex items-center gap-2 text-muted-foreground">
+              <Building2 className="h-4 w-4" />
+              <span>Mangler org.nr</span>
+            </span>
           )}
         </div>
-      )
+      );
     },
   },
   {
@@ -71,30 +85,34 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="URL" />
     ),
     cell: ({ row, table }: any) => {
-      const [url, setUrl] = useState(row.getValue("url") as string)
-      const [isEditing, setIsEditing] = useState(false)
-      const [editedUrl, setEditedUrl] = useState(url)
+      const [url, setUrl] = useState(row.getValue("url") as string);
+      const [isEditing, setIsEditing] = useState(false);
+      const [editedUrl, setEditedUrl] = useState(url);
 
       const handleUpdateUrl = async () => {
         try {
           const updatedCompany = await updateCompany(row.original.uuid, {
             url: editedUrl,
-          })
+          });
           if (updatedCompany) {
-            setUrl(updatedCompany.url)
-            toast.success("URL oppdatert")
-            table.options.meta?.updateData(row.index, "url", updatedCompany.url)
+            setUrl(updatedCompany.url);
+            toast.success("URL oppdatert");
+            table.options.meta?.updateData(
+              row.index,
+              "url",
+              updatedCompany.url
+            );
           } else {
-            toast.error("Kunne ikke oppdatere URL")
+            toast.error("Kunne ikke oppdatere URL");
           }
         } catch (error) {
-          console.error("Error updating URL:", error)
-          toast.error("En feil oppstod under oppdatering av URL")
+          console.error("Error updating URL:", error);
+          toast.error("En feil oppstod under oppdatering av URL");
         }
-        setIsEditing(false)
-      }
+        setIsEditing(false);
+      };
 
-      const domain = url ? extractDomain(url) : "Tom"
+      const domain = url ? extractDomain(url) : null;
 
       return (
         <div className="text-sm text-muted-foreground">
@@ -104,7 +122,8 @@ export const columns: ColumnDef<Company>[] = [
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm hover:underline text-muted-foreground">
+                className="text-sm hover:underline text-muted-foreground"
+              >
                 {domain}
               </Link>
             </Badge>
@@ -112,7 +131,10 @@ export const columns: ColumnDef<Company>[] = [
             <Popover open={isEditing} onOpenChange={setIsEditing}>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="h-8 p-0 font-normal">
-                  <span className="text-sm text-muted-foreground">Tom</span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Globe className="h-4 w-4" />
+                    <span>Mangler nettside</span>
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -127,9 +149,10 @@ export const columns: ColumnDef<Company>[] = [
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        setEditedUrl(url)
-                        setIsEditing(false)
-                      }}>
+                        setEditedUrl(url);
+                        setIsEditing(false);
+                      }}
+                    >
                       <X className="h-4 w-4 mr-1" />
                       Avbryt
                     </Button>
@@ -143,46 +166,57 @@ export const columns: ColumnDef<Company>[] = [
             </Popover>
           )}
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: "account_owners",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Personer" />
+      <DataTableColumnHeader column={column} title="Ansvarlig" />
     ),
     cell: ({ row }) => {
-      const accountOwners = row.original.account_owners || []
+      const accountOwners = row.original.account_owners || [];
       return (
         <div
           className="flex gap-1 w-full overflow-auto py-1"
-          style={{ scrollbarWidth: "thin" }}>
-          {accountOwners.map((owner) => (
-            <Link
-              key={owner.id}
-              href={`/people/${owner.clerk_id}`}
-              className="inline-block">
-              <Badge
-                variant="secondary"
-                className="font-normal whitespace-nowrap">
-                <div className="flex items-center gap-1">
-                  <div
-                    className={cn(
-                      "flex items-center justify-center",
-                      "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
-                      "text-[10px] font-medium"
-                    )}>
-                    {owner.first_name?.charAt(0) || owner.email.charAt(0)}
+          style={{ scrollbarWidth: "thin" }}
+        >
+          {accountOwners.length > 0 ? (
+            accountOwners.map((owner) => (
+              <Link
+                key={owner.id}
+                href={`/people/${owner.clerk_id}`}
+                className="inline-block"
+              >
+                <Badge
+                  variant="secondary"
+                  className="font-normal whitespace-nowrap"
+                >
+                  <div className="flex items-center gap-1">
+                    <div
+                      className={cn(
+                        "flex items-center justify-center",
+                        "w-4 h-4 rounded-full bg-orange-100 text-orange-500",
+                        "text-[10px] font-medium"
+                      )}
+                    >
+                      {owner.first_name?.charAt(0) || owner.email.charAt(0)}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {`${owner.first_name || ""} ${owner.last_name || ""}`}
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {`${owner.first_name || ""} ${owner.last_name || ""}`}
-                  </span>
-                </div>
-              </Badge>
-            </Link>
-          ))}
+                </Badge>
+              </Link>
+            ))
+          ) : (
+            <span className="flex items-center gap-2 text-muted-foreground text-sm">
+              <UserCircle2 className="h-4 w-4" />
+              <span>Ingen ansvarlig</span>
+            </span>
+          )}
         </div>
-      )
+      );
     },
     filterFn: filterOwners,
   },
@@ -192,34 +226,34 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="Ansatte" />
     ),
     cell: ({ row, table }: any) => {
-      const [isEditing, setIsEditing] = useState(false)
+      const [isEditing, setIsEditing] = useState(false);
       const [editedEmployees, setEditedEmployees] = useState(
         row.getValue("num_employees")?.toString() || ""
-      )
+      );
 
       const handleUpdateEmployees = async () => {
         try {
           const updatedCompany = await updateCompany(row.original.uuid, {
             num_employees: parseInt(editedEmployees, 10),
-          })
+          });
           if (updatedCompany) {
             table.options.meta?.updateData(
               row.index,
               "num_employees",
               updatedCompany.num_employees
-            )
-            toast.success("Antall ansatte oppdatert")
+            );
+            toast.success("Antall ansatte oppdatert");
           } else {
-            toast.error("Kunne ikke oppdatere antall ansatte")
+            toast.error("Kunne ikke oppdatere antall ansatte");
           }
         } catch (error) {
-          console.error("Error updating number of employees:", error)
-          toast.error("En feil oppstod under oppdatering av antall ansatte")
+          console.error("Error updating number of employees:", error);
+          toast.error("En feil oppstod under oppdatering av antall ansatte");
         }
-        setIsEditing(false)
-      }
+        setIsEditing(false);
+      };
 
-      const employeeCount = row.getValue("num_employees")
+      const employeeCount = row.getValue("num_employees");
 
       return (
         <div className="text-sm text-muted-foreground">
@@ -229,7 +263,10 @@ export const columns: ColumnDef<Company>[] = [
             <Popover open={isEditing} onOpenChange={setIsEditing}>
               <PopoverTrigger asChild>
                 <Button variant="ghost" className="h-8 p-0 font-normal">
-                  <span className="text-sm text-muted-foreground">Tom</span>
+                  <span className="flex items-center gap-2 text-muted-foreground">
+                    <Users2 className="h-4 w-4" />
+                    <span>Ingen data</span>
+                  </span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80">
@@ -245,9 +282,10 @@ export const columns: ColumnDef<Company>[] = [
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        setEditedEmployees("")
-                        setIsEditing(false)
-                      }}>
+                        setEditedEmployees("");
+                        setIsEditing(false);
+                      }}
+                    >
                       <X className="h-4 w-4 mr-1" />
                       Avbryt
                     </Button>
@@ -261,7 +299,7 @@ export const columns: ColumnDef<Company>[] = [
             </Popover>
           )}
         </div>
-      )
+      );
     },
     filterFn: "inNumberRange",
   },
@@ -271,21 +309,22 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="Laget av" />
     ),
     cell: ({ row }) => {
-      const user = row.original.user
+      const user = row.original.user;
       return (
         <div className="text-sm text-muted-foreground">
           {user
             ? `${user.first_name || ""} ${user.last_name || ""}`.trim()
             : "N/A"}
         </div>
-      )
+      );
     },
     filterFn: (row: any, columnId: string, filterValue: string[]) => {
-      const user = row.original.user
-      const username = `${user?.first_name ?? ""} ${user?.last_name ?? ""}`.trim()
+      const user = row.original.user;
+      const username = `${user?.first_name ?? ""} ${
+        user?.last_name ?? ""
+      }`.trim();
 
-      return filterValue.some(filter => filter === username.toLowerCase())
-      
+      return filterValue.some((filter) => filter === username.toLowerCase());
     },
   },
   {
@@ -294,14 +333,14 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="Sist kontaktet" />
     ),
     cell: ({ row }) => {
-      const date = parseISO(row.getValue("last_contacted"))
+      const date = parseISO(row.getValue("last_contacted"));
       return (
         <div className="text-sm text-muted-foreground">
           {formatDistanceToNow(date, { addSuffix: true, locale: nb })}
         </div>
-      )
+      );
     },
-    filterFn: lastContactedFilter
+    filterFn: lastContactedFilter,
   },
   {
     accessorKey: "arr",
@@ -309,31 +348,35 @@ export const columns: ColumnDef<Company>[] = [
       <DataTableColumnHeader column={column} title="ARR" />
     ),
     cell: ({ row, table }: any) => {
-      const [isEditing, setIsEditing] = useState(false)
+      const [isEditing, setIsEditing] = useState(false);
       const [editedArr, setEditedArr] = useState(
         row.getValue("arr")?.toString() || ""
-      )
+      );
 
       const handleUpdateArr = async () => {
         try {
           const updatedCompany = await updateCompany(row.original.uuid, {
             arr: parseFloat(editedArr),
-          })
+          });
           if (updatedCompany) {
-            table.options.meta?.updateData(row.index, "arr", updatedCompany.arr)
-            toast.success("ARR oppdatert")
+            table.options.meta?.updateData(
+              row.index,
+              "arr",
+              updatedCompany.arr
+            );
+            toast.success("ARR oppdatert");
           } else {
-            toast.error("Kunne ikke oppdatere ARR")
+            toast.error("Kunne ikke oppdatere ARR");
           }
         } catch (error) {
-          console.error("Error updating ARR:", error)
-          toast.error("En feil oppstod under oppdatering av ARR")
+          console.error("Error updating ARR:", error);
+          toast.error("En feil oppstod under oppdatering av ARR");
         }
-        setIsEditing(false)
-      }
+        setIsEditing(false);
+      };
 
-      const arr = parseFloat(row.getValue("arr"))
-      const formatted = arr ? nFormatter(arr, { digits: 1 }) : null
+      const arr = parseFloat(row.getValue("arr"));
+      const formatted = arr ? nFormatter(arr, { digits: 1 }) : null;
 
       return (
         <div className="text-sm text-muted-foreground text-right">
@@ -359,9 +402,10 @@ export const columns: ColumnDef<Company>[] = [
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        setEditedArr("")
-                        setIsEditing(false)
-                      }}>
+                        setEditedArr("");
+                        setIsEditing(false);
+                      }}
+                    >
                       <X className="h-4 w-4 mr-1" />
                       Avbryt
                     </Button>
@@ -375,11 +419,11 @@ export const columns: ColumnDef<Company>[] = [
             </Popover>
           )}
         </div>
-      )
+      );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },
-]
+];

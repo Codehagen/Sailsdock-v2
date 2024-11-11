@@ -27,6 +27,7 @@ export default async function PeoplePage() {
 
 async function PeopleTableWrapper() {
   const { data: people, totalCount } = await getAllPeople(10, 1);
+  console.log(people);
 
   if (people && people.length > 0) {
     return (
