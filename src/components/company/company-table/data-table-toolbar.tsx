@@ -9,12 +9,8 @@ import { DataTableViewOptions } from "@/components/company/company-table/data-ta
 import { SaveViewButton } from "@/components/ui/save-view-button"
 
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { companyTypes, companyStatuses, companyPriorities } from "./data"
-import { set } from "date-fns"
-import { RotateCwSquare } from "lucide-react"
 import DataTableEmployeeFilter from "./employee-filter"
-import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users"
-import { useEffect } from "react"
+import { usePathname } from "next/navigation"
 
 
 const arrRanges = [
@@ -46,6 +42,7 @@ export function DataTableToolbar<TData>({
   viewType,
   users,
 }: DataTableToolbarProps<TData>) {
+  const path = usePathname()
   const isFiltered = table.getState().columnFilters.length > 0
   const userList = users
   .filter((usr: any) => usr.first_name && usr.last_name)

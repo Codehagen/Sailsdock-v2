@@ -127,6 +127,14 @@ export function CompanyTable<TData, TValue>({
   )
   const [sorting, setSorting] = React.useState<SortingState>([])
 
+  // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
+  React.useEffect(() => {
+    if (defaultFilterValues) {
+      setColumnFilters(defaultFilterValues)
+    }
+  }, [searchParams])
+  // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
+  
   const table = useReactTable({
     data,
     columns,
