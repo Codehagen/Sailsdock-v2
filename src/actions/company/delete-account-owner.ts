@@ -16,9 +16,9 @@ export async function removeAccountOwner(
   }
 
   try {
-    console.log(
-      `Attempting to remove account owner with ID: ${accountOwnerIdToRemove} from company: ${companyUuid}`
-    );
+    // console.log(
+    //  `Attempting to remove account owner with ID: ${accountOwnerIdToRemove} from company: ${companyUuid}`
+    // );
 
     // First, get the current company details
     const companyResponse = await apiClient.company.getDetails(companyUuid);
@@ -47,7 +47,7 @@ export async function removeAccountOwner(
     );
 
     if (updateResponse.success) {
-      console.log("Account owner removed successfully");
+      // console.log("Account owner removed successfully");
       return true;
     } else {
       console.error("Failed to update company:", updateResponse.status);

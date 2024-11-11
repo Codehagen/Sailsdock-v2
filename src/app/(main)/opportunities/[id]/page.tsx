@@ -12,7 +12,7 @@ export default async function OpportunityDetailsPage(
   const params = await props.params;
   const opportunityId = params.id;
   const opportunityDetails = await getOpportunityDetails(opportunityId);
-  console.log(opportunityDetails);
+  // console.log(opportunityDetails);
 
   if (!opportunityDetails) {
     notFound();

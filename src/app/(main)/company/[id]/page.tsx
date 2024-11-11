@@ -23,7 +23,7 @@ export default async function CompanyUserPage(props: {
   const params = await props.params;
   const companyId = params.id;
   const companyDetails = await getCompanyDetails(companyId);
-  // console.log("companyDetails", companyDetails);
+  // // console.log("companyDetails", companyDetails);
 
   if (!companyDetails) {
     return (

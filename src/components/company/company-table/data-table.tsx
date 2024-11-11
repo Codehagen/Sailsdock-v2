@@ -40,9 +40,11 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { useSearchParams } from "next/navigation"
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  initialData: TData[]
-  initialTotalCount: number
+  columns: ColumnDef<TData, TValue>[];
+  initialData: TData[];
+  initialTotalCount: number;
+  users: any
+
 }
 
 const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
@@ -56,6 +58,7 @@ export const lastContactedFilter = (
   columnId: string,
   filterValue: string[]
 ) => {
+
   if (!filterValue?.length) return true
   const lastContactedDate = parseISO(row.getValue(columnId))
   const now = new Date()
@@ -108,6 +111,7 @@ export function CompanyTable<TData, TValue>({
   columns,
   initialData,
   initialTotalCount,
+  users
 }: DataTableProps<TData, TValue>) {
   const searchParams = useSearchParams()
   const defaultFilterValues = Object.entries(
@@ -186,7 +190,7 @@ export function CompanyTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar data={data} table={table} viewType="company" />
+      <DataTableToolbar data={data} table={table} viewType="company" users={users} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

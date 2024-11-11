@@ -17,11 +17,11 @@ export async function getCurrentUser(): Promise<UserData | null> {
     const response = await apiClient.users.get(userId);
 
     if (response.success && response.data.length > 0) {
-      console.log("User found in database");
+      // console.log("User found in database");
       return response.data[0];
     }
 
-    console.log("User not found in database. Attempting to create...");
+    // console.log("User not found in database. Attempting to create...");
     const newUserData: Partial<UserData> = {
       clerk_id: userId,
       email: clerkUser.emailAddresses[0].emailAddress,
@@ -33,7 +33,7 @@ export async function getCurrentUser(): Promise<UserData | null> {
     const createResponse = await apiClient.users.create(newUserData);
 
     if (createResponse.success && createResponse.data.length > 0) {
-      console.log("New user created successfully");
+      // console.log("New user created successfully");
       return createResponse.data[0];
     } else {
       console.error("Failed to create user:", createResponse.status);

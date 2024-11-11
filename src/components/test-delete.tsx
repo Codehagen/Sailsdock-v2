@@ -48,7 +48,7 @@ export function TestSidebarView() {
       };
 
       const result = await createSidebarView(testView);
-      console.log(`Created view in section ${parentElement}:`, result);
+      // console.log(`Created view in section ${parentElement}:`, result);
     } catch (error) {
       console.error(`Error creating view in section ${parentElement}:`, error);
     } finally {

@@ -17,7 +17,7 @@ export async function getWorkspaceUsers(): Promise<WorkspaceData[] | null> {
 
     const workspaceId = currentUser.company_details.uuid;
     const response = await apiClient.workspaces.getUsers(workspaceId);
-    console.log("API response:", response);
+    // console.log("API response:", response);
 
     if (response.success && response.data) {
       return response.data;

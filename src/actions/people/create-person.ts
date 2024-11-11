@@ -28,12 +28,12 @@ export async function createPerson(
       user: currentUser.id,
       workspace: currentUser.company, // Assuming 'company' field in UserData represents the workspace ID
     };
-    console.log("Data to send:", dataToSend);
+    // console.log("Data to send:", dataToSend);
 
     const response = await apiClient.people.create(dataToSend);
 
     // Log the entire response
-    console.log("API response:", JSON.stringify(response, null, 2));
+    // console.log("API response:", JSON.stringify(response, null, 2));
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

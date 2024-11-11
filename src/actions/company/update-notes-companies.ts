@@ -16,21 +16,21 @@ export async function updateNotesCompany(
   }
 
   try {
-    console.log(`Attempting to update note with UUID: ${noteUuid}`);
+    // console.log(`Attempting to update note with UUID: ${noteUuid}`);
 
     const updatedNoteData = {
       ...noteData,
       date: noteData.clientDate || new Date().toISOString(),
     };
 
-    console.log("Update data:", JSON.stringify(updatedNoteData, null, 2));
+    // console.log("Update data:", JSON.stringify(updatedNoteData, null, 2));
 
     const response = await apiClient.company.notes.update(
       noteUuid,
       updatedNoteData
     );
 
-    console.log("API response:", JSON.stringify(response, null, 2));
+    // console.log("API response:", JSON.stringify(response, null, 2));
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

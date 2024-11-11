@@ -1,27 +1,28 @@
-"use client";
+"use client"
 
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { Table } from "@tanstack/react-table";
+import { Cross2Icon } from "@radix-ui/react-icons"
+import { Table } from "@tanstack/react-table"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DataTableViewOptions } from "@/components/company/company-table/data-table-view-options";
-import { SaveViewButton } from "@/components/ui/save-view-button";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { DataTableViewOptions } from "@/components/company/company-table/data-table-view-options"
+import { SaveViewButton } from "@/components/ui/save-view-button"
 
-import { DataTableFacetedFilter } from "./data-table-faceted-filter";
-import { companyTypes, companyStatuses, companyPriorities } from "./data";
-import { set } from "date-fns";
-import { RotateCwSquare } from "lucide-react";
-import DataTableEmployeeFilter from "./employee-filter";
-import { usePathname } from "next/navigation"
-import Link from "next/link"
+import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { companyTypes, companyStatuses, companyPriorities } from "./data"
+import { set } from "date-fns"
+import { RotateCwSquare } from "lucide-react"
+import DataTableEmployeeFilter from "./employee-filter"
+import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users"
+import { useEffect } from "react"
+
 
 const arrRanges = [
   { label: "< 100k", value: "0-100000" },
   { label: "100k - 500k", value: "100000-500000" },
   { label: "500k - 1M", value: "500000-1000000" },
   { label: "> 1M", value: "1000000-" },
-];
+]
 
 const last_contacted_options = [
   { label: "Én uke", value: "last-week" },
@@ -30,44 +31,36 @@ const last_contacted_options = [
   { label: "Seks måneder", value: "last-6-months" },
   { label: "Ett år", value: "last-year" },
   { label: "Over ett år", value: "more-than-year" },
-];
+]
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>;
-  data?: any[];
-  viewType: "people" | "company";
+  table: Table<TData>
+  data?: any[]
+  viewType: "people" | "company"
+  users: any
 }
 
 export function DataTableToolbar<TData>({
   table,
   data = [],
   viewType,
+  users,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0;
-  const path = usePathname()
+  const isFiltered = table.getState().columnFilters.length > 0
+  const userList = users
+  .filter((usr: any) => usr.first_name && usr.last_name)
+  .reduce((acc: { value: string; label: string; icon: any }[], user: any) => {
+    const name = `${user.first_name} ${user.last_name}`;
+    const value = name.toLowerCase();
 
-  const owners =
-    viewType === "company" && data.length > 0
-      ? data
-          .filter((row) => row.account_owners?.length > 0)
-          .flatMap((row) => row.account_owners)
-          .reduce((uniqueOwners: any[], owner: any) => {
-            const ownerName = `${owner?.first_name ?? ""} ${
-              owner?.last_name ?? ""
-            }`.trim();
-            const ownerValue = ownerName.toLowerCase();
 
-            if (!uniqueOwners.some((o) => o.value === ownerValue)) {
-              uniqueOwners.push({
-                value: ownerValue,
-                label: ownerName,
-                icon: undefined,
-              });
-            }
+    if (!acc.some((item) => item.value === value)) {
+      acc.push({ value, label: name, icon: undefined });
+    }
 
-            return uniqueOwners;
-          }, [])
-      : [];
+    return acc;
+  }, []);
+
 
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
@@ -90,7 +83,7 @@ export function DataTableToolbar<TData>({
               <DataTableFacetedFilter
                 column={table.getColumn("account_owners")}
                 title="Personer"
-                options={owners}
+                options={userList}
               />
             )}
             {table.getColumn("num_employees") && (
@@ -102,7 +95,7 @@ export function DataTableToolbar<TData>({
               <DataTableFacetedFilter
                 column={table.getColumn("user_name")}
                 title="Laget av"
-                options={owners}
+                options={userList}
               />
             )}
             {table.getColumn("last_contacted") && (
@@ -124,6 +117,7 @@ export function DataTableToolbar<TData>({
         {isFiltered && (
           <Button
             variant="ghost"
+
             onClick={() => {
               table.resetColumnFilters()
               window.history.pushState({}, "", path)
@@ -140,5 +134,5 @@ export function DataTableToolbar<TData>({
         <DataTableViewOptions table={table} />
       </div>
     </div>
-  );
+  )
 }

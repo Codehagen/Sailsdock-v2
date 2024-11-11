@@ -31,7 +31,7 @@ export async function createSidebarView(
     const response = await apiClient.sidebarViews.create(dataToSend);
 
     if (response.success && response.data.length > 0) {
-      console.log("Created sidebar view:", response.data[0]);
+      // console.log("Created sidebar view:", response.data[0]);
       return response.data[0];
     } else {
       console.error("Failed to create sidebar view:", response.status);

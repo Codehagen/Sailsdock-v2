@@ -27,7 +27,7 @@ export function AddTaskSheet() {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     // Here you would typically handle the task creation
-    console.log("Task created:", { taskName, taskDescription });
+    // console.log("Task created:", { taskName, taskDescription });
     // Reset form fields
     setTaskName("");
     setTaskDescription("");
