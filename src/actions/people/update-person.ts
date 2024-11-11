@@ -17,11 +17,11 @@ export async function updatePerson(
 
   try {
     // Log the data being sent
-    console.log("Updating person with ID:", personId);
-    console.log("Data being sent:", personData);
+    // console.log("Updating person with ID:", personId);
+    // console.log("Data being sent:", personData);
 
     const response = await apiClient.people.update(personId, personData);
-    console.log("updatePerson response", response);
+    // console.log("updatePerson response", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

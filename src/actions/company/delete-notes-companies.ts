@@ -12,11 +12,11 @@ export async function deleteNotesCompany(noteUuid: string): Promise<boolean> {
   }
 
   try {
-    console.log(`Attempting to delete note with UUID: ${noteUuid}`);
+    // console.log(`Attempting to delete note with UUID: ${noteUuid}`);
 
     const response = await apiClient.company.notes.delete(noteUuid);
 
-    console.log("API response:", JSON.stringify(response, null, 2));
+    // console.log("API response:", JSON.stringify(response, null, 2));
 
     if (response.success) {
       return true;

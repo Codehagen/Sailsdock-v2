@@ -16,17 +16,17 @@ export async function updateOpportunity(
   }
 
   try {
-    console.log(
-      `Sending update request for opportunity ${opportunityUuid}:`,
-      opportunityData
-    );
+    // console.log(
+    //   `Sending update request for opportunity ${opportunityUuid}:`,
+    //   opportunityData
+    // );
 
     const response = await apiClient.opportunities.update(
       opportunityUuid,
       opportunityData
     );
 
-    console.log("Update opportunity response:", response);
+    // console.log("Update opportunity response:", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];

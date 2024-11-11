@@ -10,7 +10,7 @@ export default async function TaskPage(props: { params: Promise<{ id: string }> 
   const params = await props.params;
   const taskId = params.id;
   const taskDetails = await getTaskDetails(taskId);
-  console.log(taskDetails);
+  // console.log(taskDetails);
 
   if (!taskDetails) {
     return (

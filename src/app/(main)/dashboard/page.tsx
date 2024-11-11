@@ -8,9 +8,9 @@ import { TestSidebarView } from "@/components/test-delete";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  console.log("User:", user);
+  // console.log("User:", user);
   const sidebarViews = await getSidebarViews();
-  console.log("Sidebar views:", sidebarViews);
+  // console.log("Sidebar views:", sidebarViews);
 
   if (!user) {
     console.error("No user data found");

@@ -196,15 +196,15 @@ export function MDX({ code, images, tweets, repos, className }: MDXProps) {
 
   const Tweet = ({ id }: { id: string }) => {
     if (!tweets) {
-      console.log("No tweets provided");
+      // console.log("No tweets provided");
       return null;
     }
     const tweet = tweets.find((tweet: TweetProps) => tweet?.id_str === id);
     if (!tweet) {
-      console.log("Tweet not found for id:", id);
+      // console.log("Tweet not found for id:", id);
       return null;
     }
-    console.log("Rendering tweet:", tweet);
+    // console.log("Rendering tweet:", tweet);
     return <MDXTweet data={tweet} className="mx-auto max-w-lg" noTilt />;
   };
 

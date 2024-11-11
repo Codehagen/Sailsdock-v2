@@ -70,7 +70,7 @@ const BlogPost = defineCollection({
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         remarkPlugins: [remarkGfm],
       });
-      console.log("MDX compilation successful for:", document.title);
+      // console.log("MDX compilation successful for:", document.title);
       const computed = computedFields("blog");
       return {
         ...document,
@@ -119,7 +119,7 @@ const ChangelogPost = defineCollection({
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         remarkPlugins: [remarkGfm],
       });
-      console.log("MDX compilation successful for:", document.title);
+      // console.log("MDX compilation successful for:", document.title);
       const computed = computedFields("changelog");
       return {
         ...document,
@@ -174,7 +174,7 @@ export const CustomersPost = defineCollection({
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         remarkPlugins: [remarkGfm],
       });
-      console.log("MDX compilation successful for:", document.title);
+      // console.log("MDX compilation successful for:", document.title);
       const computed = computedFields("customers");
       return {
         ...document,
@@ -275,7 +275,7 @@ export const LegalPost = defineCollection({
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         remarkPlugins: [remarkGfm],
       });
-      console.log("MDX compilation successful for:", document.title);
+      // console.log("MDX compilation successful for:", document.title);
       const computed = computedFields("legal");
       return {
         ...document,
@@ -329,7 +329,7 @@ export const IntegrationsPost = defineCollection({
         rehypePlugins: [rehypeSlug, rehypeAutolinkHeadings],
         remarkPlugins: [remarkGfm],
       });
-      console.log("MDX compilation successful for:", document.title);
+      // console.log("MDX compilation successful for:", document.title);
       const computed = computedFields("integrations");
       return {
         ...document,

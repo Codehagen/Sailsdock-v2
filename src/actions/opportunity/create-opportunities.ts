@@ -28,20 +28,20 @@ export async function createOpportunity(
       workspace: currentUser.company,
     };
 
-    console.log(
-      "Request data being sent:",
-      JSON.stringify(dataToSend, null, 2)
-    );
+    // console.log(
+    //   "Request data being sent:",
+    //   JSON.stringify(dataToSend, null, 2)
+    // );
 
     const response = await apiClient.opportunities.create(dataToSend);
 
-    console.log("Full API response:", JSON.stringify(response, null, 2));
+    // console.log("Full API response:", JSON.stringify(response, null, 2));
 
     if (response.success && response.data) {
-      console.log(
-        "Created opportunity data:",
-        JSON.stringify(response.data[0], null, 2)
-      );
+      // console.log(
+      //   "Created opportunity data:",
+      //   JSON.stringify(response.data[0], null, 2)
+      // );
       return response.data[0];
     } else {
       console.error(

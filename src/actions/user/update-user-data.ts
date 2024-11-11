@@ -18,7 +18,7 @@ export async function updateUserData(
     const response = await apiClient.users.update(userId, userData);
 
     if (response.success && response.data.length > 0) {
-      console.log("User data updated successfully");
+      // console.log("User data updated successfully");
       return response.data[0];
     } else {
       console.error("Failed to update user data:", response.status);

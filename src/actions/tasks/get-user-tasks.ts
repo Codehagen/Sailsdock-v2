@@ -21,7 +21,7 @@ export async function getUserTasks(
     }
 
     const response = await apiClient.tasks.getUserTasks(userId, pageSize, page);
-    console.log(response);
+    // console.log(response);
 
     if (response.success && Array.isArray(response.data)) {
       const totalCount = response.count || 0;

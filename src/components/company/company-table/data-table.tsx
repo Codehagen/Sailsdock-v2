@@ -42,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   initialData: TData[];
   initialTotalCount: number;
+  users: any
 }
 
 const arrRangeFilter = (row: any, columnId: string, filterValue: string) => {
@@ -56,7 +57,7 @@ export const lastContactedFilter = (
   filterValue: string[]
 ) => {
   const lastContactedDate = parseISO(row.getValue(columnId));
-  console.log(filterValue);
+  // console.log(filterValue);
   const now = new Date();
   const daysDiff = differenceInDays(now, lastContactedDate);
   const monthsDiff = differenceInMonths(now, lastContactedDate);
@@ -106,6 +107,7 @@ export function CompanyTable<TData, TValue>({
   columns,
   initialData,
   initialTotalCount,
+  users
 }: DataTableProps<TData, TValue>) {
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
@@ -180,7 +182,7 @@ export function CompanyTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar data={data} table={table} viewType="company" />
+      <DataTableToolbar data={data} table={table} viewType="company" users={users} />
       <ScrollArea className="flex-grow rounded-md border">
         <Table>
           <TableHeader>

@@ -5,6 +5,7 @@ import { columns } from "@/components/company/company-table/columns";
 import { AddCompanySheet } from "@/components/company/AddCompanySheet";
 import { EmptyPlaceholder } from "@/components/empty-placeholder";
 import { CompanyTableSkeleton } from "@/components/company/company-table-skeleton";
+import { getWorkspaceUsers } from "@/actions/workspace/get-workspace-users"
 
 export default async function CompanyPage() {
   return (
@@ -26,8 +27,10 @@ export default async function CompanyPage() {
 }
 
 async function CompanyTableWrapper() {
+  const users = await getWorkspaceUsers()
+  console.log("🚀 ~ CompanyTableWrapper ~ users:", users)
   const { data: companies, totalCount } = await getCompanies(10, 1);
-  console.log(companies);
+  // console.log(companies);
 
   if (companies && companies.length > 0) {
     return (
@@ -35,6 +38,7 @@ async function CompanyTableWrapper() {
         columns={columns}
         initialData={companies as any}
         initialTotalCount={totalCount}
+        users={users}
       />
     );
   } else {
