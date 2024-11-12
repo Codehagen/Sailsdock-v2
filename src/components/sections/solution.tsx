@@ -15,7 +15,7 @@ const features = [
     className: "hover:bg-blue-500/10 transition-all duration-500 ease-out",
     content: (
       <Safari
-        src={`/dashboard.png`}
+        src="https://imagedelivery.net/r-6-yk-gGPtjfbIST9-8uA/76a569a7-b6f4-487b-24a4-e776100ef600/public"
         url="https://sailsdock.no/bedriftsdatabase"
         className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
       />
@@ -29,7 +29,7 @@ const features = [
       "order-3 xl:order-none hover:bg-green-500/10 transition-all duration-500 ease-out",
     content: (
       <Safari
-        src={`/dashboard.png`}
+        src="https://imagedelivery.net/r-6-yk-gGPtjfbIST9-8uA/cfc68a66-53ac-4231-6c06-4568a1141b00/public"
         url="https://sailsdock.no/lead-generering"
         className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
       />
@@ -54,7 +54,7 @@ const features = [
           width={800}
         />
         <Safari
-          src={`/dashboard.png`}
+          src="https://imagedelivery.net/r-6-yk-gGPtjfbIST9-8uA/cfc68a66-53ac-4231-6c06-4568a1141b00/public"
           url="https://sailsdock.no/analyse"
           className="-mb-48 ml-12 mt-16 h-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-x-[-10px] transition-all duration-300"
         />
@@ -71,7 +71,7 @@ const features = [
       <>
         <Ripple className="absolute -bottom-full" />
         <Safari
-          src={`/dashboard.png`}
+          src="https://imagedelivery.net/r-6-yk-gGPtjfbIST9-8uA/cfc68a66-53ac-4231-6c06-4568a1141b00/public"
           url="https://sailsdock.no/sanntidsoppdateringer"
           className="-mb-32 mt-4 max-h-64 w-full px-4 select-none drop-shadow-[0_0_28px_rgba(0,0,0,.1)] group-hover:translate-y-[-10px] transition-all duration-300"
         />
