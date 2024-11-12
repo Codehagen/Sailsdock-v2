@@ -110,7 +110,7 @@ function HeroCTA() {
           Prøv gratis nå
         </Link>
         <Link
-          href="/docs"
+          href="/help/article/hva-er-sailsdock"
           className={cn(
             buttonVariants({ variant: "outline" }),
             "w-full sm:w-auto"
