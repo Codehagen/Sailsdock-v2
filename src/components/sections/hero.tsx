@@ -142,7 +142,7 @@ function HeroImage() {
       <HeroVideoDialog
         animationStyle="from-center"
         videoSrc="https://www.youtube.com/embed/qh3NGpYRG3I?si=4rb-zSdDkVK9qxxb"
-        thumbnailSrc="/dashboard.png"
+        thumbnailSrc="https://imagedelivery.net/r-6-yk-gGPtjfbIST9-8uA/cfc68a66-53ac-4231-6c06-4568a1141b00/public"
         thumbnailAlt="Sailsdock Knowledge Center Dashboard"
         className="border rounded-lg shadow-lg max-w-screen-lg mt-16"
       />
