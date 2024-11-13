@@ -1,14 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link";
+import { useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
-import { fylker } from "./data"
-import { prospectSchema, prospectTableSchema } from "./types"
-import { DataTableColumnHeader } from "../company/company-table/data-table-column-header"
-import { Checkbox } from "../ui/checkbox"
+import { fylker } from "./data";
+import { prospectSchema, prospectTableSchema } from "./types";
+import { DataTableColumnHeader } from "../company/company-table/data-table-column-header";
+import { Checkbox } from "../ui/checkbox";
+import { createCompany } from "@/actions/company/create-companies";
+import { toast } from "sonner";
 
 export const columnProspects: ColumnDef<prospectTableSchema>[] = [
   {
@@ -40,12 +45,12 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
       <DataTableColumnHeader column={column} title="Bedrift" />
     ),
     cell: ({ row }) => {
-      const name = row.getValue("name") as string
+      const name = row.getValue("name") as string;
       return (
         <span title={name} className="text-nowrap">
           {name}
         </span>
-      )
+      );
     },
   },
   {
@@ -54,12 +59,12 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
       <DataTableColumnHeader column={column} title="Addresse" />
     ),
     cell: ({ row }) => {
-      const data: any = row?.getValue("geo_street")
+      const data: any = row?.getValue("geo_street");
       return (
         <span>
           {row.getValue("geo_street") !== "" ? data.replace("/n", " - ") : "-"}
         </span>
-      )
+      );
     },
   },
   {
@@ -71,14 +76,14 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
     ),
     cell: ({ row }) => {
       //* Format text from uppercase to normal.
-      const kommune: string = row.getValue("geo_municipalty") || ""
+      const kommune: string = row.getValue("geo_municipalty") || "";
       const formattedGeoMunicipalty =
-        kommune?.charAt(0).toUpperCase() + kommune?.slice(1).toLowerCase()
+        kommune?.charAt(0).toUpperCase() + kommune?.slice(1).toLowerCase();
       return (
         <div className="hidden md:table-cell">
           <span>{formattedGeoMunicipalty}</span>
         </div>
-      )
+      );
     },
   },
   // {
@@ -103,14 +108,14 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const created: string = row.getValue("adm_founded_date") || ""
+      const created: string = row.getValue("adm_founded_date") || "";
       return (
         <div className="hidden md:table-cell">
           <span>
             {created.split("-")[0] !== "" ? created.split("-")[0] : "-"}
           </span>
         </div>
-      )
+      );
     },
   },
   {
@@ -130,7 +135,7 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
       </div>
     ),
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -148,7 +153,7 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
       </div>
     ),
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      return value.includes(row.getValue(id));
     },
   },
   {
@@ -161,10 +166,12 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
         <Link
           href={`https://www.purehelp.no/m/company/account/${row.original.orgnr}`}
           target="_blank"
-          passHref>
+          passHref
+        >
           <Button
             variant="ghost"
-            className="flex h-8 rounded-md px-4 py-2 text-xs w-full">
+            className="flex h-8 rounded-md px-4 py-2 text-xs w-full"
+          >
             Regnskapstall
           </Button>
         </Link>
@@ -175,17 +182,58 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
     id: "Add",
     header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
     cell: ({ row }) => {
+      const [isLoading, setIsLoading] = useState(false);
+      const router = useRouter();
+
+      const handleAddCompany = async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+        try {
+          const data = {
+            name: row.original.name,
+            orgnr: row.original.orgnr || "",
+            address_street: row.original.geo_street || "",
+            address_city: row.original.geo_city || "",
+            address_zip: row.original.geo_zip || "",
+          };
+
+          const result = await createCompany(data);
+          if (result) {
+            toast.success("Selskap opprettet", {
+              description: `${result.name} er lagt til.`,
+              action: {
+                label: "Se selskap",
+                onClick: () => router.push(`/company/${result.uuid}`),
+              },
+            });
+          } else {
+            toast.error("Kunne ikke opprette selskap", {
+              description: "Prøv igjen senere.",
+            });
+          }
+        } catch (error) {
+          console.error("Error creating company:", error);
+          toast.error("En uventet feil oppstod", {
+            description: "Prøv igjen senere.",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
       return (
         <div className="flex justify-center">
           <Button
-            disabled
+            onClick={handleAddCompany}
             variant="ghost"
-            className="w-full h-8 text-xs hover:text-primary">
-            Add
+            disabled={isLoading}
+            className="w-full h-8 text-xs hover:text-primary"
+          >
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
           </Button>
         </div>
-      )
-      // return <AddLead data={row.original} />
+      );
     },
   },
 
@@ -220,4 +268,4 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
   //     return value.includes(row.getValue(id))
   //   },
   // },
-]
+];

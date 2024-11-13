@@ -1,17 +1,17 @@
-import { getProspects } from "@/actions/prospects/get"
-import { columnProspects } from "@/components/prospects/columns"
-import { ProspectsTable } from "@/components/prospects/data-table"
+import { getProspects } from "@/actions/prospects/get";
+import { columnProspects } from "@/components/prospects/columns";
+import { ProspectsTable } from "@/components/prospects/data-table";
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export default async function ProspectsPage(props: {
-  searchParams: SearchParams
+  searchParams: SearchParams;
 }) {
-  const params = await props.searchParams
+  const params = await props.searchParams;
 
-  const prospects = await getProspects(params)
+  const prospects = await getProspects(params);
 
-  const { page_size = "" } = params
+  const { page_size = "" } = params;
 
   return (
     <div className="p-1">
@@ -22,5 +22,5 @@ export default async function ProspectsPage(props: {
         page_size={page_size as string}
       />
     </div>
-  )
+  );
 }
