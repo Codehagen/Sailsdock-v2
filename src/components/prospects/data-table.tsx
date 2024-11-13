@@ -31,6 +31,7 @@ import { DataTablePagination } from "./data-table-pagination"
 import { FilterNaceGroup } from "./filters/filter-nace-group-button"
 import { Loader2 } from "lucide-react"
 import { useEffect, useState } from "react"
+import { DataTableToolbar } from "./data-table-toolbar"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -39,12 +40,14 @@ interface DataTableProps<TData, TValue> {
     next: string | null
     prev: string | null
   }
+  page_size: string
 }
 
 export function ProspectsTable<TData, TValue>({
   columns,
   data,
-  pagination,
+  pagination: serverPagination,
+  page_size,
 }: DataTableProps<TData, TValue>) {
   const [totalCount, setTotalCount] = React.useState()
   const [rowSelection, setRowSelection] = React.useState({})
@@ -59,6 +62,7 @@ export function ProspectsTable<TData, TValue>({
   useEffect(() => {
     setLoading(false)
   }, [data])
+  
 
   const table = useReactTable({
     data,
@@ -68,6 +72,10 @@ export function ProspectsTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination: {
+        pageIndex: 0,
+        pageSize: page_size ? Number(page_size) : 10
+      }
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -84,13 +92,13 @@ export function ProspectsTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <FilterNaceGroup setLoading={setLoading} />
+      <DataTableToolbar setLoading={setLoading} table={table} />
       <ScrollArea className="flex-grow rounded-md border relative">
-      {loading ? (
-        <div className="absolute z-50 inset-0 bg-muted/20 rounded-md">
-          <Loader2 className="animate-spin absolute size-8 top-1/2 left-1/2 text-muted-foreground/60" />
-        </div>
-      ) : null}
+        {loading ? (
+          <div className="absolute z-50 inset-0 bg-muted/20 rounded-md">
+            <Loader2 className="animate-spin z-50 absolute size-8 top-1/2 left-1/2 text-muted-foreground" />
+          </div>
+        ) : null}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -139,7 +147,11 @@ export function ProspectsTable<TData, TValue>({
         </Table>
         <ScrollBar orientation="horizontal" />
       </ScrollArea>
-      <DataTablePagination setLoading={setLoading} pagination={pagination} table={table} />
+      <DataTablePagination
+        setLoading={setLoading}
+        pagination={serverPagination}
+        table={table}
+      />
     </div>
   )
 }

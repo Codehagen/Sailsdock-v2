@@ -14,20 +14,22 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
+      <div className="w-full h-full flex items-center justify-center">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
+      <div className="w-full h-full flex items-center justify-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -161,8 +163,8 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
           target="_blank"
           passHref>
           <Button
-            variant="outline"
-            className="flex h-8 w-auto rounded-md px-4 py-2 text-xs">
+            variant="ghost"
+            className="flex h-8 rounded-md px-4 py-2 text-xs w-full">
             Regnskapstall
           </Button>
         </Link>

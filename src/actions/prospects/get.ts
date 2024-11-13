@@ -1,6 +1,7 @@
 "use server"
 
 import { prospectSchema } from "@/components/prospects/types"
+import { filterEmptySearchParams } from "@/lib/utils"
 
 export async function getProspects(params: any): Promise<{
   data: prospectSchema[]
@@ -9,11 +10,7 @@ export async function getProspects(params: any): Promise<{
     prev: string | null
   }
 }> {
-  const filteredParams = Object.fromEntries(
-    Object.entries(params)
-      .filter(([_, value]) => value !== "" && value != null)
-      .map(([key, value]) => [key, String(value)])
-  )
+  const filteredParams = filterEmptySearchParams(params)
   const urlSearchParams = new URLSearchParams(filteredParams)
   const url = `https://crm.vegardenterprises.com/internal/v1/prospects?${
     urlSearchParams?.toString() ?? ""
@@ -34,7 +31,7 @@ export async function getProspects(params: any): Promise<{
   const response = await fetch(url, {
     method: "GET",
     headers,
-    cache: "force-cache",
+    next: { revalidate: 86400 },
   }).then((res) => res.json())
 
   const data = {

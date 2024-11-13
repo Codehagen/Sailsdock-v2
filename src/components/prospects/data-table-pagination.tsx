@@ -14,8 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import FilterButton from "../filter-button"
+import { useCallback } from "react"
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -33,6 +34,11 @@ export function DataTablePagination<TData>({
 }: DataTablePaginationProps<TData>) {
   let next = ""
   let prev = ""
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentSize = searchParams.get("page_size") ?? "10"
+
   if (pagination.next) {
     const nextParams = new URL(pagination.next)
     const nextSearch = new URLSearchParams(nextParams.searchParams)
@@ -44,23 +50,39 @@ export function DataTablePagination<TData>({
     prev = prevSearch.get("cursor")?.toString() ?? ""
   }
 
-  // Todo: Fix page size
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete("cursor")
+
+      if (name && value) {
+        params.set(name, value)
+      }
+
+      return params.toString()
+    },
+    [searchParams]
+  )
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getFilteredRowModel().rows.length} row(s) selected.
+        {table.getFilteredRowModel().rows.length} rad(er) valgt.
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="text-sm font-medium">Rader per side</p>
           <Select
-            value={`${table.getState().pagination.pageSize}`}
+            value={currentSize}
             onValueChange={(value) => {
-              table.setPageSize(Number(value))
+              setLoading(true)
+              router.push(
+                pathname + "?" + createQueryString("page_size", value)
+              )
             }}>
             <SelectTrigger className="h-8 w-[70px]">
-              <SelectValue placeholder={table.getState().pagination.pageSize} />
+              <SelectValue placeholder="10" />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -71,39 +93,33 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount()}
-        </div>
         <div className="flex items-center space-x-2">
           <FilterButton
             onClick={setLoading}
             param="cursor"
             value=""
             variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
+            className="lg:flex"
             disabled={!pagination.prev}>
-            <span className="sr-only">Go to first page</span>
             <DoubleArrowLeftIcon className="h-4 w-4" />
+            <span>Første</span>
           </FilterButton>
           <FilterButton
             onClick={setLoading}
             variant="outline"
-            className="h-8 w-8 p-0"
             param="cursor"
             value={prev}
             disabled={!pagination.prev}>
-            <span className="sr-only">Go to previous page</span>
             <ChevronLeftIcon className="h-4 w-4" />
+            <span>Forrige</span>
           </FilterButton>
           <FilterButton
             onClick={setLoading}
             variant="outline"
-            className="h-8 w-8 p-0"
             param="cursor"
             value={next}
             disabled={!pagination.next}>
-            <span className="sr-only">Go to next page</span>
+            <span>Neste</span>
             <ChevronRightIcon className="h-4 w-4" />
           </FilterButton>
         </div>

@@ -13,7 +13,7 @@ export default function FilterButton({
   variant,
   asChild = false,
   disabled,
-  onClick
+  onClick,
 }: {
   asChild?: boolean
   param: string
@@ -36,8 +36,18 @@ export default function FilterButton({
 
       if (name && !value) {
         params.delete(name)
-      } else {
+      }
+      if (name && value) {
         params.set(name, value)
+      }
+      if (!name && !value) {
+        const pageSize = params.get("page_size")
+        if (pageSize) {
+          params.forEach((value, key) => {
+            if (key === "page_size") return
+            params.delete(key)
+          })
+        }
       }
 
       return params.toString()
