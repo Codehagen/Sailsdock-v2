@@ -18,6 +18,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
   "/people": "Personer",
   "/opportunities": "Opportunities",
   "/tasks": "Oppgaver",
+  "/prospects": "Prospects",
   "/notes": "Notater",
   "/kanban": "Kanban",
   "/settings": "Innstillinger",

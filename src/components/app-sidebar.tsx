@@ -17,6 +17,7 @@ import {
   LucideIcon,
   MessageSquare,
   Sparkles,
+  Search,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -62,6 +63,11 @@ const data = {
           title: "Bedrifter",
           url: "/company",
           icon: Building,
+        },
+        {
+          title: "Prospects",
+          url: "/prospects",
+          icon: Search,
         },
         {
           title: "Opportunities",
