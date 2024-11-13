@@ -6,6 +6,7 @@ import { cn, constructMetadata } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = constructMetadata({});
 
@@ -40,6 +41,7 @@ export default function RootLayout({
             enableSystem={false}
           >
             {children}
+            <SpeedInsights />
             <ThemeToggle />
             <Toaster richColors />
             <TailwindIndicator />
