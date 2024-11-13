@@ -41,13 +41,12 @@ export default function FilterButton({
         params.set(name, value)
       }
       if (!name && !value) {
-        const pageSize = params.get("page_size")
-        if (pageSize) {
-          params.forEach((value, key) => {
-            if (key === "page_size") return
-            params.delete(key)
-          })
-        }
+        const listOfParams: string[] = []
+        params.forEach((value, key) => listOfParams.push(key))
+        listOfParams.forEach((key) => {
+          if (key === "page_size") return
+          params.delete(key)
+        })
       }
 
       return params.toString()

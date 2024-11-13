@@ -25,18 +25,26 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { NACE, NACE_nmbr_grp } from "../data"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import FilterButton from "@/components/filter-button"
 import { useCallback } from "react"
-export function FilterNaceGroup({
+export function FilterDropdown({
   setLoading,
+  queryParam,
+  options,
+  title,
 }: {
+  queryParam: string
+  options: {
+    label: string
+    value: string
+  }[]
+  title: string
   setLoading: (state: boolean) => void
 }) {
   const [open, setOpen] = React.useState(false)
   const params = useSearchParams()
-  const nace_group = params.get("nace_group") ?? ""
+  const defaultValue = params.get(queryParam) ?? ""
 
   const router = useRouter()
   const pathname = usePathname()
@@ -78,56 +86,61 @@ export function FilterNaceGroup({
                   aria-expanded={open}
                   className="h-full w-full justify-start p-0 hover:bg-transparent truncate">
                   <PlusCircledIcon className="mr-2 h-4 w-4" />
-                  {nace_group
-                    ? NACE_nmbr_grp.find(
-                        (sector, index) => (index + 1).toString() === nace_group
-                      )?.label.substring(0, 20) + "..."
-                    : "Gruppering"}
+                  {defaultValue
+                    ? options
+                        .find(
+                          (option, index) =>
+                            option.value.toLowerCase() ===
+                            defaultValue.toLowerCase()
+                        )
+                        ?.label.substring(0, 20) + "..."
+                    : title ?? "Velg"}
                 </Button>
               </PopoverTrigger>
             </TooltipTrigger>
             <TooltipContent>
               <p>
-                {nace_group
-                  ? NACE_nmbr_grp.find(
-                      (sector, index) => (index + 1).toString() === nace_group
+                {defaultValue
+                  ? options.find(
+                      (option, index) =>
+                        option.value.toLowerCase() ===
+                        defaultValue.toLowerCase()
                     )?.label
-                  : "Gruppering"}
+                  : title ?? "Velg"}
               </p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <PopoverContent className="h-auto w-auto p-0" align="start">
           <Command>
-            <CommandInput placeholder="Søk..." />
+            <CommandInput
+              placeholder="Søk..."
+            />
             <CommandList>
               <CommandEmpty>Ingen resultat.</CommandEmpty>
               <CommandGroup>
-                {NACE_nmbr_grp.map((sector, index) => (
+                {options.map((option, index) => (
                   <CommandItem
-                    key={(index + 1).toString()}
+                    key={option.value}
                     onSelect={() => {
                       setOpen(false)
                       setLoading(true)
-
                       router.push(
                         pathname +
                           "?" +
-                          createQueryString(
-                            "nace_group",
-                            (index + 1).toString()
-                          )
+                          createQueryString(queryParam, option.value.toUpperCase())
                       )
                     }}>
                     <Check
                       className={cn(
                         "mr-2 h-4 w-4",
-                        nace_group === (index + 1).toString()
+                        defaultValue.toLowerCase() ===
+                          option.value.toLowerCase()
                           ? "opacity-100"
                           : "opacity-0"
                       )}
                     />
-                    {sector.label}
+                    {option.label}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -135,7 +148,7 @@ export function FilterNaceGroup({
           </Command>
         </PopoverContent>
       </Popover>
-      {nace_group && nace_group.trim() !== "" ? (
+      {defaultValue.toLowerCase() && defaultValue.trim() !== "" ? (
         <div className="flex h-10 items-center hover:cursor-pointer">
           <TooltipProvider>
             <Tooltip>
@@ -144,7 +157,7 @@ export function FilterNaceGroup({
                   onClick={() => setLoading(true)}
                   className="h-fit w-fit p-0 m-0"
                   variant="ghost"
-                  param="nace_group"
+                  param={queryParam}
                   value=""
                   asChild>
                   <Cross2Icon className="p-1 h-4 w-4 shrink-0 opacity-50" />

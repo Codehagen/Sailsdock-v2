@@ -12,6 +12,8 @@ import { filterEmptySearchParams } from "@/lib/utils"
 import FilterButton from "../filter-button"
 import { useCallback, useState } from "react"
 import { Button } from "../ui/button"
+import { byer, kommuner, NACE_nmbr_grp } from "./data"
+import { FilterDropdown } from "./filters/filter-dropdown"
 
 
 interface DataTableToolbarProps<TData> {
@@ -66,6 +68,10 @@ export function DataTableToolbar<TData>({
     router.push(pathname + "?" + createQueryString("search", value))
   }
 
+  const sortedMunicipalties = kommuner.slice().sort((a, b) => {
+    return a.label.localeCompare(b.label)
+  })
+
   return (
     <div className="flex items-center justify-between flex-wrap gap-2">
       <div className="flex flex-1 items-center space-x-2 flex-wrap">
@@ -84,6 +90,8 @@ export function DataTableToolbar<TData>({
           Søk
         </Button>
         <>
+          <FilterDropdown title="By" queryParam="geo_city" options={byer} setLoading={setLoading} />
+          <FilterDropdown title="Kommune" queryParam="geo_municipalty" options={sortedMunicipalties} setLoading={setLoading} />
           <FilterNaceGroup setLoading={setLoading} />
           {queries?.length ? (
             <FilterButton
