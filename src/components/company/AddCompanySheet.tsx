@@ -7,106 +7,244 @@ import * as z from "zod";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { createCompany } from "@/actions/company/create-companies";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import {
+  Loader2,
+  Plus,
+  Building2,
+  Hash,
+  MapPin,
+  Home,
+  Mail,
+} from "lucide-react";
+import { CompanySearch } from "./company-search";
 
 const companySchema = z.object({
   name: z.string().min(1, "Selskapsnavn er påkrevd"),
-  orgnr: z.string().min(9, "Organisasjonsnummer må være 9 siffer").max(9),
-  address_street: z.string().optional(),
-  address_city: z.string().optional(),
-  address_zip: z.string().optional(),
+  orgnr: z
+    .string()
+    .min(9, "Organisasjonsnummer må være 9 siffer")
+    .max(9, "Organisasjonsnummer må være 9 siffer"),
+  address_street: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined || val === null ? "" : val)),
+  address_city: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined || val === null ? "" : val)),
+  address_zip: z
+    .string()
+    .optional()
+    .transform((val) => (val === undefined || val === null ? "" : val)),
 });
 
 type CompanyFormData = z.infer<typeof companySchema>;
 
 const defaultValues: CompanyFormData = {
-  name: "Test AS",
-  orgnr: "123456789",
-  address_street: "Testveien 1",
-  address_city: "Oslo",
-  address_zip: "0123",
+  name: "",
+  orgnr: "",
+  address_street: "",
+  address_city: "",
+  address_zip: "",
 };
 
 export function AddCompanySheet() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<CompanyFormData>({
+  const form = useForm<CompanyFormData>({
     resolver: zodResolver(companySchema),
     defaultValues,
   });
 
-  const onSubmit = async (data: CompanyFormData) => {
+  async function onSubmit(data: CompanyFormData) {
     try {
       const result = await createCompany(data);
       if (result) {
         toast.success("Selskap opprettet", {
           description: `${result.name} er lagt til.`,
         });
+        form.reset(defaultValues);
         setIsOpen(false);
-        reset(defaultValues);
-      } else {
-        toast.error("Kunne ikke opprette selskap", {
-          description: "Prøv igjen senere.",
-        });
+        router.push(`/company/${result.uuid}`);
       }
     } catch (error) {
-      console.error("Error creating company:", error);
-      toast.error("En uventet feil oppstod", {
-        description: "Prøv igjen senere.",
+      toast.error("Kunne ikke opprette selskap", {
+        description: "Vennligst sjekk alle feltene og prøv igjen.",
       });
+      console.error("Error creating company:", error);
     }
-  };
+  }
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button>Legg til selskap</Button>
+        <Button size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Legg til selskap
+        </Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>
           <SheetTitle>Legg til nytt selskap</SheetTitle>
+          <SheetDescription>
+            Søk etter selskap eller fyll ut informasjonen manuelt.
+          </SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div>
-            <Label htmlFor="name">Selskapsnavn</Label>
-            <Input id="name" {...register("name")} />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="orgnr">Organisasjonsnummer</Label>
-            <Input id="orgnr" {...register("orgnr")} />
-            {errors.orgnr && (
-              <p className="text-red-500 text-sm">{errors.orgnr.message}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="address_street">Adresse</Label>
-            <Input id="address_street" {...register("address_street")} />
-          </div>
-          <div>
-            <Label htmlFor="address_city">By</Label>
-            <Input id="address_city" {...register("address_city")} />
-          </div>
-          <div>
-            <Label htmlFor="address_zip">Postnummer</Label>
-            <Input id="address_zip" {...register("address_zip")} />
-          </div>
-          <Button type="submit">Opprett selskap</Button>
-        </form>
+        <div className="py-4">
+          <CompanySearch
+            onSelect={(company) => {
+              form.setValue("name", company.label);
+              form.setValue("orgnr", company.value);
+              form.setValue("address_street", company.address);
+              form.setValue("address_city", company.city);
+              form.setValue("address_zip", company.postalCode);
+            }}
+          />
+        </div>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 py-4"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Selskapsnavn</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Building2 className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Skriv inn selskapsnavn..."
+                        className="pl-8"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="orgnr"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Organisasjonsnummer</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Hash className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="123456789"
+                        className="pl-8"
+                        maxLength={9}
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address_street"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gateadresse</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <MapPin className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Skriv inn gateadresse..."
+                        className="pl-8"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address_city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>By</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Home className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Skriv inn by..."
+                        className="pl-8"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="address_zip"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Postnummer</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Mail className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        placeholder="0000"
+                        className="pl-8"
+                        maxLength={4}
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <SheetFooter>
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="w-full"
+              >
+                {form.formState.isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Lagrer...
+                  </>
+                ) : (
+                  "Opprett selskap"
+                )}
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );
