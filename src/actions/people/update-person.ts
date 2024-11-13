@@ -16,21 +16,29 @@ export async function updatePerson(
   }
 
   try {
-    // Log the data being sent
-    // console.log("Updating person with ID:", personId);
-    // console.log("Data being sent:", personData);
+    // Ensure companies array contains valid numbers
+    if (personData.companies) {
+      personData.companies = personData.companies
+        .filter(id => typeof id === 'number' && !isNaN(id))
+        .map(id => Number(id));
+    }
 
     const response = await apiClient.people.update(personId, personData);
-    // console.log("updatePerson response", response);
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
     } else {
       console.error("Failed to update person:", response.status);
+      if (response.data) {
+        console.error("Error details:", JSON.stringify(response.data, null, 2));
+      }
       return null;
     }
   } catch (error: any) {
     console.error("Error in updatePerson:", error.message);
+    if (error.response?.data) {
+      console.error("API error details:", JSON.stringify(error.response.data, null, 2));
+    }
     return null;
   }
 }
