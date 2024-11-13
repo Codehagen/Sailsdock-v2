@@ -60,9 +60,15 @@ export function OpportunityCombobox({
     setSelectedOpportunity(opportunity);
     setOpen(false);
     try {
+      const updatedCompanies = opportunity.companies || [];
+      if (!updatedCompanies.includes(companyId)) {
+        updatedCompanies.push(companyId);
+      }
+
       const updatedOpportunity = await updateOpportunity(opportunity.uuid, {
-        companies: [...currentOpportunities, companyId],
+        companies: updatedCompanies,
       });
+      
       if (updatedOpportunity) {
         onOpportunityAdded(updatedOpportunity);
         toast.success(`${opportunity.name} lagt til som mulighet`);

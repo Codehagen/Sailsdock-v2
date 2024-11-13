@@ -57,8 +57,13 @@ export function PersonCombobox({
     setSelectedPerson(person);
     setOpen(false);
     try {
+      const updatedCompanies = person.companies || [];
+      if (!updatedCompanies.includes(companyId)) {
+        updatedCompanies.push(companyId);
+      }
+
       const updatedPerson = await updatePerson(person.uuid, {
-        companies: [...currentPeople, companyId], // Ensure companyId is included
+        companies: updatedCompanies,
       });
       if (updatedPerson) {
         onPersonAdded(updatedPerson);

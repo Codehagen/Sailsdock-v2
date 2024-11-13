@@ -6,7 +6,7 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function updateOpportunity(
   opportunityUuid: string,
-  opportunityData: { companies: number[] }
+  opportunityData: Partial<OpportunityData>
 ): Promise<OpportunityData | null> {
   const { userId } = await auth();
 
@@ -16,34 +16,32 @@ export async function updateOpportunity(
   }
 
   try {
-    // console.log(
-    //   `Sending update request for opportunity ${opportunityUuid}:`,
-    //   opportunityData
-    // );
+    // Ensure companies array contains valid numbers
+    if (opportunityData.companies) {
+      opportunityData.companies = opportunityData.companies
+        .filter(id => typeof id === 'number' && !isNaN(id))
+        .map(id => Number(id));
+    }
 
     const response = await apiClient.opportunities.update(
       opportunityUuid,
       opportunityData
     );
 
-    // console.log("Update opportunity response:", response);
-
     if (response.success && response.data.length > 0) {
       return response.data[0];
     } else {
-      console.error(
-        "Failed to update opportunity:",
-        response.status,
-        response.data
-      );
+      console.error("Failed to update opportunity:", response.status);
+      if (response.data) {
+        console.error("Error details:", JSON.stringify(response.data, null, 2));
+      }
       return null;
     }
   } catch (error: any) {
-    console.error(
-      "Error in updateOpportunity:",
-      error.message,
-      error.response?.data
-    );
+    console.error("Error in updateOpportunity:", error.message);
+    if (error.response?.data) {
+      console.error("API error details:", JSON.stringify(error.response.data, null, 2));
+    }
     return null;
   }
 }
