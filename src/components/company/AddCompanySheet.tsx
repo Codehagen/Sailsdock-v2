@@ -35,6 +35,7 @@ import {
   Home,
   Mail,
 } from "lucide-react";
+import { CompanySearch } from "./company-search";
 
 const companySchema = z.object({
   name: z.string().min(1, "Selskapsnavn er påkrevd"),
@@ -105,9 +106,20 @@ export function AddCompanySheet() {
         <SheetHeader>
           <SheetTitle>Legg til nytt selskap</SheetTitle>
           <SheetDescription>
-            Fyll ut informasjonen under for å legge til et nytt selskap.
+            Søk etter selskap eller fyll ut informasjonen manuelt.
           </SheetDescription>
         </SheetHeader>
+        <div className="py-4">
+          <CompanySearch
+            onSelect={(company) => {
+              form.setValue("name", company.label);
+              form.setValue("orgnr", company.value);
+              form.setValue("address_street", company.address);
+              form.setValue("address_city", company.city);
+              form.setValue("address_zip", company.postalCode);
+            }}
+          />
+        </div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

@@ -75,7 +75,7 @@ export function AddPersonSheet() {
         });
         form.reset(defaultValues);
         setIsOpen(false);
-        router.push(`/people/${result.id}`);
+        router.push(`/people/${result.uuid}`);
       }
     } catch (error) {
       toast.error("Kunne ikke opprette person", {
