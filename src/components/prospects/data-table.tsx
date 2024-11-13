@@ -30,7 +30,7 @@ import { useSearchParams } from "next/navigation"
 import { DataTablePagination } from "./data-table-pagination"
 import { FilterNaceGroup } from "./filters/filter-nace-group-button"
 import { Loader2 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, createContext, useContext } from "react"
 import { DataTableToolbar } from "./data-table-toolbar"
 
 interface DataTableProps<TData, TValue> {
@@ -42,6 +42,12 @@ interface DataTableProps<TData, TValue> {
   }
   page_size: string
 }
+
+const ProspectsTableContext = createContext<{
+  table: ReturnType<typeof useReactTable> | null;
+}>({ table: null });
+
+export const useProspectsTable = () => useContext(ProspectsTableContext);
 
 export function ProspectsTable<TData, TValue>({
   columns,
@@ -91,67 +97,69 @@ export function ProspectsTable<TData, TValue>({
   })
 
   return (
-    <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar setLoading={setLoading} table={table} />
-      <ScrollArea className="flex-grow rounded-md border relative">
-        {loading ? (
-          <div className="absolute z-50 inset-0 bg-muted/20 rounded-md">
-            <Loader2 className="animate-spin z-50 absolute size-8 top-1/2 left-1/2 text-muted-foreground" />
-          </div>
-        ) : null}
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="p-0.5 px-2 border w-min truncate overflow-hidden max-w-[380px]">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+    <ProspectsTableContext.Provider value={{ table }}>
+      <div className="space-y-4 h-full flex flex-col">
+        <DataTableToolbar setLoading={setLoading} table={table} />
+        <ScrollArea className="flex-grow rounded-md border relative">
+          {loading ? (
+            <div className="absolute z-50 inset-0 bg-muted/20 rounded-md">
+              <Loader2 className="animate-spin z-50 absolute size-8 top-1/2 left-1/2 text-muted-foreground" />
+            </div>
+          ) : null}
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center">
-                  Ingen resultater.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      <DataTablePagination
-        setLoading={setLoading}
-        pagination={serverPagination}
-        table={table}
-      />
-    </div>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="p-0.5 px-2 border w-min truncate overflow-hidden max-w-[380px]">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center">
+                    Ingen resultater.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        <DataTablePagination
+          setLoading={setLoading}
+          pagination={serverPagination}
+          table={table}
+        />
+      </div>
+    </ProspectsTableContext.Provider>
   )
 }

@@ -14,7 +14,7 @@ import { useCallback, useState } from "react"
 import { Button } from "../ui/button"
 import { byer, kommuner, NACE_nmbr_grp } from "./data"
 import { FilterDropdown } from "./filters/filter-dropdown"
-
+import { BulkAddCompanies } from "./bulk-add-companies"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -107,6 +107,7 @@ export function DataTableToolbar<TData>({
         </>
       </div>
       <div className="flex items-center space-x-2">
+        <BulkAddCompanies table={table} />
         <DataTableViewOptions table={table} />
       </div>
     </div>
