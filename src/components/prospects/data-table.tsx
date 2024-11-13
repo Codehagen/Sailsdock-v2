@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,7 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -23,24 +23,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { useSearchParams } from "next/navigation"
-import { DataTablePagination } from "./data-table-pagination"
-import { FilterNaceGroup } from "./filters/filter-nace-group-button"
-import { Loader2 } from "lucide-react"
-import { useEffect, useState, createContext, useContext } from "react"
-import { DataTableToolbar } from "./data-table-toolbar"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useSearchParams } from "next/navigation";
+import { DataTablePagination } from "./data-table-pagination";
+import { FilterNaceGroup } from "./filters/filter-nace-group-button";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState, createContext, useContext } from "react";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
   pagination: {
-    next: string | null
-    prev: string | null
-  }
-  page_size: string
+    next: string | null;
+    prev: string | null;
+  };
+  page_size: string;
 }
 
 const ProspectsTableContext = createContext<{
@@ -55,20 +55,19 @@ export function ProspectsTable<TData, TValue>({
   pagination: serverPagination,
   page_size,
 }: DataTableProps<TData, TValue>) {
-  const [totalCount, setTotalCount] = React.useState()
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [totalCount, setTotalCount] = React.useState();
+  const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [loading, setLoading] = useState(false)
+  );
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(false)
-  }, [data])
-  
+    setLoading(false);
+  }, [data]);
 
   const table = useReactTable({
     data,
@@ -80,8 +79,8 @@ export function ProspectsTable<TData, TValue>({
       columnFilters,
       pagination: {
         pageIndex: 0,
-        pageSize: page_size ? Number(page_size) : 10
-      }
+        pageSize: page_size ? Number(page_size) : 10,
+      },
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -94,7 +93,7 @@ export function ProspectsTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   return (
     <ProspectsTableContext.Provider value={{ table }}>
@@ -128,11 +127,13 @@ export function ProspectsTable<TData, TValue>({
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}>
+                    data-state={row.getIsSelected() && "selected"}
+                  >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="p-0.5 px-2 border w-min truncate overflow-hidden max-w-[380px]">
+                        className="p-0.5 px-2 border w-min truncate overflow-hidden max-w-[380px]"
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -145,7 +146,8 @@ export function ProspectsTable<TData, TValue>({
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center">
+                    className="h-24 text-center"
+                  >
                     Ingen resultater.
                   </TableCell>
                 </TableRow>
@@ -161,5 +163,5 @@ export function ProspectsTable<TData, TValue>({
         />
       </div>
     </ProspectsTableContext.Provider>
-  )
+  );
 }

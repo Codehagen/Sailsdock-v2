@@ -6,7 +6,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, FileText, Plus } from "lucide-react";
 
 import { fylker } from "./data";
 import { prospectSchema, prospectTableSchema } from "./types";
@@ -14,6 +14,13 @@ import { DataTableColumnHeader } from "../company/company-table/data-table-colum
 import { Checkbox } from "../ui/checkbox";
 import { createCompany } from "@/actions/company/create-companies";
 import { toast } from "sonner";
+
+function formatCompanyName(name: string) {
+  return name.split(' ').map((word, index) => {
+    if (word === 'AS' || word === 'ASA') return word;
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  }).join(' ');
+}
 
 export const columnProspects: ColumnDef<prospectTableSchema>[] = [
   {
@@ -46,9 +53,10 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
     ),
     cell: ({ row }) => {
       const name = row.getValue("name") as string;
+      const formattedName = formatCompanyName(name);
       return (
-        <span title={name} className="text-nowrap">
-          {name}
+        <span title={formattedName} className="text-nowrap">
+          {formattedName}
         </span>
       );
     },
@@ -159,19 +167,20 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
   {
     id: "actionButton",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Actions" />
+      <DataTableColumnHeader column={column} title="Handlinger" />
     ),
     cell: ({ row }) => (
       <div className="flex justify-center">
         <Link
-          href={`https://www.purehelp.no/m/company/account/${row.original.orgnr}`}
+          href={`https://www.proff.no/bransjesøk?q=${row.original.orgnr}`}
           target="_blank"
           passHref
         >
           <Button
             variant="ghost"
-            className="flex h-8 rounded-md px-4 py-2 text-xs w-full"
+            className="flex h-8 rounded-md px-4 py-2 text-xs w-full items-center"
           >
+            <FileText className="h-4 w-4 mr-1" />
             Regnskapstall
           </Button>
         </Link>
@@ -228,9 +237,16 @@ export const columnProspects: ColumnDef<prospectTableSchema>[] = [
             onClick={handleAddCompany}
             variant="ghost"
             disabled={isLoading}
-            className="w-full h-8 text-xs hover:text-primary"
+            className="w-full h-8 text-xs hover:text-primary flex items-center"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Add"}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-1" />
+                Legg til
+              </>
+            )}
           </Button>
         </div>
       );
