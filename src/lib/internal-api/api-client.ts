@@ -256,14 +256,13 @@ class ApiClient {
     updateCardPosition: (
       opportunityId: string,
       updateData: {
-        status: string;
-        position: number;
+        stage: string;
       }
     ) =>
       this.request<OpportunityData>(
         "patch",
-        `opportunities/${opportunityId}/position/`,
-        updateData
+        `opportunities/${opportunityId}/`,
+        { stage: updateData.stage }
       ),
 
     getBoardColumns: (workspaceId: string) =>
@@ -297,8 +296,7 @@ class ApiClient {
     bulkUpdate: (
       updates: Array<{
         id: string;
-        status: string;
-        position: number;
+        stage: string;
       }>
     ) =>
       this.request<OpportunityData[]>("patch", `kanban/cards/bulk/`, {

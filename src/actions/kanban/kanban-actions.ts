@@ -5,13 +5,12 @@ import { OpportunityData } from "@/lib/internal-api/types";
 import { getCurrentUser } from "@/actions/user/get-user-data";
 
 interface UpdatePositionData {
-  status: string;
-  position: number;
+  stage: string;
 }
 
 interface BulkUpdateData {
   id: string;
-  status: string;
+  stage: string;
   position: number;
 }
 
@@ -93,10 +92,9 @@ export async function updateCardPosition(
   updateData: UpdatePositionData
 ): Promise<OpportunityData | null> {
   try {
-    const response = await apiClient.kanban.updateCardPosition(
-      opportunityId,
-      updateData
-    );
+    const response = await apiClient.kanban.updateCardPosition(opportunityId, {
+      stage: updateData.stage,
+    });
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
@@ -113,8 +111,8 @@ export async function bulkUpdateCards(
 ): Promise<OpportunityData[] | null> {
   try {
     const response = await apiClient.kanban.bulkUpdate(updates);
-    if (response.success) {
-      return response.data;
+    if (response.success && response.data.length > 0) {
+      return response.data[0];
     }
     return null;
   } catch (error: any) {

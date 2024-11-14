@@ -22,6 +22,7 @@ import { TaskCard, Task } from "./TaskCard";
 import type { Column } from "./BoardColumn";
 import { hasDraggableData } from "./kanban-utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
+import { updateCardPosition } from "@/actions/kanban/kanban-actions";
 
 // Dynamically import DragOverlay to use it only on the client side
 const DynamicDragOverlay = dynamic(
@@ -58,6 +59,12 @@ const defaultCols: Column[] = [
 ];
 
 export type ColumnId = "todo" | "in-progress" | "done";
+
+const stageMap = {
+  todo: "Sendt tilbud",
+  "in-progress": "Følge opp",
+  done: "Vunnet",
+};
 
 export function KanbanBoard({ opportunities }: KanbanBoardProps) {
   // Update the initial state of columns
@@ -342,7 +349,7 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
     });
   }
 
-  function onDragOver(event: DragOverEvent) {
+  async function onDragOver(event: DragOverEvent) {
     const { active, over } = event;
     if (!over) return;
 
@@ -368,11 +375,19 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
         const overIndex = tasks.findIndex((t) => t.id === overId);
         const activeTask = tasks[activeIndex];
         const overTask = tasks[overIndex];
+
         if (
           activeTask &&
           overTask &&
           activeTask.columnId !== overTask.columnId
         ) {
+          // Get the new stage from the column ID
+          const newStage = stageMap[overTask.columnId as keyof typeof stageMap];
+
+          updateCardPosition(activeId as string, {
+            stage: newStage,
+          });
+
           activeTask.columnId = overTask.columnId;
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
@@ -388,8 +403,16 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
       setTasks((tasks) => {
         const activeIndex = tasks.findIndex((t) => t.id === activeId);
         const activeTask = tasks[activeIndex];
+
         if (activeTask) {
-          activeTask.columnId = overId as ColumnId;
+          const newColumnId = overId as ColumnId;
+          const newStage = stageMap[newColumnId];
+
+          updateCardPosition(activeId as string, {
+            stage: newStage,
+          });
+
+          activeTask.columnId = newColumnId;
           return arrayMove(tasks, activeIndex, activeIndex);
         }
         return tasks;
