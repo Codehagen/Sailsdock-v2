@@ -23,6 +23,7 @@ import type { Column } from "./BoardColumn";
 import { hasDraggableData } from "./kanban-utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import { updateCardPosition } from "@/actions/kanban/kanban-actions";
+import { Pencil } from "lucide-react";
 
 // Dynamically import DragOverlay to use it only on the client side
 const DynamicDragOverlay = dynamic(
@@ -51,27 +52,25 @@ interface KanbanBoardProps {
   opportunities: OpportunityData[];
 }
 
-// Update the defaultCols declaration
-const defaultCols: Column[] = [
-  { id: "todo", title: "Todo" },
-  { id: "in-progress", title: "In progress" },
-  { id: "done", title: "Done" },
-];
-
-export type ColumnId = "todo" | "in-progress" | "done";
-
-const stageMap = {
-  todo: "Sendt tilbud",
-  "in-progress": "Følge opp",
-  done: "Vunnet",
-};
+type ColumnId = string;
 
 export function KanbanBoard({ opportunities }: KanbanBoardProps) {
-  // Update the initial state of columns
-  const [columns, setColumns] = useState<Column[]>(() => [...defaultCols]);
+  // Create unique columns from the opportunities data
+  const [columns, setColumns] = useState<Column[]>(() => {
+    const uniqueStages = Array.from(
+      new Set(opportunities.map((opp) => opp.stage))
+    ).filter((stage): stage is string => Boolean(stage)); // Type guard to ensure non-null strings
+
+    return uniqueStages.map((stage) => ({
+      id: stage.toLowerCase().replace(/\s+/g, "-"),
+      title: stage,
+    }));
+  });
+
   const pickedUpTaskColumn = useRef<ColumnId | null>(null);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
+  // Initialize tasks with dynamic column IDs
   const initialTasks: Task[] = useMemo(() => {
     if (!Array.isArray(opportunities)) return [];
 
@@ -87,8 +86,8 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
           : "Unassigned",
       },
       arr: opp.value ? `${opp.value} NOK` : "N/A",
-      company: "", // Add company name if available in the opportunity data
-      pointOfContact: "", // Add point of contact if available in the opportunity data
+      company: "",
+      pointOfContact: "",
     }));
   }, [opportunities]);
 
@@ -241,6 +240,62 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
     });
   };
 
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const [newColumnTitle, setNewColumnTitle] = useState("");
+
+  const handleAddColumn = () => {
+    if (newColumnTitle.trim()) {
+      const newColumn: Column = {
+        id: newColumnTitle.toLowerCase().replace(/\s+/g, "-"),
+        title: newColumnTitle.trim(),
+      };
+
+      setColumns((prev) => [...prev, newColumn]);
+      setNewColumnTitle("");
+      setIsAddingColumn(false);
+    }
+  };
+
+  const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
+  const [editingColumnTitle, setEditingColumnTitle] = useState("");
+
+  const handleRenameColumn = (columnId: string) => {
+    if (editingColumnTitle.trim()) {
+      setColumns((prevColumns) =>
+        prevColumns.map((col) =>
+          col.id === columnId
+            ? {
+                ...col,
+                title: editingColumnTitle.trim(),
+                id: editingColumnTitle
+                  .trim()
+                  .toLowerCase()
+                  .replace(/\s+/g, "-"),
+              }
+            : col
+        )
+      );
+
+      // Update all tasks that were in the old column
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.columnId === columnId
+            ? {
+                ...task,
+                columnId: editingColumnTitle
+                  .trim()
+                  .toLowerCase()
+                  .replace(/\s+/g, "-"),
+              }
+            : task
+        )
+      );
+
+      setEditingColumnId(null);
+      setEditingColumnTitle("");
+    }
+  };
+
   return (
     <DndContext
       accessibility={{
@@ -258,7 +313,19 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
               key={col.id}
               column={col}
               tasks={tasks.filter((task) => task.columnId === col.id)}
-              onStatusChange={handleStatusChange} // Pass the onStatusChange prop
+              onStatusChange={handleStatusChange}
+              isEditing={editingColumnId === col.id}
+              editingTitle={editingColumnTitle}
+              onEditStart={(columnId, title) => {
+                setEditingColumnId(columnId);
+                setEditingColumnTitle(title);
+              }}
+              onEditChange={setEditingColumnTitle}
+              onEditComplete={handleRenameColumn}
+              onEditCancel={() => {
+                setEditingColumnId(null);
+                setEditingColumnTitle("");
+              }}
             >
               {tasks
                 .filter((task) => task.columnId === col.id)
@@ -271,6 +338,42 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
                 ))}
             </BoardColumn>
           ))}
+
+          <div className="flex-shrink-0 w-72 p-2">
+            {isAddingColumn ? (
+              <div className="bg-white p-2 rounded-lg shadow">
+                <input
+                  type="text"
+                  value={newColumnTitle}
+                  onChange={(e) => setNewColumnTitle(e.target.value)}
+                  placeholder="Enter column title"
+                  className="w-full p-2 border rounded mb-2"
+                  autoFocus
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => setIsAddingColumn(false)}
+                    className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAddColumn}
+                    className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsAddingColumn(true)}
+                className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
+              >
+                + Add Column
+              </button>
+            )}
+          </div>
         </SortableContext>
       </BoardContainer>
 
@@ -281,7 +384,19 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
               isOverlay
               column={activeColumn}
               tasks={tasks.filter((task) => task.columnId === activeColumn.id)}
-              onStatusChange={handleStatusChange} // Pass the onStatusChange prop
+              onStatusChange={handleStatusChange}
+              isEditing={editingColumnId === activeColumn.id}
+              editingTitle={editingColumnTitle}
+              onEditStart={(columnId, title) => {
+                setEditingColumnId(columnId);
+                setEditingColumnTitle(title);
+              }}
+              onEditChange={setEditingColumnTitle}
+              onEditComplete={handleRenameColumn}
+              onEditCancel={() => {
+                setEditingColumnId(null);
+                setEditingColumnTitle("");
+              }}
             >
               {tasks
                 .filter((task) => task.columnId === activeColumn.id)
@@ -381,17 +496,20 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
           overTask &&
           activeTask.columnId !== overTask.columnId
         ) {
-          // Get the new stage from the column ID
-          const newStage = stageMap[overTask.columnId as keyof typeof stageMap];
+          // Find the column to get the actual stage name
+          const targetColumn = columns.find(
+            (col) => col.id === overTask.columnId
+          );
 
-          updateCardPosition(activeId as string, {
-            stage: newStage,
-          });
+          if (targetColumn) {
+            updateCardPosition(activeId as string, {
+              stage: targetColumn.title, // Use the actual stage name
+            });
 
-          activeTask.columnId = overTask.columnId;
-          return arrayMove(tasks, activeIndex, overIndex - 1);
+            activeTask.columnId = overTask.columnId;
+            return arrayMove(tasks, activeIndex, overIndex - 1);
+          }
         }
-
         return arrayMove(tasks, activeIndex, overIndex);
       });
     }
@@ -405,33 +523,24 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
         const activeTask = tasks[activeIndex];
 
         if (activeTask) {
-          const newColumnId = overId as ColumnId;
-          const newStage = stageMap[newColumnId];
+          const targetColumn = columns.find((col) => col.id === overId);
 
-          updateCardPosition(activeId as string, {
-            stage: newStage,
-          });
+          if (targetColumn) {
+            updateCardPosition(activeId as string, {
+              stage: targetColumn.title, // Use the actual stage name
+            });
 
-          activeTask.columnId = newColumnId;
-          return arrayMove(tasks, activeIndex, activeIndex);
+            activeTask.columnId = overId as string;
+            return arrayMove(tasks, activeIndex, activeIndex);
+          }
         }
         return tasks;
       });
     }
   }
 
-  function getColumnIdFromStage(stage?: string): ColumnId {
-    if (!stage) return "todo"; // Default to "todo" if stage is undefined
-
-    switch (stage.toLowerCase()) {
-      case "sendt tilbud":
-        return "todo";
-      case "følge opp":
-        return "in-progress";
-      case "vunnet":
-        return "done";
-      default:
-        return "todo";
-    }
+  function getColumnIdFromStage(stage?: string): string {
+    if (!stage) return columns[0]?.id || "todo"; // Fallback to first column or 'todo'
+    return stage.toLowerCase().replace(/\s+/g, "-");
   }
 }
