@@ -240,27 +240,17 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
     });
   };
 
-  const [isAddingColumn, setIsAddingColumn] = useState(false);
-  const [newColumnTitle, setNewColumnTitle] = useState("");
-
-  const handleAddColumn = () => {
-    if (newColumnTitle.trim()) {
-      const newColumn: Column = {
-        id: newColumnTitle.toLowerCase().replace(/\s+/g, "-"),
-        title: newColumnTitle.trim(),
-      };
-
-      setColumns((prev) => [...prev, newColumn]);
-      setNewColumnTitle("");
-      setIsAddingColumn(false);
-    }
-  };
-
   const [editingColumnId, setEditingColumnId] = useState<string | null>(null);
   const [editingColumnTitle, setEditingColumnTitle] = useState("");
 
   const handleRenameColumn = (columnId: string) => {
     if (editingColumnTitle.trim()) {
+      console.log("Renaming column:", {
+        oldId: columnId,
+        newTitle: editingColumnTitle.trim(),
+        newId: editingColumnTitle.trim().toLowerCase().replace(/\s+/g, "-"),
+      });
+
       setColumns((prevColumns) =>
         prevColumns.map((col) =>
           col.id === columnId
@@ -338,42 +328,6 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
                 ))}
             </BoardColumn>
           ))}
-
-          <div className="flex-shrink-0 w-72 p-2">
-            {isAddingColumn ? (
-              <div className="bg-white p-2 rounded-lg shadow">
-                <input
-                  type="text"
-                  value={newColumnTitle}
-                  onChange={(e) => setNewColumnTitle(e.target.value)}
-                  placeholder="Enter column title"
-                  className="w-full p-2 border rounded mb-2"
-                  autoFocus
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setIsAddingColumn(false)}
-                    className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleAddColumn}
-                    className="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsAddingColumn(true)}
-                className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-600 transition-colors"
-              >
-                + Add Column
-              </button>
-            )}
-          </div>
         </SortableContext>
       </BoardContainer>
 
@@ -496,14 +450,20 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
           overTask &&
           activeTask.columnId !== overTask.columnId
         ) {
-          // Find the column to get the actual stage name
           const targetColumn = columns.find(
             (col) => col.id === overTask.columnId
           );
 
           if (targetColumn) {
+            console.log("Moving card:", {
+              cardId: activeId,
+              fromColumn: activeTask.columnId,
+              toColumn: targetColumn.title,
+              cardTitle: activeTask.title,
+            });
+
             updateCardPosition(activeId as string, {
-              stage: targetColumn.title, // Use the actual stage name
+              stage: targetColumn.title,
             });
 
             activeTask.columnId = overTask.columnId;
@@ -527,7 +487,7 @@ export function KanbanBoard({ opportunities }: KanbanBoardProps) {
 
           if (targetColumn) {
             updateCardPosition(activeId as string, {
-              stage: targetColumn.title, // Use the actual stage name
+              stage: targetColumn.title,
             });
 
             activeTask.columnId = overId as string;

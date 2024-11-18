@@ -92,16 +92,30 @@ export async function updateCardPosition(
   updateData: UpdatePositionData
 ): Promise<OpportunityData | null> {
   try {
-    const response = await apiClient.kanban.updateCardPosition(opportunityId, {
+    console.log("🎯 Updating opportunity stage:", {
+      opportunityId,
+      newStage: updateData.stage,
+    });
+
+    // Use the opportunities update endpoint to change the stage
+    const response = await apiClient.opportunities.update(opportunityId, {
       stage: updateData.stage,
+    });
+
+    console.log("📡 API Response:", {
+      success: response.success,
+      status: response.status,
+      data: response.data,
     });
 
     if (response.success && response.data.length > 0) {
       return response.data[0];
     }
+
+    console.log("❌ Failed to update stage:", response);
     return null;
   } catch (error: any) {
-    console.error("Error in updateCardPosition:", error.message);
+    console.error("💥 Error updating opportunity stage:", error.message);
     return null;
   }
 }
