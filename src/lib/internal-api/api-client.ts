@@ -245,6 +245,72 @@ class ApiClient {
     },
   };
 
+  // Update kanban section with full CRUD operations
+  kanban = {
+    getBoard: (workspaceId: string) =>
+      this.request<OpportunityData[]>(
+        "get",
+        `workspaces/${workspaceId}/kanban/`
+      ),
+
+    updateCardPosition: (
+      opportunityId: string,
+      updateData: {
+        stage: string;
+      }
+    ) =>
+      this.request<OpportunityData>(
+        "patch",
+        `opportunities/${opportunityId}/`,
+        { stage: updateData.stage }
+      ),
+
+    getBoardColumns: (workspaceId: string) =>
+      this.request<{ id: string; title: string }[]>(
+        "get",
+        `workspaces/${workspaceId}/kanban/columns/`
+      ),
+
+    // Add CRUD operations
+    create: (workspaceId: string, cardData: Partial<OpportunityData>) =>
+      this.request<OpportunityData>(
+        "post",
+        `workspaces/${workspaceId}/kanban/cards/`,
+        cardData
+      ),
+
+    update: (cardId: string, cardData: Partial<OpportunityData>) =>
+      this.request<OpportunityData>(
+        "patch",
+        `kanban/cards/${cardId}/`,
+        cardData
+      ),
+
+    delete: (cardId: string) =>
+      this.request<OpportunityData>("delete", `kanban/cards/${cardId}/`),
+
+    getCard: (cardId: string) =>
+      this.request<OpportunityData>("get", `kanban/cards/${cardId}/`),
+
+    // Add bulk operations
+    bulkUpdate: (
+      updates: Array<{
+        id: string;
+        stage: string;
+      }>
+    ) =>
+      this.request<OpportunityData[]>("patch", `kanban/cards/bulk/`, {
+        updates,
+      }),
+
+    reorderColumn: (columnId: string, cardIds: string[]) =>
+      this.request<{ success: boolean }>(
+        "patch",
+        `kanban/columns/${columnId}/reorder/`,
+        { cardIds }
+      ),
+  };
+
   // Add this new section for people
   people = {
     getAll: (workspaceId: string, pageSize?: number, page?: number) => {
