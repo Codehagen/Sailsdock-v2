@@ -69,6 +69,7 @@ class ApiClient {
           pagination: {
             next: response.data.next,
             prev: response.data.previous,
+            count: response.data.count,
           },
         }),
       };
