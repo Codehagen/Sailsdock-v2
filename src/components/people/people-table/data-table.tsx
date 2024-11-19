@@ -29,8 +29,8 @@ import { DataTablePagination } from "@/components/company/company-table/data-tab
 import { getAllPeople } from "@/actions/people/get-all-people";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Person } from "./types";
-import { DataTableToolbar } from "./data-table-toolbar"
-import { useSearchParams } from "next/navigation"
+import { DataTableToolbar } from "./data-table-toolbar";
+import { useSearchParams } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -43,45 +43,32 @@ export function PeopleTable<TData, TValue>({
   initialData,
   initialTotalCount,
 }: DataTableProps<TData, TValue>) {
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const defaultFilterValues = Object.entries(
     Object.fromEntries(searchParams)
-  ).map(([key, value]) => ({ id: key, value: value ? value.split(",") : "" }))
+  ).map(([key, value]) => ({ id: key, value: value ? value.split(",") : "" }));
+
   const [data, setData] = React.useState(initialData);
   const [totalCount, setTotalCount] = React.useState(initialTotalCount);
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    defaultFilterValues ?? []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
-    // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
-    React.useEffect(() => {
-      if (defaultFilterValues) {
-        setColumnFilters(defaultFilterValues)
-      }
-    }, [searchParams])
-    // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
-    
-
-  const updateData = React.useCallback(
-    (rowIndex: number, columnId: string, value: unknown) => {
-      setData((old) =>
-        old.map((row, index) => {
-          if (index === rowIndex) {
-            return {
-              ...old[rowIndex]!,
-              [columnId]: value,
-            };
-          }
-          return row;
-        })
-      );
-    },
-    []
-  );
+  // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
+  React.useEffect(() => {
+    if (defaultFilterValues) {
+      setColumnFilters(defaultFilterValues);
+    }
+  }, [searchParams]);
+  // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
 
   const table = useReactTable({
     data,
@@ -91,31 +78,45 @@ export function PeopleTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination,
     },
+    pageCount: Math.ceil(totalCount / pagination.pageSize),
+    manualPagination: true,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    pageCount: Math.ceil(totalCount / 10), // Assuming 10 items per page
     meta: {
-      updateData,
+      updateData: (rowIndex: number, columnId: string, value: unknown) => {
+        setData((old) =>
+          old.map((row, index) => {
+            if (index === rowIndex) {
+              return {
+                ...old[rowIndex]!,
+                [columnId]: value,
+              };
+            }
+            return row;
+          })
+        );
+      },
     },
   });
 
   React.useEffect(() => {
     async function fetchData() {
-      const pageIndex = table.getState().pagination.pageIndex;
-      const pageSize = table.getState().pagination.pageSize;
+      const { pageIndex, pageSize } = table.getState().pagination;
       const { data: newData, totalCount: newTotalCount } = await getAllPeople(
         pageSize,
-        pageIndex + 1
+        pageIndex + 1 // Add 1 because API uses 1-based pagination
       );
       if (newData) {
         setData(newData as TData[]);
