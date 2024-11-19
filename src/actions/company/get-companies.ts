@@ -20,11 +20,11 @@ export async function getCompanies(
 
     const companyId = currentUser.company_details.uuid;
     const response = await apiClient.company.getAll(companyId, pageSize, page);
+    console.log(response);
 
     if (response.success && Array.isArray(response.data)) {
-      // Assuming the API returns the total count in the response
-      // You might need to adjust this based on your actual API response structure
-      const totalCount = response.totalCount || response.data.length;
+      // Get total count from the pagination object
+      const totalCount = response.pagination?.count ?? response.data.length;
       return { data: response.data, totalCount };
     } else {
       console.error("Companies not found:", response.status);
