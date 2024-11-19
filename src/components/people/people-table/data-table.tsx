@@ -31,6 +31,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Person } from "./types";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -61,6 +62,7 @@ export function PeopleTable<TData, TValue>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [isLoading, setIsLoading] = React.useState(false);
 
   // !THIS USEEFFECT COMBINED WITH COLUMN.SETFILTERS IS UPDATING THE FILTERS TWICE - REMOVE IT AS SOON AS SERVER FILTERING IS ENABLED
   React.useEffect(() => {
@@ -113,14 +115,21 @@ export function PeopleTable<TData, TValue>({
 
   React.useEffect(() => {
     async function fetchData() {
-      const { pageIndex, pageSize } = table.getState().pagination;
-      const { data: newData, totalCount: newTotalCount } = await getAllPeople(
-        pageSize,
-        pageIndex + 1 // Add 1 because API uses 1-based pagination
-      );
-      if (newData) {
-        setData(newData as TData[]);
-        setTotalCount(newTotalCount);
+      setIsLoading(true);
+      try {
+        const { pageIndex, pageSize } = table.getState().pagination;
+        const { data: newData, totalCount: newTotalCount } = await getAllPeople(
+          pageSize,
+          pageIndex + 1
+        );
+        if (newData) {
+          setData(newData as TData[]);
+          setTotalCount(newTotalCount);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchData();
@@ -132,7 +141,17 @@ export function PeopleTable<TData, TValue>({
   return (
     <div className="space-y-4 h-full flex flex-col">
       <DataTableToolbar table={table} data={data} />
-      <ScrollArea className="flex-grow rounded-md border">
+      <ScrollArea className="flex-grow rounded-md border relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-50">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-sm text-muted-foreground">
+                Laster data...
+              </span>
+            </div>
+          </div>
+        )}
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -160,7 +179,7 @@ export function PeopleTable<TData, TValue>({
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className="p-0.5 px-2 border w-min"
+                      className="p-0.5 px-2 border w-min max-w-[300px]"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

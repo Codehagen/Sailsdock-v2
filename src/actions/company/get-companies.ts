@@ -20,7 +20,6 @@ export async function getCompanies(
 
     const companyId = currentUser.company_details.uuid;
     const response = await apiClient.company.getAll(companyId, pageSize, page);
-    console.log(response);
 
     if (response.success && Array.isArray(response.data)) {
       // Get total count from the pagination object

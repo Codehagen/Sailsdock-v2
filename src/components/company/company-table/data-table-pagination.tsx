@@ -30,11 +30,11 @@ export function DataTablePagination<TData>({
         table.options.pageCount! * table.getState().pagination.pageSize
           ? table.options.pageCount! * table.getState().pagination.pageSize
           : table.getPageCount() * table.getState().pagination.pageSize}{" "}
-        total records
+        totale rader
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Rows per page</p>
+          <p className="text-sm font-medium">Rader per side</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -54,7 +54,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
+          Side {table.getState().pagination.pageIndex + 1} av{" "}
           {table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">
