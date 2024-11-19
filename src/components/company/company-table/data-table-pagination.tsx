@@ -26,8 +26,11 @@ export function DataTablePagination<TData>({
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
         {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getPageCount() * table.getState().pagination.pageSize} total
-        records
+        {table.getPageCount() * table.getState().pagination.pageSize >
+        table.options.pageCount! * table.getState().pagination.pageSize
+          ? table.options.pageCount! * table.getState().pagination.pageSize
+          : table.getPageCount() * table.getState().pagination.pageSize}{" "}
+        total records
       </div>
       <div className="flex items-center space-x-6 lg:space-x-8">
         <div className="flex items-center space-x-2">

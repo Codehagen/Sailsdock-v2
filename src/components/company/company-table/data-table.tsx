@@ -149,6 +149,7 @@ export function CompanyTable<TData, TValue>({
       pagination,
     },
     pageCount: Math.ceil(totalCount / pagination.pageSize),
+    manualPagination: true,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
