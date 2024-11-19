@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   ApiResponse,
   UserData,
@@ -24,16 +24,20 @@ class ApiClient {
         "Content-Type": "application/json",
         "X-CITADEL-LOCK": process.env.FRONTEND_LOCK || "",
         "X-CITADEL-KEY": process.env.FRONTEND_KEY || "",
-        "X-CITADEL-ID": process.env.FRONTEND_ID || "",
         "Cache-Control": "no-cache",
       },
     });
 
     this.axiosInstance.interceptors.request.use(async (config) => {
       const { userId } = await auth();
-      if (!userId) {
+      const user = await currentUser();
+
+      if (!userId || !user) {
         throw new Error("Unauthorized");
       }
+
+      config.headers["X-CITADEL-ID"] = user.id;
+
       return config;
     });
 
