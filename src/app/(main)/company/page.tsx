@@ -27,7 +27,7 @@ export default async function CompanyPage() {
 }
 
 async function CompanyTableWrapper() {
-  const users = await getWorkspaceUsers()
+  const users = await getWorkspaceUsers(1000)
   const { data: companies, totalCount } = await getCompanies(10, 1);
 
   if (companies && companies.length > 0) {

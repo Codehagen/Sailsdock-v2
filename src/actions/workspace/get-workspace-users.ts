@@ -4,7 +4,7 @@ import { apiClient } from "@/lib/internal-api/api-client";
 import { WorkspaceData } from "@/lib/internal-api/types";
 import { getCurrentUser } from "@/actions/user/get-user-data";
 
-export async function getWorkspaceUsers(): Promise<WorkspaceData[] | null> {
+export async function getWorkspaceUsers(limit?: number): Promise<WorkspaceData[] | null> {
   try {
     const currentUser = await getCurrentUser();
 
@@ -16,7 +16,7 @@ export async function getWorkspaceUsers(): Promise<WorkspaceData[] | null> {
     }
 
     const workspaceId = currentUser.company_details.uuid;
-    const response = await apiClient.workspaces.getUsers(workspaceId);
+    const response = await apiClient.workspaces.getUsers(workspaceId, limit);
     // console.log("API response:", response);
 
     if (response.success && response.data) {

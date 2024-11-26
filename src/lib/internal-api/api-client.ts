@@ -125,7 +125,7 @@ class ApiClient {
   // prettier-ignore
   workspaces = {
     get: (workspaceId: string) => this.request<WorkspaceData>("get", `workspaces/${workspaceId}/`),
-    getUsers: (workspaceId: string) => this.request<UserData[]>("get", `workspaces/${workspaceId}/users/`),
+    getUsers: (workspaceId: string, limit?: number) => this.request<UserData[]>("get", `workspaces/${workspaceId}/users/?${limit ? `page_size=${limit}` : ""}`),
     create: (workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("post", "workspaces/", workspaceData),
     update: (workspaceId: string, workspaceData: Partial<WorkspaceData>) => this.request<WorkspaceData>("patch", `workspaces/${workspaceId}/`, workspaceData),
     delete: (workspaceId: string) => this.request<WorkspaceData>("delete", `workspaces/${workspaceId}/`),
