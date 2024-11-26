@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import {
   ApiResponse,
   UserData,
@@ -24,16 +24,20 @@ class ApiClient {
         "Content-Type": "application/json",
         "X-CITADEL-LOCK": process.env.FRONTEND_LOCK || "",
         "X-CITADEL-KEY": process.env.FRONTEND_KEY || "",
-        "X-CITADEL-ID": process.env.FRONTEND_ID || "",
         "Cache-Control": "no-cache",
       },
     });
 
     this.axiosInstance.interceptors.request.use(async (config) => {
       const { userId } = await auth();
-      if (!userId) {
+      const user = await currentUser();
+
+      if (!userId || !user) {
         throw new Error("Unauthorized");
       }
+
+      config.headers["X-CITADEL-ID"] = user.id;
+
       return config;
     });
 
@@ -69,6 +73,7 @@ class ApiClient {
           pagination: {
             next: response.data.next,
             prev: response.data.previous,
+            count: response.data.count,
           },
         }),
       };
@@ -243,6 +248,72 @@ class ApiClient {
           `opportunities/${opportunityId}/notes/${noteId}/`
         ),
     },
+  };
+
+  // Update kanban section with full CRUD operations
+  kanban = {
+    getBoard: (workspaceId: string) =>
+      this.request<OpportunityData[]>(
+        "get",
+        `workspaces/${workspaceId}/kanban/`
+      ),
+
+    updateCardPosition: (
+      opportunityId: string,
+      updateData: {
+        stage: string;
+      }
+    ) =>
+      this.request<OpportunityData>(
+        "patch",
+        `opportunities/${opportunityId}/`,
+        { stage: updateData.stage }
+      ),
+
+    getBoardColumns: (workspaceId: string) =>
+      this.request<{ id: string; title: string }[]>(
+        "get",
+        `workspaces/${workspaceId}/kanban/columns/`
+      ),
+
+    // Add CRUD operations
+    create: (workspaceId: string, cardData: Partial<OpportunityData>) =>
+      this.request<OpportunityData>(
+        "post",
+        `workspaces/${workspaceId}/kanban/cards/`,
+        cardData
+      ),
+
+    update: (cardId: string, cardData: Partial<OpportunityData>) =>
+      this.request<OpportunityData>(
+        "patch",
+        `kanban/cards/${cardId}/`,
+        cardData
+      ),
+
+    delete: (cardId: string) =>
+      this.request<OpportunityData>("delete", `kanban/cards/${cardId}/`),
+
+    getCard: (cardId: string) =>
+      this.request<OpportunityData>("get", `kanban/cards/${cardId}/`),
+
+    // Add bulk operations
+    bulkUpdate: (
+      updates: Array<{
+        id: string;
+        stage: string;
+      }>
+    ) =>
+      this.request<OpportunityData[]>("patch", `kanban/cards/bulk/`, {
+        updates,
+      }),
+
+    reorderColumn: (columnId: string, cardIds: string[]) =>
+      this.request<{ success: boolean }>(
+        "patch",
+        `kanban/columns/${columnId}/reorder/`,
+        { cardIds }
+      ),
   };
 
   // Add this new section for people

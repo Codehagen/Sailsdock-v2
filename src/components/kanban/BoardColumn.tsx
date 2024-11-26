@@ -1,7 +1,7 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { cva } from "class-variance-authority";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Pencil } from "lucide-react";
 
 export interface Column {
   id: string;
@@ -14,6 +14,12 @@ interface BoardColumnProps {
   isOverlay?: boolean;
   tasks: any[];
   onStatusChange: (taskId: string, newStatus: string) => void;
+  onEditStart?: (columnId: string, title: string) => void;
+  isEditing?: boolean;
+  editingTitle?: string;
+  onEditChange?: (value: string) => void;
+  onEditComplete?: (columnId: string) => void;
+  onEditCancel?: () => void;
 }
 
 export function BoardContainer({ children }: { children: React.ReactNode }) {
@@ -29,6 +35,12 @@ export function BoardColumn({
   children,
   isOverlay,
   tasks,
+  onEditStart,
+  isEditing,
+  editingTitle,
+  onEditChange,
+  onEditComplete,
+  onEditCancel,
 }: BoardColumnProps) {
   const {
     setNodeRef,
@@ -67,15 +79,40 @@ export function BoardColumn({
         dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
       })}
     >
-      <div
-        {...attributes}
-        {...listeners}
-        className="flex items-center justify-between p-4 bg-muted/60 rounded-t-lg"
-      >
-        <h3 className="text-sm font-medium">
-          {column.title} ({tasks.length})
-        </h3>
-        <GripVertical className="h-4 w-4 text-muted-foreground/50" />
+      <div className="flex items-center justify-between p-4 bg-muted/600 rounded-t-lg">
+        <div className="flex items-center gap-2 flex-1">
+          <GripVertical
+            className="h-4 w-4 text-muted-foreground/50 cursor-grab"
+            {...attributes}
+            {...listeners}
+          />
+          {isEditing ? (
+            <input
+              type="text"
+              value={editingTitle}
+              onChange={(e) => onEditChange?.(e.target.value)}
+              className="flex-1 px-2 py-1 text-sm border rounded bg-background"
+              autoFocus
+              onBlur={() => onEditComplete?.(column.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onEditComplete?.(column.id);
+                if (e.key === "Escape") onEditCancel?.();
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-between flex-1">
+              <span className="text-sm font-medium">
+                {column.title} ({tasks.length})
+              </span>
+              <button
+                onClick={() => onEditStart?.(column.id, column.title)}
+                className="p-1 text-gray-400 hover:text-gray-600"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-col flex-grow gap-2 p-2 overflow-y-auto">

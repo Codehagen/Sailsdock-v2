@@ -1,15 +1,15 @@
-import { siteConfig } from "@/lib/config";
-import { type ClassValue, clsx } from "clsx";
-import { Metadata } from "next";
-import { twMerge } from "tailwind-merge";
-import ms from "ms";
+import { siteConfig } from "@/lib/config"
+import { type ClassValue, clsx } from "clsx"
+import { Metadata } from "next"
+import { twMerge } from "tailwind-merge"
+import ms from "ms"
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 export function absoluteUrl(path: string) {
-  return `${process.env.NEXT_PUBLIC_APP_URL || siteConfig.url}${path}`;
+  return `${process.env.NEXT_PUBLIC_APP_URL || siteConfig.url}${path}`
 }
 
 export function constructMetadata({
@@ -18,10 +18,10 @@ export function constructMetadata({
   image = absoluteUrl("/og"),
   ...props
 }: {
-  title?: string;
-  description?: string;
-  image?: string;
-  [key: string]: Metadata[keyof Metadata];
+  title?: string
+  description?: string
+  image?: string
+  [key: string]: Metadata[keyof Metadata]
 }): Metadata {
   return {
     title: {
@@ -55,7 +55,7 @@ export function constructMetadata({
       },
     ],
     ...props,
-  };
+  }
 }
 
 export function nFormatter(
@@ -64,9 +64,9 @@ export function nFormatter(
     digits: 1,
   }
 ) {
-  if (!num) return "0";
+  if (!num) return "0"
   if (opts.full) {
-    return Intl.NumberFormat("en-US").format(num);
+    return Intl.NumberFormat("en-US").format(num)
   }
   const lookup = [
     { value: 1, symbol: "" },
@@ -76,23 +76,23 @@ export function nFormatter(
     { value: 1e12, symbol: "T" },
     { value: 1e15, symbol: "P" },
     { value: 1e18, symbol: "E" },
-  ];
-  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  ]
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/
   var item = lookup
     .slice()
     .reverse()
     .find(function (item) {
-      return num >= item.value;
-    });
+      return num >= item.value
+    })
   return item
     ? (num / item.value).toFixed(opts.digits).replace(rx, "$1") + item.symbol
-    : "0";
+    : "0"
 }
 
 export const truncate = (str: string | null, length: number) => {
-  if (!str || str.length <= length) return str;
-  return `${str.slice(0, length - 3)}...`;
-};
+  if (!str || str.length <= length) return str
+  return `${str.slice(0, length - 3)}...`
+}
 
 // export function formatDate(date: string) {
 //   let currentDate = new Date().getTime();
@@ -131,22 +131,22 @@ export const formatDate = (dateString: string) => {
     month: "long",
     year: "numeric",
     timeZone: "UTC",
-  });
-};
+  })
+}
 
 export const timeAgo = (
   timestamp: Date | null,
   {
     withAgo,
   }: {
-    withAgo?: boolean;
+    withAgo?: boolean
   } = {}
 ): string => {
-  if (!timestamp) return "Never";
-  const diff = Date.now() - new Date(timestamp).getTime();
+  if (!timestamp) return "Never"
+  const diff = Date.now() - new Date(timestamp).getTime()
   if (diff < 1000) {
     // less than 1 second
-    return "Just now";
+    return "Just now"
   } else if (diff > 82800000) {
     // more than 23 hours – similar to how Twitter displays timestamps
     return new Date(timestamp).toLocaleDateString("en-US", {
@@ -156,17 +156,17 @@ export const timeAgo = (
         new Date(timestamp).getFullYear() !== new Date().getFullYear()
           ? "numeric"
           : undefined,
-    });
+    })
   }
-  return `${ms(diff)}${withAgo ? " ago" : ""}`;
-};
+  return `${ms(diff)}${withAgo ? " ago" : ""}`
+}
 
 export function extractDomain(url: string): string {
   try {
-    const domain = new URL(url).hostname;
-    return domain.startsWith("www.") ? domain.slice(4) : domain;
+    const domain = new URL(url).hostname
+    return domain.startsWith("www.") ? domain.slice(4) : domain
   } catch {
-    return url;
+    return url
   }
 }
 
@@ -176,21 +176,30 @@ export function formatCurrency(amount: number): string {
     currency: "NOK",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount)
 }
 
 export function getBaseUrl() {
   if (typeof window !== "undefined") {
-    return ""; // Empty string for client-side, will use relative URLs
+    return "" // Empty string for client-side, will use relative URLs
   }
   // Server-side
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-  return "https://www.sailsdock.no";
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+  return "https://www.sailsdock.no"
 }
 
 export function getFullUrl(path: string) {
-  const baseUrl = getBaseUrl();
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  return `${baseUrl}${cleanPath}`;
+  const baseUrl = getBaseUrl()
+  const cleanPath = path.startsWith("/") ? path : `/${path}`
+  return `${baseUrl}${cleanPath}`
+}
+
+export function filterEmptySearchParams(params: any) {
+  if (!params) return
+  return Object.fromEntries(
+    Object.entries(params)
+      .filter(([_, value]) => value !== "" && value != null)
+      .map(([key, value]) => [key, String(value)])
+  )
 }
