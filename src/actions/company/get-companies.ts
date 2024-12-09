@@ -6,7 +6,8 @@ import { getCurrentUser } from "@/actions/user/get-user-data";
 
 export async function getCompanies(
   pageSize: number = 10,
-  page: number = 1
+  page: number = 1,
+  search?: string
 ): Promise<{ data: CompanyData[] | null; totalCount: number }> {
   try {
     const currentUser = await getCurrentUser();
@@ -19,16 +20,17 @@ export async function getCompanies(
     }
 
     const companyId = currentUser.company_details.uuid;
-    const response = await apiClient.company.getAll(companyId, pageSize, page);
+    const response = search
+      ? await apiClient.company.search(companyId, search, pageSize, page)
+      : await apiClient.company.getAll(companyId, pageSize, page);
 
     if (response.success && Array.isArray(response.data)) {
-      // Get total count from the pagination object
       const totalCount = response.pagination?.count ?? response.data.length;
       return { data: response.data, totalCount };
-    } else {
-      console.error("Companies not found:", response.status);
-      return { data: null, totalCount: 0 };
     }
+
+    console.error("Companies not found:", response.status);
+    return { data: null, totalCount: 0 };
   } catch (error: any) {
     console.error("Error in getCompanies:", error.message);
     return { data: null, totalCount: 0 };

@@ -158,6 +158,13 @@ class ApiClient {
     delete: (companyId: string) => this.request<CompanyData>("delete", `/companies/${companyId}`),
     getDetails: (companyId: string) => 
       this.request<CompanyData>("get", `/companies/${companyId}/details`),
+    search: (workspaceId: string, query: string, pageSize?: number, page?: number) => {
+      let url = `workspaces/${workspaceId}/companies/?name=${encodeURIComponent(query)}`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `&page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<CompanyData[]>("get", url);
+    },
 
      // prettier-ignore
     notes: {

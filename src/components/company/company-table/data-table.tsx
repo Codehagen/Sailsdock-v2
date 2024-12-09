@@ -39,6 +39,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useCallback } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -185,6 +186,30 @@ export function CompanyTable<TData, TValue>({
     },
   });
 
+  const handleSearch = useCallback(
+    async (query: string) => {
+      setIsLoading(true);
+      try {
+        const { pageIndex, pageSize } = table.getState().pagination;
+        const { data: newData, totalCount: newTotalCount } = await getCompanies(
+          pageSize,
+          pageIndex + 1,
+          query
+        );
+
+        if (newData) {
+          setData(newData as TData[]);
+          setTotalCount(newTotalCount);
+        }
+      } catch (error) {
+        console.error("Error searching companies:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [table.getState().pagination]
+  );
+
   React.useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -192,8 +217,10 @@ export function CompanyTable<TData, TValue>({
         const { pageIndex, pageSize } = table.getState().pagination;
         const { data: newData, totalCount: newTotalCount } = await getCompanies(
           pageSize,
-          pageIndex + 1
+          pageIndex + 1,
+          table.getColumn("name")?.getFilterValue() as string
         );
+
         if (newData) {
           setData(newData as TData[]);
           setTotalCount(newTotalCount);
@@ -212,7 +239,12 @@ export function CompanyTable<TData, TValue>({
 
   return (
     <div className="space-y-4 h-full flex flex-col">
-      <DataTableToolbar data={data} table={table} users={users} />
+      <DataTableToolbar
+        data={data}
+        table={table}
+        users={users}
+        onSearch={handleSearch}
+      />
       <ScrollArea className="flex-grow rounded-md border relative">
         {isLoading && (
           <div className="absolute inset-0 bg-background/50 flex items-center justify-center z-50">
