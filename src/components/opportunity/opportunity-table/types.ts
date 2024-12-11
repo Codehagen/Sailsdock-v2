@@ -13,9 +13,5 @@ export interface Opportunity {
     first_name: string;
     last_name: string;
   }>;
-  companies: Array<{
-    id: number;
-    name: string;
-    uuid: string;
-  }>;
+  companies: number[];
 }

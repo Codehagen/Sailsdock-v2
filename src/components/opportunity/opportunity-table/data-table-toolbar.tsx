@@ -14,11 +14,11 @@ import { useDebouncedCallback } from "use-debounce";
 
 // Define filter options
 const stageOptions = [
-  { label: "Ikke startet", value: "ikke-startet" },
-  { label: "Følge opp", value: "folge-opp" },
-  { label: "Forhandling", value: "forhandling" },
-  { label: "Vunnet", value: "vunnet" },
-  { label: "Tapt", value: "tapt" },
+  { label: "Ikke startet", value: "Ikke startet" },
+  { label: "Følge opp", value: "Følge opp" },
+  { label: "Forhandling", value: "Forhandling" },
+  { label: "Vunnet", value: "Vunnet" },
+  { label: "Tapt", value: "Tapt" },
 ];
 
 const statusOptions = [

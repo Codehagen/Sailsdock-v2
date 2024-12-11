@@ -33,11 +33,18 @@ export const columns: ColumnDef<Opportunity>[] = [
       <DataTableColumnHeader column={column} title="Stadium" />
     ),
     cell: ({ row }) => {
+      const stage = row.getValue("stage");
+      console.log("Stage value:", stage);
       return (
         <div className="text-sm">
-          <Badge variant="secondary">{row.getValue("stage")}</Badge>
+          <Badge variant="secondary">{stage}</Badge>
         </div>
       );
+    },
+    filterFn: (row, id, filterValue) => {
+      const stage = row.getValue(id) as string;
+      console.log("Filtering stage:", { stage, filterValue });
+      return filterValue.includes(stage);
     },
   },
   {

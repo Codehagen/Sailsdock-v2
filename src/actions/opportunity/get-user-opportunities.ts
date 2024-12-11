@@ -9,7 +9,7 @@ interface GetUserOpportunitiesResponse {
   totalCount: number;
   pagination: {
     next: string | null;
-    previous: string | null;
+    prev: string | null;
   };
 }
 
@@ -27,7 +27,7 @@ export async function getUserOpportunities(
         totalCount: 0,
         pagination: {
           next: null,
-          previous: null,
+          prev: null,
         },
       };
     }
@@ -44,7 +44,7 @@ export async function getUserOpportunities(
         totalCount: response.pagination?.count ?? response.data.length,
         pagination: {
           next: response.pagination?.next ?? null,
-          previous: response.pagination?.previous ?? null,
+          prev: response.pagination?.prev ?? null,
         },
       };
     } else {
@@ -54,7 +54,7 @@ export async function getUserOpportunities(
         totalCount: 0,
         pagination: {
           next: null,
-          previous: null,
+          prev: null,
         },
       };
     }
@@ -65,7 +65,7 @@ export async function getUserOpportunities(
       totalCount: 0,
       pagination: {
         next: null,
-        previous: null,
+        prev: null,
       },
     };
   }
