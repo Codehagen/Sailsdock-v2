@@ -218,6 +218,17 @@ class ApiClient {
         "get",
         `/opportunities/${opportunityId}/details`
       ),
+    getUserOpportunities: (
+      userId: string,
+      pageSize?: number,
+      page?: number
+    ) => {
+      let url = `users/${userId}/opportunities`;
+      if (pageSize !== undefined && page !== undefined) {
+        url += `?page_size=${pageSize}&page=${page}`;
+      }
+      return this.request<OpportunityData[]>("get", url);
+    },
 
     // You can add a notes section for opportunities if needed, similar to the company notes
     notes: {
