@@ -219,20 +219,21 @@ function SMSForm({
   loading: Function
   closeDialog: Function
 }) {
+  console.log(customer)
   const router = useRouter()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      sms: `Hei${
-        customer?.default_contact?.name
-          ? ' ' + customer?.default_contact?.name
+      sms: `Hei,${
+        customer?.name
+          ? ' ' + customer?.name
           : ''
-      },
+      }. Du mottar denne SMS-en for din tilknytning til ${customer?.companies?.[0]?.name ? customer?.companies?.[0]?.name : "<BEDRIFT>"}.
 
 Jeg har prøvd å komme i kontakt med deg, fint om du kan ringe meg tilbake når anledningen passer.
 
 Mvh
-${user.first_name + ' ' + user.last_name}${user.role ? '\n' + user.role : ''}
+${user.first_name + ' ' + user.last_name}${user.title ? '\n' + user.title : ''}
 ${user.company_details.name}
         `,
     },
@@ -245,12 +246,11 @@ ${user.company_details.name}
       customer?.phone ? customer?.phone : '',
       data.sms,
       user?.phone ? user.phone : '',
-      false //true = testing, no sms is sent / false = testing off, functionality is live.
+      false // true = testing, no sms is sent /// false = testing off, functionality is live.
     )
 
     //Check for errors from SMS provider before countinuing
     if (response.errors) {
-      //Sum Ting Wong
       toast.error('Feilmelding:', {
         description: (
           <>
